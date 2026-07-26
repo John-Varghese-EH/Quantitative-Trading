@@ -1,0 +1,66 @@
+# Core
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+python-multipart==0.0.9
+pydantic==2.6.1
+pydantic-settings==2.2.1
+
+# Database
+sqlalchemy==2.0.27
+alembic==1.13.1
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.2
+
+# HTTP
+httpx==0.26.0
+aiohttp==3.9.3
+
+# Machine Learning
+scikit-learn==1.4.0
+xgboost==2.0.3
+numpy==1.26.4
+pandas==2.2.0
+pandas-ta==0.3.14b0
+scipy==1.12.0
+
+# Deep Learning
+tensorflow==2.15.0
+torch==2.2.0
+torchvision==0.17.0
+
+# Explainable AI
+shap==0.44.1
+
+# Financial Data
+yfinance==0.2.36
+alpha-vantage==2.3.1
+
+# Visualization
+plotly==5.19.0
+matplotlib==3.8.2
+seaborn==0.13.2
+
+# Utilities
+loguru==0.7.2
+python-dotenv==1.0.1
+joblib==1.3.2
+email-validator==2.1.0
+Jinja2==3.1.3
+aiofiles==23.2.1
+
+# Testing
+pytest==8.0.0
+pytest-asyncio==0.23.5
+pytest-cov==4.1.0
+httpx==0.26.0
+
+# PDF Export
+reportlab==4.1.0
+
+# Cache
+cachetools==5.3.2

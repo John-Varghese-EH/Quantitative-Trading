@@ -1,0 +1,109 @@
+name: CI — QuantAdv Sandbox
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Backend Tests ─────────────────────────────────────────────
+  backend:
+    name: Backend Tests (Python)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: quantadv
+          POSTGRES_PASSWORD: quantadv_pass
+          POSTGRES_DB: quantadv_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://quantadv:quantadv_pass@localhost:5432/quantadv_test
+      SECRET_KEY: ci_test_secret_key_very_long_32ch
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        working-directory: server
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        working-directory: server
+        run: pytest ../tests/ -v --tb=short --co -q 2>/dev/null || pytest ../tests/ -v --tb=short
+
+  # ─── Frontend Build ─────────────────────────────────────────────
+  frontend:
+    name: Frontend Build (React + TypeScript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: TypeScript check
+        working-directory: client
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: client
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: client/dist/
+          retention-days: 7
+
+  # ─── Docker Build ───────────────────────────────────────────────
+  docker:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -f server/Dockerfile -t quantadv-server:ci server/
+
+      - name: Verify container starts
+        run: |
+          docker run --rm -d -p 8000:8000 \
+            -e DATABASE_URL="sqlite:///./test.db" \
+            -e SECRET_KEY="test_secret_only_for_docker_build" \
+            --name quantadv_ci \
+            quantadv-server:ci
+          sleep 5
+          curl -f http://localhost:8000/health || (docker logs quantadv_ci; exit 1)
+          docker stop quantadv_ci

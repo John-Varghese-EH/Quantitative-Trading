@@ -1,0 +1,90 @@
+version: '3.9'
+
+services:
+  # ─── PostgreSQL Database ────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: quantadv_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-quantadv}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-quantadv_password}
+      POSTGRES_DB: ${POSTGRES_DB:-quantadv}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-quantadv}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── pgAdmin (DB GUI) ────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: quantadv_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@quantadv.io
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  # ─── FastAPI Backend ─────────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: quantadv_server
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-quantadv}:${POSTGRES_PASSWORD:-quantadv_password}@postgres:5432/${POSTGRES_DB:-quantadv}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173}
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY:-}
+      - BINANCE_API_KEY=${BINANCE_API_KEY:-}
+      - MOCK_EMAIL=${MOCK_EMAIL:-true}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@quantadv.io}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin@123456}
+    volumes:
+      - ./models:/app/models
+      - ./datasets:/app/datasets
+      - ./server:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # ─── React Frontend ──────────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: quantadv_client
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: quantadv_network
