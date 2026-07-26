@@ -1,13 +1,19 @@
-# QuantAdv
+<p align="center">
+  <img src="client/public/favicon.svg" alt="QuantAdv Logo" width="100" />
+</p>
 
-![QuantAdv Dashboard Preview](/home/j0x/.gemini/antigravity/brain/afb61490-e068-438f-a305-6966c0a5fbbc/quantadv_dashboard_preview_1785052502252.png)
+<h1 align="center">QuantAdv</h1>
 
-A production-quality full-stack sandbox combining quantitative finance, adversarial machine learning, explainable AI, and real-time analytics.
+<p align="center">
+  A production-quality full-stack sandbox combining quantitative finance, adversarial machine learning, explainable AI, and real-time analytics.
+</p>
 
-![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
-![Python](https://img.shields.io/badge/python-3.11+-green.svg)
-![Next.js](https://img.shields.io/badge/next.js-15+-black.svg)
-![FastAPI](https://img.shields.io/badge/fastapi-0.110+-teal.svg)
+<p align="center">
+  <img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License" />
+  <img src="https://img.shields.io/badge/python-3.11+-green.svg" alt="Python" />
+  <img src="https://img.shields.io/badge/next.js-15+-black.svg" alt="Next.js" />
+  <img src="https://img.shields.io/badge/fastapi-0.110+-teal.svg" alt="FastAPI" />
+</p>
 
 ## Overview
 

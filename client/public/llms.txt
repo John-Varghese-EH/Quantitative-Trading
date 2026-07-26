@@ -1,0 +1,23 @@
+# QuantAdv
+Institutional-Grade Algorithmic Sandbox
+
+## About Us
+QuantAdv is a secure, simulated market environment designed for testing and deploying quantitative trading strategies against adversarial machine learning attacks. We provide researchers, quant developers, and institutions with the tools to train models, execute strategies, and evaluate their robustness against various data perturbations.
+
+## Features
+- **Trading Simulator**: Backtest strategies including Mean Reversion, Momentum, and custom algorithms.
+- **AI Prediction Models**: Utilize Linear Regression, Random Forest, XGBoost, LSTM, and Transformer networks for market prediction.
+- **Adversarial Testing**: Evaluate model resilience using FGSM, PGD, data poisoning, and label flipping techniques.
+- **Defensive Mechanisms**: Implement adversarial training, defensive distillation, and outlier detection.
+- **Explainable AI (XAI)**: Understand model decisions with SHAP values and feature importance analysis.
+- **Real-Time Analytics**: Monitor portfolio growth, risk metrics, and live market data.
+
+## License
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+
+## Official Links
+- Home: https://quantadv.io
+- Registration: https://quantadv.io/register
+- Documentation: https://quantadv.io/docs
+- Terms of Service: https://quantadv.io/terms
+- Privacy Policy: https://quantadv.io/privacy
