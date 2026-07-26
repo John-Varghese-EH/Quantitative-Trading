@@ -7,6 +7,19 @@ const nextConfig = {
         destination: 'http://localhost:8000/api/:path*' // Proxy to Backend
       }
     ];
+  },
+  headers: async () => {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+        ],
+      },
+    ];
   }
 };
 

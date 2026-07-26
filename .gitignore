@@ -163,6 +163,9 @@ server/models_store/
 server/.env
 client/.env
 
+# Firebase Service Account Key
+server/serviceAccountKey.json
+
 # ─── Deployment & Docker ───────────────────────────────────────────────────────
 .dockerignore
 .vercel/

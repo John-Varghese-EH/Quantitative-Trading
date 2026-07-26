@@ -2,25 +2,23 @@
 
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
-  const user = useAppStore((s) => s.user);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !user) {
       router.replace('/login');
-    } else if (pathname.startsWith('/admin') && user?.role !== 'admin') {
-      router.replace('/dashboard');
-    }
-  }, [isAuthenticated, router, pathname, user]);
+    } 
+    // Add any role based routing here later if needed, e.g. checking user document from firestore
+  }, [user, loading, router, pathname]);
 
-  if (!isAuthenticated) return null;
+  if (loading || !user) return null;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)' }}>
