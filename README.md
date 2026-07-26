@@ -1,104 +1,71 @@
-# ⚡ QuantAdv — Quantitative Trading Adversarial ML Sandbox
+# QuantAdv
 
-> A production-quality full-stack sandbox combining quantitative finance, adversarial machine learning, explainable AI, and real-time analytics.
+A production-quality full-stack sandbox combining quantitative finance, adversarial machine learning, explainable AI, and real-time analytics.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.11+-green.svg)
 ![React](https://img.shields.io/badge/react-18+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.110+-teal.svg)
 
----
+## Overview
 
-## 🚀 Quick Start (Docker)
+QuantAdv is an advanced sandbox environment designed for testing and deploying quantitative trading strategies against adversarial machine learning attacks. It provides a secure, simulated market environment where you can train models, execute strategies, and evaluate their robustness against various data perturbations.
 
-```bash
-# 1. Clone and enter directory
-git clone <repo-url>
-cd quantadv-sandbox
+## Architecture
 
-# 2. Copy environment variables
-cp .env.example .env
-# Edit .env and add your API keys (optional)
+The system is built on a modern, scalable stack:
 
-# 3. Start all services
-docker-compose up --build
+- **Client**: React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, and Plotly.js.
+- **Server**: FastAPI, Python 3.11, and a robust ML stack (scikit-learn, XGBoost, PyTorch, TensorFlow).
+- **Database**: PostgreSQL 15 for reliable data persistence.
+- **Infrastructure**: Containerized with Docker for consistent deployment across environments.
 
-# 4. Open browser
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8000/docs
-# pgAdmin: http://localhost:5050
-```
+## Core Features
 
----
+- **Trading Simulator**: Backtest strategies including Mean Reversion, Momentum, and custom models.
+- **AI Prediction Models**: Leverage Linear Regression, Random Forest, XGBoost, LSTM, and Transformer networks.
+- **Adversarial Testing**: Evaluate model resilience using FGSM, PGD, data poisoning, and label flipping.
+- **Defensive Mechanisms**: Implement adversarial training, defensive distillation, and outlier detection.
+- **Explainable AI (XAI)**: Understand model decisions with SHAP values and feature importance analysis.
+- **Real-Time Analytics**: Monitor portfolio growth, risk metrics, and market data through interactive dashboards.
 
-## 🏗️ Architecture
+## Quick Start (Docker)
 
-```
-QuantAdv-Sandbox/
-├── client/          → React 18 + TypeScript + Vite + Tailwind CSS
-├── server/          → FastAPI + Python 3.11 + ML stack
-├── models/          → Saved ML model artifacts (.pkl, .h5, .pt)
-├── datasets/        → Sample financial data (CSV/Parquet)
-├── notebooks/       → Jupyter EDA notebooks
-├── tests/           → Unit + integration tests
-└── docker-compose.yml
-```
+To run the application locally using Docker:
 
----
+1. Clone the repository and navigate to the project directory:
+   ```bash
+   git clone <repo-url>
+   cd quantadv-sandbox
+   ```
 
-## ✨ Features
+2. Configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Add your API keys to the `.env` file if necessary.
 
-| Module | Description |
-|--------|-------------|
-| 🔐 **Authentication** | JWT login/register, email verification, role-based access |
-| 📊 **Dashboard** | Animated stat cards, live price ticker, portfolio overview |
-| 📈 **Market Data** | Candlestick charts, RSI, MACD, Bollinger Bands via yfinance |
-| 🤖 **AI Prediction** | Linear Regression, Random Forest, XGBoost, LSTM, Transformer |
-| 💹 **Trading Simulator** | Backtest 5 strategies — Buy & Hold, MA Crossover, Momentum, etc. |
-| ⚔️ **Adversarial Attacks** | FGSM, PGD, Data Poisoning, Label Flipping, Feature Manipulation |
-| 🛡️ **Defenses** | Adversarial Training, Outlier Detection, Defensive Distillation |
-| 🧪 **Sandbox** | Risk-free environment — train, attack, defend, reset |
-| 📉 **Analytics** | Plotly dashboards — model accuracy, portfolio growth, risk |
-| 🔍 **Explainable AI** | SHAP values, feature importance, buy/sell reasoning |
-| 👑 **Admin Panel** | User management, system logs, model registry |
-| 🔔 **Notifications** | Real-time alerts for prices, attacks, trade events |
+3. Start all services:
+   ```bash
+   docker-compose up --build
+   ```
 
----
+4. Access the applications:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000/docs
+   - DB Management (pgAdmin): http://localhost:5050
 
-## 🛠️ Tech Stack
+## Deployment Readiness
 
-**Frontend**: React 18, TypeScript, Vite, Tailwind CSS v3, Framer Motion, Recharts, Plotly.js, React Router v6, Zustand, React Query
+While the current Docker configuration is optimized for development (using `npm run dev` and Uvicorn with hot-reload), the application can be easily adapted for production:
 
-**Backend**: FastAPI, SQLAlchemy, Alembic, python-jose (JWT), bcrypt, loguru
+1. **Frontend**: The React client can be built statically (`npm run build`) and deployed to Vercel, Netlify, or served via Nginx.
+2. **Backend**: The FastAPI server should be run using Gunicorn with Uvicorn workers for production workloads.
+3. **Database**: Managed PostgreSQL instances (e.g., AWS RDS, Supabase) are recommended for production environments.
 
-**Machine Learning**: scikit-learn, XGBoost, TensorFlow/Keras (LSTM), PyTorch (Transformer), SHAP, pandas, numpy, yfinance, pandas-ta
+## Testing
 
-**Database**: PostgreSQL 15
-
-**Infrastructure**: Docker, Docker Compose, GitHub Actions
-
----
-
-## 📁 Environment Variables
-
-See `.env.example` for all required variables. Key ones:
-
-```env
-SECRET_KEY=your-super-secret-key
-DATABASE_URL=postgresql://user:password@localhost:5432/quantadv
-ALPHA_VANTAGE_API_KEY=optional
-BINANCE_API_KEY=optional
-```
-
----
-
-## 📖 API Documentation
-
-Visit `http://localhost:8000/docs` for interactive Swagger UI after starting the backend.
-
----
-
-## 🧪 Running Tests
+Execute the test suites to ensure system integrity:
 
 ```bash
 # Backend tests
@@ -110,8 +77,6 @@ cd client
 npm run test
 ```
 
----
+## License
 
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
