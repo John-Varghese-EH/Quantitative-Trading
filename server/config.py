@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # ── Database ─────────────────────────────────────────────────────
-    DATABASE_URL: str = "postgresql://quantadv:quantadv_password@localhost:5432/quantadv"
+    # ── Database (Firebase) ──────────────────────────────────────────
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = "serviceAccountKey.json"
+    FIREBASE_PROJECT_ID: str = ""
 
     # ── CORS ─────────────────────────────────────────────────────────────
     ALLOWED_ORIGINS_STR: str = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"

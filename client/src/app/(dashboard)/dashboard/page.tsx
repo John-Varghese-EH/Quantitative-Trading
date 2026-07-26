@@ -9,8 +9,11 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 import api from '@/services/api'
 
 const CARD_VARIANTS = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08 } }),
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: (i: number) => ({ 
+    opacity: 1, y: 0, scale: 1, 
+    transition: { delay: i * 0.08, type: 'spring' as const, stiffness: 120, damping: 14 } 
+  }),
 }
 
 interface StatCard {
@@ -78,6 +81,11 @@ export default function DashboardPage() {
     queryFn: () => api.get('/news/feed').then(r => r.data.articles),
   })
 
+  const { data: holdings } = useQuery({
+    queryKey: ['portfolio-holdings'],
+    queryFn: () => api.get('/dashboard/portfolio').then(r => r.data.holdings).catch(() => []),
+  })
+
   const CARDS: StatCard[] = stats ? [
     {
       label: 'Portfolio Value', value: `$${stats.portfolio_value?.toLocaleString() ?? '—'}`,
@@ -143,8 +151,8 @@ export default function DashboardPage() {
             <AreaChart data={portfolio?.history || []}>
               <defs>
                 <linearGradient id="portfolioGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00d4ff" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#00d4ff" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#00e1ff" stopOpacity={0.6} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -180,22 +188,58 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* News Feed */}
-      <div className="glass" style={{ padding: 24 }}>
-        <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>📰 Market News & Sentiment</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
-          {(news || []).slice(0, 6).map((article: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
-              className="glass-light" style={{ padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>{article.source}</span>
-                <span className={`badge ${article.impact === 'bullish' ? 'badge-success' : 'badge-danger'}`}>
-                  {article.impact}
-                </span>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: 1.5 }}>{article.title}</p>
-            </motion.div>
-          ))}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        {/* Portfolio Holdings */}
+        <div className="glass" style={{ padding: 24 }}>
+          <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>💼 Active Holdings</h3>
+          {(!holdings || holdings.length === 0) ? (
+            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--color-muted)' }}>No active holdings</div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Shares</th>
+                    <th>Avg Price</th>
+                    <th>Current Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {holdings.map((h: any, i: number) => (
+                    <motion.tr key={h.symbol} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                      <td style={{ fontWeight: 700 }}>{h.symbol}</td>
+                      <td>{h.shares}</td>
+                      <td>${h.avg_price?.toFixed(2)}</td>
+                      <td style={{ color: h.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                        ${(h.shares * h.current_price)?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* News Feed */}
+        <div className="glass" style={{ padding: 24 }}>
+          <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>📰 Market News & Sentiment</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {(news || []).slice(0, 5).map((article: any, i: number) => (
+              <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.01, x: 4 }}
+                className="glass-light" style={{ padding: 14, cursor: 'pointer' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>{article.source}</span>
+                  <span className={`badge ${article.impact === 'bullish' ? 'badge-success' : 'badge-danger'}`}>
+                    {article.impact}
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: 1.5 }}>{article.title}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

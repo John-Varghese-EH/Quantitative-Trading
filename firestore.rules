@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidString(str, maxLength) {
+      return str is string && str.size() <= maxLength;
+    }
+
+    // Validate a generic trade object
+    function isValidTrade() {
+      let data = request.resource.data;
+      return isValidString(data.symbol, 10) &&
+             isValidString(data.side, 5) &&
+             isValidString(data.strategy, 50) &&
+             (data.status == 'open' || data.status == 'closed') &&
+             (data.entry_price is number) &&
+             (data.quantity is number);
+    }
+    
+    function isTradeUpdateValid() {
+      // Allow closing a trade or updating profit loss, but don't let them corrupt the symbol or side
+      let diff = request.resource.data.diff(resource.data);
+      // Ensure they aren't changing the original entry parameters on an update
+      return diff.affectedKeys().hasOnly(['status', 'exit_price', 'profit_loss', 'roi_percent', 'closed_at']) &&
+             isValidTrade();
+    }
+
+    // USERS COLLECTION
+    match /users/{userId} {
+      
+      // Allow users to read and create their own root profile
+      allow read, create: if isOwner(userId);
+      // Prevent users from granting themselves admin roles or bypassing size limits
+      allow update: if isOwner(userId) &&
+                    (!request.resource.data.keys().hasAny(['isAdmin', 'role'])) &&
+                    (request.resource.data.email is string && request.resource.data.email.size() < 100);
+
+      // TRADES SUBCOLLECTION
+      match /trades/{tradeId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTrade();
+        allow update: if isOwner(userId) && isTradeUpdateValid();
+        allow delete: if isOwner(userId);
+      }
+      
+      // MODELS SUBCOLLECTION
+      match /models/{modelId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && 
+                              isValidString(request.resource.data.type, 50) &&
+                              (request.resource.data.status in ['training', 'ready', 'failed']);
+      }
+      
+      // ATTACKS SUBCOLLECTION
+      match /attacks/{attackId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidString(request.resource.data.attack_type, 50);
+      }
+      
+      // BACKTESTS SUBCOLLECTION
+      match /backtests/{backtestId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && (request.resource.data.total_return is number);
+      }
+    }
+    
+    // Deny access to everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

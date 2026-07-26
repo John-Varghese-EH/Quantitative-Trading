@@ -1,12 +1,11 @@
-"""Adversarial attacks API router."""
+"""Adversarial attacks API router (Firestore)."""
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
-from database.session import get_db
-from database.models import User, AttackLog, AttackType, MLModel
+from database.firestore import get_db
 from auth.dependencies import get_current_user
 from ml.trainer import load_model
 from ml.feature_engineering import engineer_features, FEATURE_COLUMNS
@@ -18,16 +17,14 @@ from attacks.attacks import (
 
 router = APIRouter()
 
-
 class AttackRequest(BaseModel):
     model_id: str
     attack_type: str
     symbol: str
     params: dict = {}
 
-
 @router.get("/types")
-def list_attack_types(current_user: User = Depends(get_current_user)):
+def list_attack_types(current_user: dict = Depends(get_current_user)):
     return {
         "attacks": [
             {"id": "fgsm", "name": "FGSM", "description": "Fast Gradient Sign Method — minimal perturbation", "category": "gradient"},
@@ -39,26 +36,27 @@ def list_attack_types(current_user: User = Depends(get_current_user)):
         ]
     }
 
-
 @router.post("/simulate")
 def simulate_attack(
     body: AttackRequest,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_db),
 ):
-    """Simulate an adversarial attack on a trained model."""
-    ml_model = db.query(MLModel).filter(
-        MLModel.id == body.model_id,
-        MLModel.user_id == current_user.id,
-    ).first()
-    if not ml_model or ml_model.status != "ready":
+    uid = current_user.get("id")
+    ml_model_doc = db.collection("users").document(uid).collection("models").document(body.model_id).get()
+    
+    if not ml_model_doc.exists:
+        raise HTTPException(status_code=404, detail="Model not found")
+        
+    ml_model = ml_model_doc.to_dict()
+    if ml_model.get("status") != "ready":
         raise HTTPException(status_code=400, detail="Model not ready for attack")
 
     artifact = load_model(body.model_id)
     if not artifact:
         raise HTTPException(status_code=404, detail="Model artifact not found")
 
-    # Prepare data
+    from datetime import timedelta
     end = datetime.now().strftime("%Y-%m-%d")
     start = (datetime.now() - timedelta(days=300)).strftime("%Y-%m-%d")
     df = _fetch_yfinance(body.symbol, start, end)
@@ -71,11 +69,9 @@ def simulate_attack(
     attack_type = body.attack_type
     params = body.params
 
-    # Get original predictions
     orig_probs = model.predict_proba(X)[:, 1]
     orig_preds = (orig_probs >= 0.5).astype(int)
 
-    # Run attack
     X_adv = X.copy()
     meta = {}
 
@@ -88,22 +84,18 @@ def simulate_attack(
     elif attack_type == "noise_injection":
         X_adv, meta = noise_injection_attack(X, params.get("noise_type", "gaussian"), params.get("scale", 0.1))
     elif attack_type in ("data_poisoning", "label_flipping"):
-        # These attack training data — simulate impact by adding heavy noise
         X_adv, meta = noise_injection_attack(X, "gaussian", params.get("rate", 0.2))
         meta["attack"] = attack_type
     else:
         raise HTTPException(status_code=422, detail=f"Unknown attack: {attack_type}")
 
-    # Get adversarial predictions
     adv_probs = model.predict_proba(X_adv)[:, 1]
     adv_preds = (adv_probs >= 0.5).astype(int)
 
-    # Compute attack metrics
     n_flipped = int(np.sum(orig_preds != adv_preds))
     success_rate = round(n_flipped / len(orig_preds) * 100, 2)
     confidence_drop = round(float(np.mean(np.abs(orig_probs - adv_probs))) * 100, 2)
 
-    # Sample comparison (last 20 points)
     comparison = []
     for i in range(min(20, len(X))):
         comparison.append({
@@ -115,20 +107,22 @@ def simulate_attack(
             "flipped": bool(orig_preds[-20 + i] != adv_preds[-20 + i]),
         })
 
-    # Log attack
-    log = AttackLog(
-        user_id=current_user.id,
-        model_id=ml_model.id,
-        attack_type=attack_type,
-        parameters={**params, **meta},
-        original_prediction={"predictions": orig_preds[-5:].tolist(), "avg_confidence": round(float(np.mean(orig_probs)), 4)},
-        adversarial_prediction={"predictions": adv_preds[-5:].tolist(), "avg_confidence": round(float(np.mean(adv_probs)), 4)},
-        attack_success=success_rate > 10,
-        success_rate=success_rate,
-        confidence_drop=confidence_drop,
-    )
-    db.add(log)
-    db.commit()
+    log_id = str(uuid.uuid4())
+    log_data = {
+        "id": log_id,
+        "user_id": uid,
+        "model_id": body.model_id,
+        "attack_type": attack_type,
+        "parameters": {**params, **meta},
+        "original_prediction": {"predictions": orig_preds[-5:].tolist(), "avg_confidence": round(float(np.mean(orig_probs)), 4)},
+        "adversarial_prediction": {"predictions": adv_preds[-5:].tolist(), "avg_confidence": round(float(np.mean(adv_probs)), 4)},
+        "attack_success": success_rate > 10,
+        "success_rate": success_rate,
+        "confidence_drop": confidence_drop,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    
+    db.collection("users").document(uid).collection("attacks").document(log_id).set(log_data)
 
     return {
         "attack_type": attack_type,
@@ -142,25 +136,25 @@ def simulate_attack(
         "adversarial_avg_confidence": round(float(np.mean(adv_probs)) * 100, 2),
         "comparison": comparison,
         "metadata": meta,
-        "log_id": str(log.id),
+        "log_id": log_id,
     }
-
 
 @router.get("/history")
 def get_attack_history(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_db),
 ):
-    logs = db.query(AttackLog).filter(
-        AttackLog.user_id == current_user.id
-    ).order_by(AttackLog.created_at.desc()).limit(50).all()
-    return {"history": [
-        {
-            "id": str(l.id),
-            "attack_type": l.attack_type.value,
-            "success_rate": l.success_rate,
-            "confidence_drop": l.confidence_drop,
-            "created_at": l.created_at.isoformat() if l.created_at else None,
-        }
-        for l in logs
-    ]}
+    uid = current_user.get("id")
+    docs = db.collection("users").document(uid).collection("attacks").order_by("created_at", direction="DESCENDING").limit(50).stream()
+    
+    history = []
+    for doc in docs:
+        l = doc.to_dict()
+        history.append({
+            "id": l.get("id"),
+            "attack_type": l.get("attack_type"),
+            "success_rate": l.get("success_rate"),
+            "confidence_drop": l.get("confidence_drop"),
+            "created_at": l.get("created_at"),
+        })
+    return {"history": history}

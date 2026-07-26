@@ -1,0 +1,19 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "anonymous": false,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "QuantAdv",
+        "supportEmail": "support@example.com",
+        "authorizedRedirectUris": [
+          "http://localhost"
+        ]
+      }
+    }
+  }
+}

@@ -1,56 +1,112 @@
-"""News and sentiment feed (NewsAPI-ready, mock fallback)."""
-import random
-from datetime import datetime, timedelta
+"""News and sentiment feed (Real Yahoo Finance RSS)."""
+from datetime import datetime, timezone
+import feedparser
+from textblob import TextBlob
 from fastapi import APIRouter, Depends, Query
 from auth.dependencies import get_current_user
-from database.models import User
 
 router = APIRouter()
 
-MOCK_NEWS = [
-    {"title": "Fed signals rate cut may come sooner than expected", "sentiment": "positive", "source": "Reuters", "impact": "bullish"},
-    {"title": "Tech stocks rally as AI spending continues to surge", "sentiment": "positive", "source": "Bloomberg", "impact": "bullish"},
-    {"title": "Bitcoin ETF sees record inflows in Q1 2024", "sentiment": "positive", "source": "CoinDesk", "impact": "bullish"},
-    {"title": "Inflation data comes in hotter than expected", "sentiment": "negative", "source": "WSJ", "impact": "bearish"},
-    {"title": "NVDA beats earnings estimates by 30% on AI demand", "sentiment": "positive", "source": "CNBC", "impact": "bullish"},
-    {"title": "Oil prices surge amid Middle East tensions", "sentiment": "negative", "source": "Reuters", "impact": "bearish"},
-    {"title": "S&P 500 hits new all-time high", "sentiment": "positive", "source": "MarketWatch", "impact": "bullish"},
-    {"title": "Credit card delinquencies rise to decade high", "sentiment": "negative", "source": "FT", "impact": "bearish"},
-    {"title": "Apple announces $110B share buyback program", "sentiment": "positive", "source": "Bloomberg", "impact": "bullish"},
-    {"title": "China manufacturing PMI falls below 50", "sentiment": "negative", "source": "Reuters", "impact": "bearish"},
-]
-
+def fetch_yahoo_finance_news(symbol=None):
+    if symbol:
+        url = f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={symbol}&region=US&lang=en-US"
+    else:
+        # General market news (S&P 500 as proxy)
+        url = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC&region=US&lang=en-US"
+        
+    feed = feedparser.parse(url)
+    articles = []
+    
+    for entry in feed.entries[:10]:
+        title = entry.title
+        link = entry.link
+        published = entry.get("published", datetime.now(timezone.utc).isoformat())
+        
+        # Simple sentiment analysis using TextBlob
+        blob = TextBlob(title)
+        polarity = blob.sentiment.polarity  # -1 to 1
+        
+        if polarity > 0.1:
+            sentiment_label = "positive"
+            impact = "bullish"
+        elif polarity < -0.1:
+            sentiment_label = "negative"
+            impact = "bearish"
+        else:
+            sentiment_label = "neutral"
+            impact = "neutral"
+            
+        articles.append({
+            "title": title,
+            "sentiment": sentiment_label,
+            "source": "Yahoo Finance",
+            "impact": impact,
+            "sentiment_score": round(polarity, 3),
+            "published_at": published,
+            "url": link,
+        })
+        
+    return articles
 
 @router.get("/feed")
 def get_news_feed(
     symbol: str = Query(default=None),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
-    """Return latest news articles with sentiment scores."""
-    news = []
-    for i, item in enumerate(MOCK_NEWS):
-        hours_ago = random.randint(1, 48)
-        score = random.uniform(0.3, 0.95) * (1 if item["sentiment"] == "positive" else -1)
-        news.append({
-            **item,
-            "sentiment_score": round(score, 3),
-            "published_at": (datetime.now() - timedelta(hours=hours_ago)).isoformat(),
-            "url": f"https://example.com/news/{i}",
-        })
-    random.shuffle(news)
-    return {"articles": news[:8], "overall_sentiment": "bullish"}
-
+    """Return latest news articles with real sentiment scores."""
+    try:
+        articles = fetch_yahoo_finance_news(symbol)
+        overall_score = sum([a["sentiment_score"] for a in articles]) / (len(articles) or 1)
+        
+        return {
+            "articles": articles,
+            "overall_sentiment": "bullish" if overall_score > 0 else "bearish" if overall_score < 0 else "neutral"
+        }
+    except Exception as e:
+        return {"articles": [], "overall_sentiment": "neutral", "error": str(e)}
 
 @router.get("/sentiment")
-def get_market_sentiment(current_user: User = Depends(get_current_user)):
+def get_market_sentiment(current_user: dict = Depends(get_current_user)):
     """Return aggregated market sentiment indicators."""
-    return {
-        "fear_greed_index": random.randint(40, 75),
-        "fear_greed_label": "Greed",
-        "bullish_pct": round(random.uniform(50, 70), 1),
-        "bearish_pct": round(random.uniform(20, 35), 1),
-        "neutral_pct": round(random.uniform(5, 20), 1),
-        "twitter_sentiment": round(random.uniform(0.1, 0.7), 3),
-        "reddit_sentiment": round(random.uniform(0.0, 0.6), 3),
-        "updated_at": datetime.now().isoformat(),
-    }
+    # We will fetch general news and aggregate the sentiment
+    try:
+        articles = fetch_yahoo_finance_news()
+        scores = [a["sentiment_score"] for a in articles]
+        avg_score = sum(scores) / (len(scores) or 1)
+        
+        # Map avg_score (-1 to 1) to Fear/Greed Index (0 to 100)
+        fg_index = int(((avg_score + 1) / 2) * 100)
+        
+        if fg_index > 75: label = "Extreme Greed"
+        elif fg_index > 55: label = "Greed"
+        elif fg_index < 25: label = "Extreme Fear"
+        elif fg_index < 45: label = "Fear"
+        else: label = "Neutral"
+        
+        bullish = sum(1 for s in scores if s > 0.1)
+        bearish = sum(1 for s in scores if s < -0.1)
+        neutral = len(scores) - bullish - bearish
+        
+        total = len(scores) or 1
+        
+        return {
+            "fear_greed_index": fg_index,
+            "fear_greed_label": label,
+            "bullish_pct": round((bullish / total) * 100, 1),
+            "bearish_pct": round((bearish / total) * 100, 1),
+            "neutral_pct": round((neutral / total) * 100, 1),
+            "twitter_sentiment": round(avg_score, 3), # Mocking social using news as proxy
+            "reddit_sentiment": round(avg_score * 0.9, 3),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as e:
+        return {
+            "fear_greed_index": 50,
+            "fear_greed_label": "Neutral",
+            "bullish_pct": 33.3,
+            "bearish_pct": 33.3,
+            "neutral_pct": 33.3,
+            "twitter_sentiment": 0,
+            "reddit_sentiment": 0,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }

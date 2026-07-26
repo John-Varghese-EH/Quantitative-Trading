@@ -8,11 +8,11 @@ import pandas as pd
 import numpy as np
 
 from fastapi import APIRouter, Depends, Query, HTTPException
-from sqlalchemy.orm import Session
 
-from database.session import get_db
+
+
 from auth.dependencies import get_current_user
-from database.models import User
+
 from utils.cache import cache_get, cache_set
 from utils.logger import logger
 
@@ -81,7 +81,7 @@ def get_ohlcv(
     start: str = Query(default=None),
     end: str = Query(default=None),
     interval: str = Query(default="1d", description="1d, 1wk, 1mo, 1h"),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Fetch OHLCV candlestick data with technical indicators."""
     if not end:
@@ -112,7 +112,7 @@ def get_ohlcv(
 @router.get("/quote")
 def get_quote(
     symbol: str = Query(...),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Get latest quote for a symbol."""
     try:
@@ -145,35 +145,44 @@ def get_quote(
 @router.get("/search")
 def search_symbols(
     q: str = Query(..., min_length=1),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
-    """Search for ticker symbols (static list + yfinance validation)."""
-    # Common symbols list for quick search
-    popular = [
-        {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock"},
-        {"symbol": "GOOGL", "name": "Alphabet Inc.", "type": "stock"},
-        {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock"},
-        {"symbol": "TSLA", "name": "Tesla Inc.", "type": "stock"},
-        {"symbol": "NVDA", "name": "NVIDIA Corporation", "type": "stock"},
-        {"symbol": "AMZN", "name": "Amazon.com Inc.", "type": "stock"},
-        {"symbol": "META", "name": "Meta Platforms Inc.", "type": "stock"},
-        {"symbol": "SPY", "name": "S&P 500 ETF", "type": "etf"},
-        {"symbol": "QQQ", "name": "Nasdaq-100 ETF", "type": "etf"},
-        {"symbol": "BTC-USD", "name": "Bitcoin USD", "type": "crypto"},
-        {"symbol": "ETH-USD", "name": "Ethereum USD", "type": "crypto"},
-        {"symbol": "SOL-USD", "name": "Solana USD", "type": "crypto"},
-        {"symbol": "EURUSD=X", "name": "EUR/USD Forex", "type": "forex"},
-        {"symbol": "GBPUSD=X", "name": "GBP/USD Forex", "type": "forex"},
-    ]
-    q_upper = q.upper()
-    results = [s for s in popular if q_upper in s["symbol"] or q_upper in s["name"].upper()]
-    return {"results": results[:10]}
+    """Search for ticker symbols using Yahoo Finance."""
+    import requests
+    try:
+        url = f"https://query2.finance.yahoo.com/v1/finance/search?q={q}"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        
+        results = []
+        for quote in data.get('quotes', []):
+            if 'symbol' in quote and 'shortname' in quote:
+                results.append({
+                    "symbol": quote['symbol'],
+                    "name": quote['shortname'],
+                    "type": quote.get('quoteType', 'UNKNOWN').lower(),
+                    "exchange": quote.get('exchange', 'UNKNOWN')
+                })
+        
+        return {"results": results[:10]}
+    except Exception as e:
+        logger.error(f"Search API error: {e}")
+        # Fallback to popular if API fails
+        popular = [
+            {"symbol": "AAPL", "name": "Apple Inc.", "type": "stock", "exchange": "NMS"},
+            {"symbol": "MSFT", "name": "Microsoft Corporation", "type": "stock", "exchange": "NMS"},
+        ]
+        q_upper = q.upper()
+        results = [s for s in popular if q_upper in s["symbol"] or q_upper in s["name"].upper()]
+        return {"results": results[:10]}
 
 
 @router.get("/live-prices")
 def get_live_prices(
     symbols: str = Query(default="AAPL,MSFT,GOOGL,TSLA,BTC-USD"),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Get current prices for multiple symbols (ticker bar)."""
     import yfinance as yf
@@ -203,7 +212,7 @@ def get_indicators(
     symbol: str,
     start: str = Query(default=None),
     end: str = Query(default=None),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Fetch pre-computed technical indicators for a symbol."""
     if not end:

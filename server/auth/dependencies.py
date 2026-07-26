@@ -1,48 +1,63 @@
-"""FastAPI dependencies for authentication and authorization."""
+"""FastAPI dependencies for authentication and authorization using Firebase."""
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from firebase_admin import auth
+from database.firestore import get_db
 
-from database.session import get_db
-from database.models import User, UserRole
-from auth.service import decode_token
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
+security = HTTPBearer()
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
-) -> User:
+    cred: HTTPAuthorizationCredentials = Depends(security),
+    db = Depends(get_db),
+):
+    """Verify Firebase ID token and return user profile from Firestore."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    payload = decode_token(token)
-    if payload is None or payload.get("type") != "access":
+    
+    try:
+        token = cred.credentials
+        decoded_token = auth.verify_id_token(token)
+        uid = decoded_token.get("uid")
+    except Exception as e:
         raise credentials_exception
 
-    user_id: str = payload.get("sub")
-    if user_id is None:
+    # Fetch user data from Firestore
+    user_ref = db.collection("users").document(uid)
+    user_doc = user_ref.get()
+    
+    if not user_doc.exists:
+        # Auto-create user if they don't exist in Firestore but have a valid Firebase Auth token
+        user_data = {
+            "id": uid,
+            "email": decoded_token.get("email"),
+            "username": decoded_token.get("email", "").split("@")[0] if decoded_token.get("email") else "user",
+            "role": "user",
+            "is_active": True,
+            "is_verified": decoded_token.get("email_verified", False),
+        }
+        user_ref.set(user_data)
+        return user_data
+
+    user_data = user_doc.to_dict()
+    user_data["id"] = uid
+    
+    if not user_data.get("is_active", True):
         raise credentials_exception
+        
+    return user_data
 
-    user = db.query(User).filter(User.id == user_id).first()
-    if user is None or not user.is_active:
-        raise credentials_exception
-    return user
-
-
-def require_admin(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role != UserRole.ADMIN:
+def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
+    if current_user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",
         )
     return current_user
 
-
-def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
-    if not current_user.is_active:
+def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
+    if not current_user.get("is_active", True):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

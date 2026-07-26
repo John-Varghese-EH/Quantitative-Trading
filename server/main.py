@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import settings
-from database.session import create_tables
+from database.firestore import init_firebase
 from utils.logger import logger
 
 # Routers
@@ -27,8 +27,8 @@ from defenses.router import router as defenses_router
 async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown events."""
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    create_tables()
-    logger.info("✅ Database tables created/verified")
+    # Firebase is initialized on import via database.firestore
+    logger.info("✅ Firebase Admin SDK ready")
     yield
     logger.info("👋 Shutting down QuantAdv Sandbox")
 

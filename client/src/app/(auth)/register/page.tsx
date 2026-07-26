@@ -1,105 +1,187 @@
 "use client";
-import { useState } from 'react'
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
-import { motion } from 'framer-motion'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Zap, Eye, EyeOff } from 'lucide-react'
-import api from '@/services/api'
-import toast from 'react-hot-toast'
+import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Activity, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import toast from 'react-hot-toast';
+import { useTheme } from 'next-themes';
 
 const schema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.string().email('Invalid email format'),
   username: z.string().min(3, 'At least 3 characters'),
   password: z.string().min(8, 'At least 8 characters'),
-  full_name: z.string().optional(),
-})
-type FormData = z.infer<typeof schema>
+  full_name: z.string().min(1, 'Full name is required'),
+});
+type FormData = z.infer<typeof schema>;
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { register: authRegister } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await api.post('/auth/register', data)
-      toast.success('Account created! Check your email to verify.')
-      router.push('/login')
+      await authRegister(data.email, data.password);
+      toast.success('Account created!');
+      router.push('/dashboard');
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || 'Registration failed')
+      toast.error(err.message || 'Registration failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div style={{
-      minHeight: '100vh', background: 'var(--color-bg)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
-      backgroundImage: `radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
-                        radial-gradient(ellipse at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%)`,
-    }}>
-      <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 460 }}>
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{
-            width: 56, height: 56, margin: '0 auto 14px',
-            background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
-            borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 30px rgba(0,212,255,0.4)',
-          }}>
-            <Zap size={28} color="#fff" />
+    <div className={`min-h-screen flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-500 ${isDark ? 'bg-[#000000]' : 'bg-[#fafafa]'}`}>
+      {/* Background Effects */}
+      {isDark ? (
+        <>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
+        </>
+      ) : (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-black/5 rounded-full blur-[120px] pointer-events-none" />
+      )}
+
+      {/* Back to Home */}
+      <NextLink href="/" className={`absolute top-8 left-8 sm:top-12 sm:left-12 flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? 'text-zinc-500 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
+        <ArrowLeft size={16} />
+        Home
+      </NextLink>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-[440px] relative z-10"
+      >
+        <div className="text-center mb-10 mt-8">
+          <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center shadow-2xl transition-colors ${isDark ? 'bg-white text-black shadow-white/10' : 'bg-black text-white shadow-black/10'}`}>
+            <Activity size={32} strokeWidth={2.5} />
           </div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }} className="gradient-text">QuantAdv</h1>
-          <p style={{ color: 'var(--color-muted)', margin: '4px 0 0' }}>Create your sandbox account</p>
+          <h1 className={`text-3xl font-bold tracking-tight mb-2 ${isDark ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'var(--font-heading)' }}>
+            Create an account
+          </h1>
+          <p className={`${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            Start building institutional-grade strategies
+          </p>
         </div>
 
-        <div className="glass" style={{ padding: 32 }}>
-          <h2 style={{ margin: '0 0 24px', fontWeight: 700 }}>Create Account</h2>
-          <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className={`p-8 sm:p-10 rounded-3xl border shadow-xl backdrop-blur-xl ${isDark ? 'bg-white/[0.03] border-white/10 shadow-black/50' : 'bg-white/70 border-black/5 shadow-black/5'}`}>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Full Name</label>
-              <input {...register('full_name')} className="input-field" placeholder="John Doe" />
-            </div>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Email</label>
-              <input {...register('email')} type="email" className="input-field" placeholder="you@example.com" />
-              {errors.email && <span style={{ color: 'var(--color-danger)', fontSize: '0.8rem' }}>{errors.email.message}</span>}
-            </div>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Username</label>
-              <input {...register('username')} className="input-field" placeholder="tradingquant" />
-              {errors.username && <span style={{ color: 'var(--color-danger)', fontSize: '0.8rem' }}>{errors.username.message}</span>}
-            </div>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Password</label>
-              <div style={{ position: 'relative' }}>
-                <input {...register('password')} type={showPassword ? 'text' : 'password'} className="input-field" placeholder="Min 8 characters" style={{ paddingRight: 44 }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)' }}>
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              {errors.password && <span style={{ color: 'var(--color-danger)', fontSize: '0.8rem' }}>{errors.password.message}</span>}
+              <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Full Name
+              </label>
+              <input 
+                {...register('full_name')} 
+                type="text"
+                className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all ${
+                  isDark 
+                    ? 'bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:border-white/30 focus:bg-white/5' 
+                    : 'bg-white border-black/10 text-black placeholder:text-zinc-400 focus:border-black/30 focus:bg-black/5'
+                }`}
+                placeholder="John Doe" 
+              />
+              {errors.full_name && <span className="text-red-500 text-xs mt-1 block">{errors.full_name.message}</span>}
             </div>
 
-            <motion.button type="submit" className="btn-primary" disabled={loading}
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              style={{ padding: '14px', fontSize: '1rem', marginTop: 8, opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Creating account…' : 'Create Account'}
+            <div>
+              <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Email Address
+              </label>
+              <input 
+                {...register('email')} 
+                type="email"
+                className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all ${
+                  isDark 
+                    ? 'bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:border-white/30 focus:bg-white/5' 
+                    : 'bg-white border-black/10 text-black placeholder:text-zinc-400 focus:border-black/30 focus:bg-black/5'
+                }`}
+                placeholder="you@example.com" 
+              />
+              {errors.email && <span className="text-red-500 text-xs mt-1 block">{errors.email.message}</span>}
+            </div>
+
+            <div>
+              <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Username
+              </label>
+              <input 
+                {...register('username')} 
+                type="text"
+                className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all ${
+                  isDark 
+                    ? 'bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:border-white/30 focus:bg-white/5' 
+                    : 'bg-white border-black/10 text-black placeholder:text-zinc-400 focus:border-black/30 focus:bg-black/5'
+                }`}
+                placeholder="tradingquant" 
+              />
+              {errors.username && <span className="text-red-500 text-xs mt-1 block">{errors.username.message}</span>}
+            </div>
+
+            <div>
+              <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  className={`w-full px-4 py-2.5 pr-12 rounded-xl border outline-none transition-all ${
+                    isDark 
+                      ? 'bg-black/50 border-white/10 text-white placeholder:text-zinc-600 focus:border-white/30 focus:bg-white/5' 
+                      : 'bg-white border-black/10 text-black placeholder:text-zinc-400 focus:border-black/30 focus:bg-black/5'
+                  }`}
+                  placeholder="Min 8 characters"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)} 
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-600'}`}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && <span className="text-red-500 text-xs mt-1 block">{errors.password.message}</span>}
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`w-full py-3.5 mt-4 rounded-xl font-semibold text-sm transition-all ${
+                isDark 
+                  ? 'bg-white text-black hover:bg-zinc-200 disabled:bg-white/50' 
+                  : 'bg-black text-white hover:bg-zinc-800 disabled:bg-black/50'
+              }`}
+            >
+              {loading ? 'Creating account...' : 'Create Account'}
             </motion.button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-            Already have an account?{' '}
-            <NextLink href="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign in</NextLink>
+          <div className="mt-8 pt-6 border-t border-zinc-500/10 text-center">
+            <p className={`text-sm ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              Already have an account?{' '}
+              <NextLink href="/login" className={`font-semibold transition-colors ${isDark ? 'text-white hover:text-zinc-300' : 'text-black hover:text-zinc-700'}`}>
+                Sign in
+              </NextLink>
+            </p>
           </div>
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

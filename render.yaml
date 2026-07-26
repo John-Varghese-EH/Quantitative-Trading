@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: quantadv-backend
+    env: python
+    buildCommand: "cd server && pip install -r requirements.txt"
+    startCommand: "cd server && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: ALLOWED_ORIGINS_STR
+        sync: false
