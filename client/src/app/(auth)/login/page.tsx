@@ -150,12 +150,6 @@ export default function LoginPage() {
               </NextLink>
             </p>
           </div>
-          
-          <div className={`mt-6 p-4 rounded-xl text-center text-xs border ${isDark ? 'bg-white/5 border-white/10 text-zinc-400' : 'bg-black/5 border-black/10 text-zinc-600'}`}>
-            <span className="opacity-70">Demo credentials: </span>
-            <span className={`font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>admin@quantadv.io</span> / <span className={`font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>Admin@123456</span>
-          </div>
-        </div>
       </motion.div>
     </div>
   );
