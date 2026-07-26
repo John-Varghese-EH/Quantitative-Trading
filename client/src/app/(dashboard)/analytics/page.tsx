@@ -1,7 +1,8 @@
+"use client";
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 
 const COLORS = ['#00d4ff', '#7c3aed', '#10b981', '#f59e0b', '#f97316', '#ef4444']
 
@@ -106,7 +107,7 @@ export default function AnalyticsPage() {
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={attackDist} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                <Pie data={attackDist} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`} labelLine={false}>
                   {attackDist.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: '#0d1429', border: 'none', borderRadius: 6, fontSize: '0.75rem' }} />

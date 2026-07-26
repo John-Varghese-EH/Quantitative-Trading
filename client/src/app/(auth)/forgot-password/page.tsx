@@ -1,8 +1,9 @@
+"use client";
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import NextLink from 'next/link'
 import { motion } from 'framer-motion'
 import { Zap, ArrowLeft } from 'lucide-react'
-import api from '../../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 export default function ForgotPasswordPage() {
@@ -49,15 +50,15 @@ export default function ForgotPasswordPage() {
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-field" placeholder="you@example.com" required />
               </div>
               <motion.button type="submit" className="btn-primary" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ padding: '13px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Sending…' : 'Send Reset Link'}
+                {loading ? 'Sending…' : 'Send Reset NextLink'}
               </motion.button>
             </form>
           )}
 
           <div style={{ textAlign: 'center', marginTop: 20 }}>
-            <Link to="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <NextLink href="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <ArrowLeft size={14} /> Back to Login
-            </Link>
+            </NextLink>
           </div>
         </div>
       </motion.div>

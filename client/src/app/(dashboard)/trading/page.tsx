@@ -1,9 +1,10 @@
+"use client";
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Activity, Play, TrendingUp, TrendingDown } from 'lucide-react'
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 const STRATEGIES = [

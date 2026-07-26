@@ -1,93 +1,121 @@
-# ─── Python ──────────────────────────────────────────────────────────────────
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.pyd
-*.pyo
-.Python
-*.egg
-*.egg-info/
-dist/
-build/
-eggs/
-parts/
-var/
-sdist/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-.installed.cfg
-lib/
-lib64/
-MANIFEST
+# ==============================================================================
+#  QuantAdv - Impressive .gitignore
+# ==============================================================================
 
-# Virtual environments
-.venv/
-venv/
-ENV/
-env/
-.env.bak
-python-embed/
+# ─── macOS / Windows / OS ─────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
 
-# ─── Database ────────────────────────────────────────────────────────────────
-*.db
-*.sqlite
-*.sqlite3
-server/quantadv.db
+# ─── IDEs and Editors ──────────────────────────────────────────────────────────
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
 
-# ─── Logs ────────────────────────────────────────────────────────────────────
-*.log
-server/logs/
-logs/
+# JetBrains (IntelliJ, PyCharm, WebStorm)
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
 
-# ─── ML Models / Artifacts ───────────────────────────────────────────────────
-server/models_store/
-*.pkl
-*.joblib
-*.h5
-*.pt
-*.pth
-*.onnx
-*.bin
+# General Editors
+*.swp
+*.swo
+*~
+.directory
+.project
+.settings/
 
-# ─── Environment Variables ───────────────────────────────────────────────────
-.env
-.env.local
-.env.production
-.env.*.local
-server/.env
-client/.env
-
-# ─── Node / Frontend ─────────────────────────────────────────────────────────
+# ─── Node.js & Next.js (Client) ────────────────────────────────────────────────
 node_modules/
 client/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store
 .npm
 .eslintcache
+.stylelintcache
+.prettiercache
 .yarn-integrity
 
-# Vite build output
-client/dist/
-client/dist-ssr/
-client/.vite/
+# Next.js specific
+client/.next/
+client/out/
+client/build/
+client/.vercel/
 
-# ─── IDE / Editor ────────────────────────────────────────────────────────────
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-desktop.ini
+# ─── Python & FastAPI (Server) ─────────────────────────────────────────────────
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
 
-# ─── Testing ─────────────────────────────────────────────────────────────────
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env.bak
+.venv/
+venv/
+ENV/
+env/
+python-embed/
+
+# Pytest & Coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .tox/
 .nox/
@@ -96,11 +124,53 @@ coverage.xml
 .hypothesis/
 tests/__pycache__/
 
-# ─── Docker ──────────────────────────────────────────────────────────────────
-.dockerignore
+# ─── Data, Logs, and Databases ─────────────────────────────────────────────────
+*.log
+logs/
+server/logs/
 
-# ─── Misc ────────────────────────────────────────────────────────────────────
+# SQLite Databases
+*.db
+*.sqlite
+*.sqlite3
+server/quantadv.db
+
+# ─── Machine Learning Artifacts ────────────────────────────────────────────────
+# Model weights and artifacts
+server/models_store/
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.bin
+*.ckpt
+*.safetensors
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# ─── Environment Variables (SECRETS) ───────────────────────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+.env.*.local
+server/.env
+client/.env
+
+# ─── Deployment & Docker ───────────────────────────────────────────────────────
+.dockerignore
+.vercel/
+
+# ─── Miscellaneous ─────────────────────────────────────────────────────────────
 *.bak
 *.tmp
 *.temp
 .cache/
+coverage/
+

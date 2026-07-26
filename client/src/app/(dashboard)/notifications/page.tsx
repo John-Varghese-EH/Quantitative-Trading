@@ -1,7 +1,8 @@
+"use client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Bell, CheckCheck, Zap, Brain, TrendingUp, Shield, AlertTriangle } from 'lucide-react'
-import { useAppStore } from '../store/useAppStore'
+import { useAppStore } from '@/store/useAppStore'
 
 const NOTIF_ICONS: Record<string, React.ReactNode> = {
   price: <TrendingUp size={16} color="#00d4ff" />,

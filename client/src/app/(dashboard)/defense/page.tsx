@@ -1,9 +1,10 @@
+"use client";
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Shield, Play, CheckCircle } from 'lucide-react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 const DEFENSE_DESCRIPTIONS: Record<string, { color: string; risk: string }> = {

@@ -72,15 +72,15 @@ services:
     container_name: quantadv_client
     restart: unless-stopped
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     volumes:
       - ./client:/app
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "3000:3000"
     depends_on:
       - server
-    command: npm run dev -- --host
+    command: npm run dev
 
 volumes:
   postgres_data:

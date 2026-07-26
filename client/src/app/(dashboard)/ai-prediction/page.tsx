@@ -1,11 +1,12 @@
+"use client";
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw } from 'lucide-react'
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import api from '../services/api'
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
-import { useAppStore } from '../store/useAppStore'
+import { useAppStore } from '@/store/useAppStore'
 
 const MODEL_TYPES = [
   { id: 'linear_regression', name: 'Logistic Regression', desc: 'Fast, interpretable baseline', color: '#00d4ff' },

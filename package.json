@@ -1,0 +1,13 @@
+{
+  "name": "quantadv-root",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Root workspace for Quantitative-Trading",
+  "scripts": {
+    "dev": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "npm run start --prefix client",
+    "test": "npm run test --prefix client",
+    "install:all": "npm install --prefix client && pip install -r server/requirements.txt"
+  }
+}

@@ -1,7 +1,9 @@
+"use client";
+
 import { useQuery } from '@tanstack/react-query'
 import { Bell, Search, TrendingUp, TrendingDown } from 'lucide-react'
-import { useAppStore } from '../store/useAppStore'
-import api from '../services/api'
+import { useAppStore } from '@/store/useAppStore'
+import api from '@/services/api'
 
 export default function TopBar() {
   const { unreadCount, user } = useAppStore()

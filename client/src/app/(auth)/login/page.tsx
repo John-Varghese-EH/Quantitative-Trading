@@ -1,12 +1,14 @@
+"use client";
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Zap, Eye, EyeOff, TrendingUp } from 'lucide-react'
-import api from '../../services/api'
-import { useAppStore } from '../../store/useAppStore'
+import api from '@/services/api'
+import { useAppStore } from '@/store/useAppStore'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
@@ -19,7 +21,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { setAuth } = useAppStore()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
 
@@ -32,7 +34,7 @@ export default function LoginPage() {
       const res = await api.post('/auth/login', form, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
       setAuth(res.data.user, res.data.access_token, res.data.refresh_token)
       toast.success(`Welcome back, ${res.data.user.username}!`)
-      navigate('/dashboard')
+      router.push('/dashboard')
     } catch (err: any) {
       toast.error(err.response?.data?.detail || 'Login failed')
     } finally {
@@ -98,9 +100,9 @@ export default function LoginPage() {
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <Link to="/forgot-password" style={{ fontSize: '0.83rem', color: 'var(--color-primary)', textDecoration: 'none' }}>
+              <NextLink href="/forgot-password" style={{ fontSize: '0.83rem', color: 'var(--color-primary)', textDecoration: 'none' }}>
                 Forgot password?
-              </Link>
+              </NextLink>
             </div>
 
             <motion.button
@@ -117,9 +119,9 @@ export default function LoginPage() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: 'var(--color-muted)' }}>
             No account?{' '}
-            <Link to="/register" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
+            <NextLink href="/register" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
               Create one
-            </Link>
+            </NextLink>
           </div>
 
           {/* Demo credentials */}

@@ -1,11 +1,13 @@
+"use client";
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Zap, Eye, EyeOff } from 'lucide-react'
-import api from '../../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
@@ -19,7 +21,7 @@ type FormData = z.infer<typeof schema>
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
 
@@ -28,7 +30,7 @@ export default function RegisterPage() {
     try {
       await api.post('/auth/register', data)
       toast.success('Account created! Check your email to verify.')
-      navigate('/login')
+      router.push('/login')
     } catch (err: any) {
       toast.error(err.response?.data?.detail || 'Registration failed')
     } finally {
@@ -94,7 +96,7 @@ export default function RegisterPage() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: 'var(--color-muted)' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+            <NextLink href="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign in</NextLink>
           </div>
         </div>
       </motion.div>

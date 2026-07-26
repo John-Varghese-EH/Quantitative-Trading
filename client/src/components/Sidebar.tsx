@@ -1,11 +1,14 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+"use client";
+
+import { usePathname, useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, TrendingUp, Brain, Zap, Shield, FlaskConical,
   BarChart3, Lightbulb, Bell, Settings, LogOut, ChevronLeft, Activity,
   Newspaper, Users
 } from 'lucide-react'
-import { useAppStore } from '../store/useAppStore'
+import { useAppStore } from '@/store/useAppStore'
 
 const NAV_ITEMS = [
   { to: '/dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
@@ -22,11 +25,12 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const { user, clearAuth, unreadCount } = useAppStore()
-  const navigate = useNavigate()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const handleLogout = () => {
     clearAuth()
-    navigate('/login')
+    router.push('/login')
   }
 
   return (
@@ -63,9 +67,9 @@ export default function Sidebar() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.04 }}
           >
-            <NavLink
-              to={to}
-              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            <NextLink
+              href={to}
+              className={`sidebar-link ${pathname === to ? 'active' : ''}`}
             >
               <Icon size={18} />
               <span>{label}</span>
@@ -82,16 +86,16 @@ export default function Sidebar() {
                   textAlign: 'center',
                 }}>{unreadCount}</span>
               )}
-            </NavLink>
+            </NextLink>
           </motion.div>
         ))}
 
         {/* Admin only */}
         {user?.role === 'admin' && (
-          <NavLink to="/admin" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+          <NextLink href="/admin" className={`sidebar-link ${pathname === '/admin' ? 'active' : ''}`}>
             <Users size={18} />
             <span>Admin Panel</span>
-          </NavLink>
+          </NextLink>
         )}
       </nav>
 
@@ -108,7 +112,7 @@ export default function Sidebar() {
             {user?.username?.[0]?.toUpperCase() || 'U'}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.85rem', truncate: true }}>{user?.username}</div>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.username}</div>
             <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
           </div>
           <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4 }}>

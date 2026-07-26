@@ -1,7 +1,8 @@
+"use client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Users, Trash2, ToggleLeft, ToggleRight, Activity, Shield, Brain, AlertTriangle } from 'lucide-react'
-import api from '../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 export default function AdminPage() {

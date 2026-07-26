@@ -1,3 +1,4 @@
+"use client";
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import {
@@ -5,7 +6,7 @@ import {
   Zap, BarChart2, Target, AlertTriangle
 } from 'lucide-react'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 
 const CARD_VARIANTS = {
   hidden: { opacity: 0, y: 20 },

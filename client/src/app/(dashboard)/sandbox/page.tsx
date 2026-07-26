@@ -1,6 +1,7 @@
+"use client";
 import { motion } from 'framer-motion'
 import { FlaskConical, Play, RotateCcw, Download } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import NextLink from 'next/link'
 
 const SANDBOX_STEPS = [
   { step: 1, title: 'Fetch Market Data', desc: 'Select a stock or crypto and date range', link: '/market', color: '#00d4ff', icon: '📈' },
@@ -49,7 +50,7 @@ export default function SandboxPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
           >
-            <Link to={s.link} style={{ textDecoration: 'none' }}>
+            <NextLink href={s.link} style={{ textDecoration: 'none' }}>
               <motion.div
                 className="glass"
                 whileHover={{ scale: 1.03, boxShadow: `0 20px 60px ${s.color}25` }}
@@ -73,7 +74,7 @@ export default function SandboxPage() {
                   Go to {s.title} →
                 </div>
               </motion.div>
-            </Link>
+            </NextLink>
           </motion.div>
         ))}
       </div>

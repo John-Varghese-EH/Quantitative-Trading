@@ -1,9 +1,10 @@
+"use client";
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Zap, Play, AlertTriangle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 import toast from 'react-hot-toast'
 
 const ATTACK_COLORS: Record<string, string> = {

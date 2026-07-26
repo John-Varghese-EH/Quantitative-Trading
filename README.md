@@ -1,10 +1,12 @@
 # QuantAdv
 
+![QuantAdv Dashboard Preview](/home/j0x/.gemini/antigravity/brain/afb61490-e068-438f-a305-6966c0a5fbbc/quantadv_dashboard_preview_1785052502252.png)
+
 A production-quality full-stack sandbox combining quantitative finance, adversarial machine learning, explainable AI, and real-time analytics.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.11+-green.svg)
-![React](https://img.shields.io/badge/react-18+-blue.svg)
+![Next.js](https://img.shields.io/badge/next.js-15+-black.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.110+-teal.svg)
 
 ## Overview
@@ -15,7 +17,7 @@ QuantAdv is an advanced sandbox environment designed for testing and deploying q
 
 The system is built on a modern, scalable stack:
 
-- **Client**: React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, and Plotly.js.
+- **Client**: Next.js 15 (App Router), React 18, TypeScript, Tailwind CSS, Framer Motion, and Recharts.
 - **Server**: FastAPI, Python 3.11, and a robust ML stack (scikit-learn, XGBoost, PyTorch, TensorFlow).
 - **Database**: PostgreSQL 15 for reliable data persistence.
 - **Infrastructure**: Containerized with Docker for consistent deployment across environments.
@@ -51,15 +53,15 @@ To run the application locally using Docker:
    ```
 
 4. Access the applications:
-   - Frontend: http://localhost:5173
+   - Frontend: http://localhost:3000 (Next.js default)
    - Backend API: http://localhost:8000/docs
    - DB Management (pgAdmin): http://localhost:5050
 
 ## Deployment Readiness
 
-While the current Docker configuration is optimized for development (using `npm run dev` and Uvicorn with hot-reload), the application can be easily adapted for production:
+The application is fully configured for production deployment:
 
-1. **Frontend**: The React client can be built statically (`npm run build`) and deployed to Vercel, Netlify, or served via Nginx.
+1. **Frontend (Vercel)**: The Next.js client is optimized for seamless deployment to Vercel. Simply import the repository, select `client` as the Root Directory, and Vercel will auto-configure the Next.js build settings.
 2. **Backend**: The FastAPI server should be run using Gunicorn with Uvicorn workers for production workloads.
 3. **Database**: Managed PostgreSQL instances (e.g., AWS RDS, Supabase) are recommended for production environments.
 
@@ -79,4 +81,4 @@ npm run test
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details. This ensures that any modifications made to this software that are offered as a service over a network must also have their source code made openly available.

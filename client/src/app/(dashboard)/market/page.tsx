@@ -1,9 +1,10 @@
+"use client";
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
 import { Search, RefreshCw } from 'lucide-react'
-import api from '../services/api'
+import api from '@/services/api'
 
 const SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'BTC-USD', 'ETH-USD', 'SPY', 'AMZN', 'META']
 const INTERVALS = [{ v: '1d', l: '1 Day' }, { v: '1wk', l: '1 Week' }, { v: '1mo', l: '1 Month' }]

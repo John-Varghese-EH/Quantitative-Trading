@@ -1,9 +1,10 @@
+"use client";
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Lightbulb, Brain } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts'
-import api from '../services/api'
+import api from '@/services/api'
 
 export default function ExplainableAIPage() {
   const [modelId, setModelId] = useState('')
