@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
 import { motion } from 'framer-motion'
 import { Bell, CheckCheck, Zap, Brain, TrendingUp, Shield, AlertTriangle } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
@@ -36,7 +36,7 @@ const SAMPLE_NOTIFS = [
   { id: '2', type: 'attack', title: 'Attack Simulation Result', message: 'FGSM attack achieved 34% success rate on your LSTM model.', is_read: false, created_at: new Date(Date.now() - 15 * 60000).toISOString() },
   { id: '3', type: 'trade', title: 'Backtest Complete', message: 'MA Crossover on SPY returned +18.4% over 2 years.', is_read: true, created_at: new Date(Date.now() - 60 * 60000).toISOString() },
   { id: '4', type: 'defense', title: 'Defense Applied', message: 'Adversarial Training improved model security score to 78.', is_read: true, created_at: new Date(Date.now() - 2 * 3600000).toISOString() },
-  { id: '5', type: 'price', title: 'Price Alert', message: 'NVDA crossed $900 — up 3.2% today.', is_read: true, created_at: new Date(Date.now() - 5 * 3600000).toISOString() },
+  { id: '5', type: 'price', title: 'Price Alert', message: 'NVDA crossed $900 - up 3.2% today.', is_read: true, created_at: new Date(Date.now() - 5 * 3600000).toISOString() },
 ]
 
 function timeAgo(date: string) {

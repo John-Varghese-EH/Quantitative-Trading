@@ -18,9 +18,9 @@
  */
 
 import { useState } from 'react'
-import NextLink from 'next/link'
 import { motion } from 'framer-motion'
-import { Zap, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { Zap, Mail, ArrowLeft } from 'lucide-react'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 
@@ -57,10 +57,15 @@ export default function ForgotPasswordPage() {
           </div>
 
           {sent ? (
-            <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 12 }}>📧</div>
-              <p style={{ color: 'var(--color-success)' }}>Reset email sent! Check your inbox.</p>
-            </div>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+                  <Mail size={32} />
+                </div>
+              </div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 8 }}>Check your inbox</h2>
+              <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>We've sent a reset link to your email.</p>
+            </motion.div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
@@ -68,15 +73,15 @@ export default function ForgotPasswordPage() {
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-field" placeholder="you@example.com" required />
               </div>
               <motion.button type="submit" className="btn-primary" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ padding: '13px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Sending…' : 'Send Reset NextLink'}
+                {loading ? 'Sending…' : 'Send Reset Link'}
               </motion.button>
             </form>
           )}
 
           <div style={{ textAlign: 'center', marginTop: 20 }}>
-            <NextLink href="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <ArrowLeft size={14} /> Back to Login
-            </NextLink>
+            <Link href="/login" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <ArrowLeft size={16} /> Back to Login
+            </Link>
           </div>
         </div>
       </motion.div>

@@ -18,16 +18,16 @@
  */
 
 import { motion } from 'framer-motion'
-import { FlaskConical, Play } from 'lucide-react'
+import { FlaskConical, LineChart, Brain, BarChart3, Sword, Shield, Presentation, AlertTriangle, RefreshCw } from 'lucide-react'
 import NextLink from 'next/link'
 
-const SANDBOX_STEPS = [
-  { step: 1, title: 'Fetch Market Data', desc: 'Select a stock or crypto and date range', link: '/market', color: '#00d4ff', icon: '📈' },
-  { step: 2, title: 'Train AI Model', desc: 'Choose from 5 ML architectures', link: '/ai-prediction', color: '#7c3aed', icon: '🧠' },
-  { step: 3, title: 'Backtest Strategy', desc: 'Test your strategy on historical data', link: '/trading', color: '#10b981', icon: '💹' },
-  { step: 4, title: 'Launch Attack', desc: 'Simulate adversarial attacks on your model', link: '/adversarial', color: '#ef4444', icon: '⚔️' },
-  { step: 5, title: 'Apply Defense', desc: 'Harden the model against attacks', link: '/defense', color: '#f59e0b', icon: '🛡️' },
-  { step: 6, title: 'Analyze Results', desc: 'Review performance with explainable AI', link: '/analytics', color: '#06b6d4', icon: '📊' },
+const WORKFLOW_STEPS = [
+  { step: 1, title: 'Fetch Market Data', desc: 'Select a stock or crypto and date range', link: '/market', color: '#00d4ff', icon: <LineChart size={24} /> },
+  { step: 2, title: 'Train AI Model', desc: 'Choose from 5 ML architectures', link: '/ai-prediction', color: '#7c3aed', icon: <Brain size={24} /> },
+  { step: 3, title: 'Backtest Strategy', desc: 'Test your strategy on historical data', link: '/trading', color: '#10b981', icon: <BarChart3 size={24} /> },
+  { step: 4, title: 'Launch Attack', desc: 'Simulate adversarial attacks on your model', link: '/adversarial', color: '#ef4444', icon: <Sword size={24} /> },
+  { step: 5, title: 'Apply Defense', desc: 'Harden the model against attacks', link: '/defense', color: '#f59e0b', icon: <Shield size={24} /> },
+  { step: 6, title: 'Analyze Results', desc: 'Review performance with explainable AI', link: '/analytics', color: '#06b6d4', icon: <Presentation size={24} /> },
 ]
 
 export default function SandboxPage() {
@@ -39,7 +39,7 @@ export default function SandboxPage() {
           Sandbox <span className="gradient-text">Environment</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>
-          Complete risk-free ML trading research environment — no real money, no limits.
+          Complete risk-free ML trading research environment - no real money, no limits.
         </p>
       </motion.div>
 
@@ -47,11 +47,11 @@ export default function SandboxPage() {
       <div style={{
         padding: '16px 20px', marginBottom: 32, borderRadius: 12,
         background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 16,
       }}>
-        <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+        <AlertTriangle size={24} color="#f59e0b" />
         <div>
-          <div style={{ fontWeight: 700, color: '#f59e0b' }}>Paper Trading Mode — No Real Money</div>
+          <div style={{ fontWeight: 700, color: '#f59e0b' }}>Paper Trading Mode - No Real Money</div>
           <div style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginTop: 2 }}>
             All trades, models, and attacks in this sandbox are simulated. This is a research and educational environment.
           </div>
@@ -59,9 +59,11 @@ export default function SandboxPage() {
       </div>
 
       {/* Workflow Steps */}
-      <h2 style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '1.2rem' }}>🔄 ML Trading Workflow</h2>
+      <h2 style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <RefreshCw size={18} className="text-primary" /> ML Trading Workflow
+      </h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16, marginBottom: 40 }}>
-        {SANDBOX_STEPS.map((s, i) => (
+        {WORKFLOW_STEPS.map((s, i) => (
           <motion.div
             key={s.step}
             initial={{ opacity: 0, y: 20 }}
@@ -76,9 +78,10 @@ export default function SandboxPage() {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
                   <div style={{
-                    width: 44, height: 44, borderRadius: 12, fontSize: '1.5rem',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 48, height: 48, borderRadius: 12,
                     background: `${s.color}18`, border: `1px solid ${s.color}33`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: s.color
                   }}>{s.icon}</div>
                   <div>
                     <div style={{ fontSize: '0.7rem', color: s.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>

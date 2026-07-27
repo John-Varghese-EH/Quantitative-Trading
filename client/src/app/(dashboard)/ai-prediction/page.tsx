@@ -20,11 +20,12 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw, MessageSquareQuote, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw, MessageSquareQuote, TrendingUp, TrendingDown, Minus, Zap } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 import { useAppStore } from '@/store/useAppStore'
+import { formatCurrency } from '@/utils/currency'
 
 const MODEL_TYPES = [
   { id: 'linear_regression', name: 'Logistic Regression', desc: 'Fast, interpretable baseline', color: '#00d4ff' },
@@ -37,6 +38,7 @@ const MODEL_TYPES = [
 const SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'BTC-USD', 'ETH-USD', 'SPY']
 
 export default function AIPredictionPage() {
+  const { currency } = useAppStore()
   const qc = useQueryClient()
   
   const [modelType, setModelType] = useState('random_forest')
@@ -47,7 +49,7 @@ export default function AIPredictionPage() {
   const [selectedModel, setSelectedModel] = useState<any>(null)
 
   // Sentiment State
-  const [activeTab, setActiveTab] = useState<'ml' | 'sentiment'>('sentiment')
+  const [activeTab, setActiveTab] = useState<'ml' | 'sentiment'>('ml')
   const [sentimentSymbol, setSentimentSymbol] = useState('AAPL')
 
   const { data: models, refetch: refetchModels } = useQuery({
@@ -189,7 +191,7 @@ export default function AIPredictionPage() {
                     Confidence Score: {sentimentQuery.data.sentiment.sentimentScore}/100
                   </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--color-muted)', marginTop: 8 }}>
-                    Current Price: ${sentimentQuery.data.price} ({sentimentQuery.data.changePercent > 0 ? '+' : ''}{sentimentQuery.data.changePercent?.toFixed(2)}%)
+                    Current Price: {formatCurrency(sentimentQuery.data.price, currency)} ({sentimentQuery.data.changePercent > 0 ? '+' : ''}{sentimentQuery.data.changePercent?.toFixed(2)}%)
                   </div>
                 </div>
 
@@ -349,12 +351,16 @@ export default function AIPredictionPage() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                 className="glass" style={{ padding: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <h3 style={{ margin: 0, fontWeight: 700 }}>Run Prediction — {selectedModel.name}</h3>
-                  <motion.button className="btn-primary" onClick={() => predictMutation.mutate({ model_id: selectedModel.id, symbol: selectedModel.symbol })}
-                    disabled={predictMutation.isPending} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                    style={{ padding: '9px 18px', fontSize: '0.88rem', opacity: predictMutation.isPending ? 0.7 : 1 }}>
-                    {predictMutation.isPending ? 'Predicting…' : '⚡ Predict'}
-                  </motion.button>
+                  <h3 style={{ margin: 0, fontWeight: 700 }}>Run Prediction - {selectedModel.name}</h3>
+                  <button 
+                    onClick={() => predictMutation.mutate({ model_id: selectedModel.id, symbol: selectedModel.symbol })} 
+                    disabled={predictMutation.isPending}
+                    className="btn-primary" 
+                    style={{ width: '100%', padding: '12px', fontSize: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                  >
+                    <Zap size={18} />
+                    {predictMutation.isPending ? 'Predicting…' : 'Predict'}
+                  </button>
                 </div>
 
                 {selectedModel.prediction && (
@@ -374,7 +380,7 @@ export default function AIPredictionPage() {
                       </div>
                       <div className="glass-light" style={{ padding: 20, textAlign: 'center' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8 }}>Current Price</div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>${selectedModel.prediction.current_price}</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{formatCurrency(selectedModel.prediction.current_price, currency)}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginTop: 6 }}>
                           Model accuracy: {(selectedModel.prediction.model_accuracy * 100).toFixed(1)}%
                         </div>

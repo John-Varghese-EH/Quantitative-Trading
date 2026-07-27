@@ -24,6 +24,8 @@ import { Activity, Play } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
+import { useAppStore } from '@/store/useAppStore'
+import { formatCurrency, formatCurrencyCompact } from '@/utils/currency'
 
 const STRATEGIES = [
   { id: 'buy_and_hold', name: 'Buy and Hold', color: '#00d4ff', desc: 'Buy on day 1, hold to end' },
@@ -36,6 +38,7 @@ const STRATEGIES = [
 const SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'BTC-USD', 'SPY', 'AMZN']
 
 export default function TradingSimulatorPage() {
+  const { currency } = useAppStore()
   const [strategy, setStrategy] = useState('ma_crossover')
   const [symbol, setSymbol] = useState('AAPL')
   const [startDate, setStartDate] = useState('2022-01-01')
@@ -69,7 +72,7 @@ export default function TradingSimulatorPage() {
         <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
           Trading <span className="gradient-text">Simulator</span>
         </h1>
-        <p style={{ color: 'var(--color-muted)', margin: 0 }}>Backtest strategies on historical data — no real money</p>
+        <p style={{ color: 'var(--color-muted)', margin: 0 }}>Backtest strategies on historical data - no real money</p>
       </motion.div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20 }}>
@@ -109,7 +112,7 @@ export default function TradingSimulatorPage() {
                 </div>
               </div>
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Initial Capital ($)</label>
+                <label style={{ fontSize: '0.8rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Initial Capital ({currency})</label>
                 <input type="number" className="input-field" value={capital} onChange={e => setCapital(Number(e.target.value))} min={100} />
               </div>
               <motion.button className="btn-primary" onClick={handleRun}
@@ -166,17 +169,17 @@ export default function TradingSimulatorPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
                 {[
                   { l: 'Total Return', v: `${result.total_return >= 0 ? '+' : ''}${result.total_return?.toFixed(2)}%`, color: result.total_return >= 0 ? 'var(--color-success)' : 'var(--color-danger)' },
-                  { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(3), color: 'var(--color-primary)' },
+                  { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'var(--color-text)' },
                   { l: 'Max Drawdown', v: `${result.max_drawdown?.toFixed(2)}%`, color: 'var(--color-danger)' },
                   { l: 'Win Rate', v: `${result.win_rate?.toFixed(1)}%`, color: 'var(--color-success)' },
-                  { l: 'Final Value', v: `$${result.final_value?.toLocaleString()}`, color: 'var(--color-text)' },
+                  { l: 'Final Value', v: formatCurrency(result.final_value, currency), color: 'var(--color-text)' },
                   { l: 'Total Trades', v: result.total_trades, color: 'var(--color-text)' },
                   { l: 'CAGR', v: `${result.cagr?.toFixed(2)}%`, color: 'var(--color-warning)' },
-                  { l: 'Initial Capital', v: `$${result.initial_capital?.toLocaleString()}`, color: 'var(--color-text)' },
-                ].map(m => (
-                  <div key={m.l} className="glass" style={{ padding: 16 }}>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.l}</div>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: m.color }}>{m.v}</div>
+                  { l: 'Initial Capital', v: formatCurrency(result.initial_capital, currency), color: 'var(--color-text)' },
+                ].map(stat => (
+                  <div key={stat.l} className="glass" style={{ padding: 16 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{stat.l}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: stat.color }}>{stat.v}</div>
                   </div>
                 ))}
               </div>
@@ -184,7 +187,7 @@ export default function TradingSimulatorPage() {
               {/* Equity Curve */}
               <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
                 <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>
-                  Equity Curve — {activeStrategy?.name} on {result.symbol}
+                  Equity Curve - {activeStrategy?.name} on {result.symbol}
                 </h3>
                 <ResponsiveContainer width="100%" height={240}>
                   <AreaChart data={result.equity_curve}>
@@ -196,9 +199,9 @@ export default function TradingSimulatorPage() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => `$${v.toLocaleString()}`} />
-                    <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 8, fontSize: '0.8rem' }}
-                      formatter={(v: any) => [`$${Number(v).toLocaleString()}`, 'Portfolio Value']} />
+                    <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrencyCompact(v, currency)} />
+                    <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: '0.8rem' }}
+                      formatter={(v: any) => [formatCurrency(v, currency), 'Portfolio Value']} />
                     <Area type="monotone" dataKey="value" stroke={activeStrategy?.color} strokeWidth={2} fill="url(#eqGrad)" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -219,13 +222,13 @@ export default function TradingSimulatorPage() {
                         <tr key={i}>
                           <td style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>{t.date}</td>
                           <td><span className={`badge ${t.type === 'BUY' ? 'badge-success' : 'badge-danger'}`}>{t.type}</span></td>
-                          <td>${t.price?.toFixed(2)}</td>
-                          <td>{t.shares?.toFixed(2)}</td>
-                          <td style={{ color: t.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 600 }}>
-                            {t.pnl !== undefined ? `${t.pnl >= 0 ? '+' : ''}$${t.pnl?.toFixed(2)}` : '—'}
+                          <td>{formatCurrency(t.price, currency)}</td>
+                          <td>{t.shares}</td>
+                          <td style={{ color: t.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                            {t.pnl !== undefined ? `${t.pnl >= 0 ? '+' : ''}${formatCurrency(Math.abs(t.pnl), currency)}` : '-'}
                           </td>
                           <td style={{ color: t.roi >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                            {t.roi !== undefined ? `${t.roi >= 0 ? '+' : ''}${t.roi?.toFixed(2)}%` : '—'}
+                            {t.roi !== undefined ? `${t.roi >= 0 ? '+' : ''}${t.roi?.toFixed(2)}%` : '-'}
                           </td>
                         </tr>
                       ))}

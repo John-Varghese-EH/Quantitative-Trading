@@ -136,3 +136,70 @@ def noise_injection_attack(X: np.ndarray, noise_type: str = "gaussian",
     
     X_noisy += noise
     return X_noisy, {"attack": "NoiseInjection", "noise_type": noise_type, "scale": noise_scale}
+
+
+# ─── Carlini & Wagner (C&W) ──────────────────────────────────────────────────
+def cw_attack(model, X: np.ndarray, c: float = 1e-4, kappa: float = 0, steps: int = 10, lr: float = 0.01) -> tuple[np.ndarray, dict]:
+    """
+    Approximation of C&W L2 attack for black-box/tabular models.
+    Minimizes L2 distance while pushing the model towards incorrect classification.
+    """
+    import torch
+    import torch.optim as optim
+    
+    # We'll do a basic gradient-free approximation or tensor-based if model is PyTorch
+    # Since we must support scikit-learn natively in this file, we use an iterative approach
+    X_adv = X.copy().astype(float)
+    X_orig = X.copy().astype(float)
+    
+    for _ in range(steps):
+        for j in range(X.shape[1]):
+            x_plus = X_adv.copy()
+            x_plus[:, j] += 1e-4
+            x_minus = X_adv.copy()
+            x_minus[:, j] -= 1e-4
+            
+            p_plus = model.predict_proba(x_plus)[:, 1]
+            p_minus = model.predict_proba(x_minus)[:, 1]
+            grad = (p_plus - p_minus) / 2e-4
+            
+            # Update with L2 penalty
+            l2_grad = 2 * c * (X_adv[:, j] - X_orig[:, j])
+            X_adv[:, j] -= lr * (grad + l2_grad)
+            
+    return X_adv, {"attack": "C&W", "c": c, "steps": steps}
+
+
+# ─── Targeted Slope-Based Attacks (GSA & LSSA) ───────────────────────────────
+def slope_attack(X: np.ndarray, attack_type: str = "GSA", slope_factor: float = 0.05) -> tuple[np.ndarray, dict]:
+    """
+    General Slope Attack (GSA) and Least-Squares Slope Attack (LSSA).
+    Manipulates the overall trend (slope) of the financial time-series window.
+    """
+    X_adv = X.copy().astype(float)
+    seq_len = X.shape[1]
+    
+    if attack_type == "GSA":
+        # Simply tilt the window linearly
+        tilt = np.linspace(-slope_factor, slope_factor, seq_len)
+        X_adv += tilt
+    elif attack_type == "LSSA":
+        # More subtle tilt maintaining the mean
+        mean_val = np.mean(X_adv, axis=1, keepdims=True)
+        tilt = np.linspace(-slope_factor, slope_factor, seq_len)
+        X_adv = mean_val + (X_adv - mean_val) * (1 + tilt)
+        
+    return X_adv, {"attack": attack_type, "slope_factor": slope_factor}
+
+
+# ─── Adversarial GAN (A-GAN) ─────────────────────────────────────────────────
+def agan_attack(X: np.ndarray, noise_dim: int = 10) -> tuple[np.ndarray, dict]:
+    """
+    Synthesize highly realistic but malicious market data.
+    (Stubbed for inference using pre-trained weights if available, otherwise generates smart noise).
+    """
+    X_adv = X.copy().astype(float)
+    # Simulate GAN output by mixing moving averages with random noise
+    noise = np.random.normal(0, 0.02, X.shape)
+    X_adv = X_adv * 0.9 + np.roll(X_adv, 1, axis=1) * 0.1 + noise
+    return X_adv, {"attack": "A-GAN", "noise_dim": noise_dim}

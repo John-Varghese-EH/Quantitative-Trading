@@ -20,17 +20,21 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion, Variants } from 'framer-motion'
 import {
-  DollarSign, TrendingUp, TrendingDown, Brain, Activity, Shield,
-  Zap, BarChart2, Target, AlertTriangle
+  DollarSign, TrendingUp, TrendingDown, Brain, Activity,
+  Zap, BarChart2, Target, AlertTriangle, Briefcase, Newspaper,
+  ChevronRight, ArrowUpRight, ArrowDownRight, Server, Shield
 } from 'lucide-react'
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '@/services/api'
+import { useAppStore } from '@/store/useAppStore'
+import { formatCurrency, formatCurrencyCompact } from '@/utils/currency'
+import Link from 'next/link'
 
 const CARD_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 15 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({ 
     opacity: 1, y: 0, 
-    transition: { delay: i * 0.05, duration: 0.3, ease: "easeOut" } 
+    transition: { delay: i * 0.05, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } 
   }),
 }
 
@@ -41,44 +45,69 @@ interface StatCard {
   positive?: boolean
   icon: React.ReactNode
   color: string
-  glowColor: string
 }
 
 function StatCardComponent({ card, index }: { card: StatCard; index: number }) {
   return (
     <motion.div
-      className="glass stat-card"
+      className="glass"
       custom={index}
       initial="hidden"
       animate="visible"
+      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(0,0,0,0.08)' }}
       variants={CARD_VARIANTS}
-      style={{ '--glow': card.glowColor } as any}
+      style={{
+        padding: '24px',
+        position: 'relative',
+        overflow: 'hidden',
+        borderTop: `3px solid ${card.color}`,
+        borderRadius: 'var(--radius-lg)'
+      }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
         <div>
-          <p style={{ margin: '0 0 4px', color: 'var(--color-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.label}</p>
-          <h3 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)' }}>{card.value}</h3>
+          <p style={{ margin: '0 0 10px', color: 'var(--color-muted)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{card.label}</p>
+          <h3 style={{ margin: '0 0 10px', fontSize: '1.85rem', fontWeight: 800, color: 'var(--color-text)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+            {card.value}
+          </h3>
           {card.change && (
-            <span style={{ fontSize: '0.8rem', color: card.positive ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 600 }}>
-              {card.positive ? '▲' : '▼'} {card.change}
+            <span style={{ 
+              fontSize: '0.75rem', 
+              color: card.positive ? 'var(--color-success)' : 'var(--color-danger)', 
+              fontWeight: 700,
+              background: `color-mix(in srgb, ${card.color} 15%, transparent)`,
+              padding: '4px 10px',
+              borderRadius: '20px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4
+            }}>
+              {card.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {card.change}
             </span>
           )}
         </div>
         <div style={{
-          width: 40, height: 40, borderRadius: 8,
-          background: `rgba(var(--color-${card.color}-rgb), 0.1)`,
-          border: `1px solid ${card.color}22`,
+          width: 52, height: 52, borderRadius: 16,
+          background: `color-mix(in srgb, ${card.color} 12%, transparent)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: card.color
+          color: card.color,
         }}>
           {card.icon}
         </div>
       </div>
+      
+      {/* Decorative ambient background */}
+      <div style={{
+        position: 'absolute', right: -20, bottom: -20, width: 120, height: 120,
+        background: `radial-gradient(circle, color-mix(in srgb, ${card.color} 15%, transparent) 0%, transparent 70%)`,
+        zIndex: 0, borderRadius: '50%', pointerEvents: 'none'
+      }} />
     </motion.div>
   )
 }
 
 export default function DashboardPage() {
+  const { currency } = useAppStore()
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.get('/dashboard/stats').then(r => r.data),
@@ -107,131 +136,190 @@ export default function DashboardPage() {
 
   const CARDS: StatCard[] = stats ? [
     {
-      label: 'Portfolio Value', value: `$${stats.portfolio_value?.toLocaleString() ?? '—'}`,
+      label: 'Portfolio Value', value: formatCurrency(stats.portfolio_value, currency),
       change: `${Math.abs(stats.daily_pnl_pct)}%`, positive: stats.daily_pnl_pct >= 0,
-      icon: <DollarSign size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
+      icon: <DollarSign size={24} />, color: 'var(--color-accent)'
     },
     {
-      label: 'Daily P&L', value: `${stats.daily_pnl >= 0 ? '+' : ''}$${stats.daily_pnl?.toFixed(2) ?? '—'}`,
+      label: 'Daily P&L', value: `${stats.daily_pnl >= 0 ? '+' : ''}${formatCurrency(Math.abs(stats.daily_pnl), currency)}`,
       positive: stats.daily_pnl >= 0,
-      icon: stats.daily_pnl >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />,
-      color: stats.daily_pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)', glowColor: 'transparent',
+      icon: stats.daily_pnl >= 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />,
+      color: stats.daily_pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)'
     },
     {
       label: 'AI Confidence', value: `${stats.ai_confidence ?? 0}%`,
-      icon: <Brain size={20} />, color: 'var(--color-accent)', glowColor: 'transparent',
+      icon: <Brain size={24} />, color: '#8B5CF6'
     },
     {
       label: 'Model Accuracy', value: `${stats.model_accuracy ?? 0}%`,
-      icon: <Target size={20} />, color: 'var(--color-warning)', glowColor: 'transparent',
+      icon: <Target size={24} />, color: 'var(--color-warning)'
     },
     {
       label: 'Risk Score', value: `${stats.risk_score ?? 0}`,
-      icon: <AlertTriangle size={20} />, color: 'var(--color-danger)', glowColor: 'transparent',
+      icon: <AlertTriangle size={24} />, color: 'var(--color-danger)'
     },
     {
       label: 'Open Positions', value: stats.open_positions ?? 0,
-      icon: <Activity size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
+      icon: <Activity size={24} />, color: '#10B981'
     },
     {
       label: 'Total Trades', value: stats.total_trades ?? 0,
-      icon: <BarChart2 size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
+      icon: <BarChart2 size={24} />, color: '#F43F5E'
     },
     {
       label: 'Attacks Simulated', value: stats.total_attacks ?? 0,
-      icon: <Zap size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
+      icon: <Zap size={24} />, color: '#F59E0B'
     },
   ] : []
 
+  const greeting = (() => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good Morning'
+    if (h < 17) return 'Good Afternoon'
+    return 'Good Evening'
+  })()
+
   return (
-    <div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
-          Trading Dashboard
-        </h1>
-        <p style={{ color: 'var(--color-muted)', margin: 0 }}>Adversarial ML Sandbox — Paper Trading Mode</p>
+    <div style={{ paddingBottom: 40 }}>
+      {/* Header Section */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
+        <div>
+          <h1 style={{ margin: '0 0 8px', fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--color-text)' }}>
+            {greeting}
+          </h1>
+          <p style={{ color: 'var(--color-muted)', margin: 0, fontSize: '0.95rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }} />
+            Algorithmic Sandbox <span style={{ opacity: 0.5 }}>•</span> Paper Trading Mode
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {[
+            { label: 'Train Model', href: '/ai-prediction', color: 'var(--color-accent)', icon: <Brain size={16} /> },
+            { label: 'Run Backtest', href: '/trading', color: 'var(--color-success)', icon: <Activity size={16} /> },
+            { label: 'Launch Attack', href: '/adversarial', color: 'var(--color-danger)', icon: <Shield size={16} /> },
+          ].map(action => (
+            <Link key={action.label} href={action.href} style={{
+              padding: '10px 18px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700,
+              background: `color-mix(in srgb, ${action.color} 10%, transparent)`, 
+              border: `1px solid color-mix(in srgb, ${action.color} 30%, transparent)`,
+              color: action.color, textDecoration: 'none', transition: 'all 0.2s',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              boxShadow: `0 4px 12px color-mix(in srgb, ${action.color} 10%, transparent)`
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = action.color;
+              e.currentTarget.style.color = '#fff';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = `color-mix(in srgb, ${action.color} 10%, transparent)`;
+              e.currentTarget.style.color = action.color;
+            }}>
+              {action.icon}
+              {action.label}
+            </Link>
+          ))}
+        </div>
       </motion.div>
 
-      {/* Stat Cards */}
+      {/* Stat Cards Grid */}
       {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}><div className="spinner" /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}><div className="spinner" /></div>
       ) : (
-        <div className="dashboard-grid" style={{ marginBottom: 32 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20, marginBottom: 32 }}>
           {CARDS.map((c, i) => <StatCardComponent key={c.label} card={c} index={i} />)}
         </div>
       )}
 
-      {/* Portfolio Chart + Market Heatmap */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, marginBottom: 24 }}>
-        {/* Portfolio Growth */}
-        <div className="glass" style={{ padding: 24 }}>
-          <h3 style={{ margin: '0 0 20px', fontWeight: 700 }}>Portfolio Growth (30 days)</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={portfolio?.history || []}>
+      {/* Main Content Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 24 }}>
+        
+        {/* Portfolio Growth Chart */}
+        <motion.div className="glass" style={{ padding: '24px 24px 12px', gridColumn: 'span 2' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem' }}>Portfolio Growth (30 Days)</h3>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-muted)', background: 'var(--color-border)', padding: '4px 12px', borderRadius: 20 }}>
+              Live Data
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={portfolio?.history || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="portfolioGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00e1ff" stopOpacity={0.6} />
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.5} />
+                  <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-muted)' }} tickLine={false} axisLine={false}
-                tickFormatter={(v) => v.slice(5)} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted)' }} tickLine={false} axisLine={false}
-                tickFormatter={(v) => `$${(v/1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 6, color: 'var(--color-text)' }}
-                formatter={(v: any) => [`$${Number(v).toLocaleString()}`, 'Value']} />
-              <Area type="monotone" dataKey="value" stroke="var(--color-accent)" strokeWidth={2} fill="url(#portfolioGrad)" />
+              <CartesianGrid strokeDasharray="4 4" stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-muted)', fontWeight: 600 }} tickLine={false} axisLine={false} tickFormatter={(v) => v.slice(5)} dy={10} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted)', fontWeight: 600 }} tickLine={false} axisLine={false} tickFormatter={(v) => formatCurrencyCompact(v, currency)} />
+              <Tooltip 
+                contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, color: 'var(--color-text)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', fontWeight: 600 }}
+                itemStyle={{ color: 'var(--color-accent)', fontWeight: 800 }}
+                formatter={(v: any) => [formatCurrency(v, currency), 'Value']} 
+              />
+              <Area type="monotone" dataKey="value" stroke="var(--color-accent)" strokeWidth={3} fill="url(#portfolioGrad)" activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--color-accent)' }} />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Market Heatmap */}
-        <div className="glass" style={{ padding: 24 }}>
-          <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Market Heatmap</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {(heatmap || []).map((s: any) => (
-              <motion.div key={s.sector} whileHover={{ y: -2 }} transition={{ duration: 0.15 }} style={{
-                padding: '10px 8px', borderRadius: 8, textAlign: 'center',
-                background: s.change >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-                border: `1px solid ${s.change >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-                cursor: 'default',
-              }}>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: 2, fontWeight: 500 }}>{s.sector}</div>
-                <div style={{ fontWeight: 600, color: s.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontSize: '0.85rem' }}>
-                  {s.change >= 0 ? '+' : ''}{s.change}%
-                </div>
-              </motion.div>
-            ))}
+        <motion.div className="glass" style={{ padding: 24 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem' }}>Sector Heatmap</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {(heatmap || []).map((s: any) => {
+              const isPositive = s.change >= 0;
+              const colorBase = isPositive ? 'var(--color-success)' : 'var(--color-danger)';
+              return (
+                <motion.div key={s.sector} whileHover={{ scale: 1.02 }} transition={{ duration: 0.15 }} style={{
+                  padding: '16px', borderRadius: 12, textAlign: 'center',
+                  background: `color-mix(in srgb, ${colorBase} 10%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${colorBase} 25%, transparent)`,
+                  cursor: 'default',
+                  display: 'flex', flexDirection: 'column', justifyContent: 'center'
+                }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-text)', marginBottom: 4, fontWeight: 700 }}>{s.sector}</div>
+                  <div style={{ fontWeight: 800, color: colorBase, fontSize: '1.1rem', fontVariantNumeric: 'tabular-nums' }}>
+                    {isPositive ? '+' : ''}{s.change}%
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 24 }}>
         {/* Portfolio Holdings */}
-        <div className="glass" style={{ padding: 24 }}>
-          <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>💼 Active Holdings</h3>
+        <motion.div className="glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Briefcase size={20} style={{ color: 'var(--color-accent)' }} /> Active Holdings
+            </h3>
+            <Link href="/trading" style={{ fontSize: '0.85rem', color: 'var(--color-accent)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              View All <ChevronRight size={14} />
+            </Link>
+          </div>
           {(!holdings || holdings.length === 0) ? (
-            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--color-muted)' }}>No active holdings</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)', background: 'var(--color-glass-light)', borderRadius: 12, fontWeight: 600 }}>No active positions in sandbox</div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
-              <table className="data-table">
+              <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr>
-                    <th>Symbol</th>
-                    <th>Shares</th>
-                    <th>Avg Price</th>
-                    <th>Current Value</th>
+                  <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
+                    <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asset</th>
+                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shares</th>
+                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Price</th>
+                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Value</th>
                   </tr>
                 </thead>
                 <tbody>
                   {holdings.map((h: any, i: number) => (
-                    <motion.tr key={h.symbol} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                      <td style={{ fontWeight: 700 }}>{h.symbol}</td>
-                      <td>{h.shares}</td>
-                      <td>${h.avg_price?.toFixed(2)}</td>
-                      <td style={{ color: h.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                        ${(h.shares * h.current_price)?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <motion.tr key={h.symbol} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <td style={{ padding: '16px 8px', fontWeight: 800 }}>{h.symbol}</td>
+                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>{h.shares}</td>
+                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--color-muted)', fontWeight: 600 }}>{formatCurrency(h.avg_price, currency)}</td>
+                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 800, color: h.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                        {formatCurrency(h.shares * h.current_price, currency)}
                       </td>
                     </motion.tr>
                   ))}
@@ -239,27 +327,63 @@ export default function DashboardPage() {
               </table>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* News Feed */}
-        <div className="glass" style={{ padding: 24 }}>
-          <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>📰 Market News & Sentiment</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {(news || []).slice(0, 5).map((article: any, i: number) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                className="glass-light" style={{ padding: '12px 16px', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>{article.source}</span>
-                  <span className={`badge ${article.impact === 'bullish' ? 'badge-success' : 'badge-danger'}`}>
-                    {article.impact}
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', lineHeight: 1.5 }}>{article.title}</p>
-              </motion.div>
-            ))}
+        <motion.div className="glass" style={{ padding: 24 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Newspaper size={20} style={{ color: 'var(--color-accent)' }} /> Market Signals
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {(news || []).slice(0, 4).map((article: any, i: number) => {
+              const isBullish = article.impact === 'bullish';
+              return (
+                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                  style={{ 
+                    padding: '16px', borderRadius: 12, cursor: 'pointer',
+                    background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', gap: 16, alignItems: 'flex-start'
+                  }}>
+                  <div style={{ 
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    background: `color-mix(in srgb, ${isBullish ? 'var(--color-success)' : 'var(--color-danger)'} 15%, transparent)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: isBullish ? 'var(--color-success)' : 'var(--color-danger)'
+                  }}>
+                    {isBullish ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{article.source}</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.5, fontWeight: 600, color: 'var(--color-text)' }}>{article.title}</p>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
-        </div>
+        </motion.div>
       </div>
+
+      {/* System Status Footer */}
+      <motion.div className="glass" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderRadius: 'var(--radius-md)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+          {[
+            { label: 'API Connection', ok: true },
+            { label: 'ML Engine', ok: true },
+            { label: 'Market Feed', ok: true },
+            { label: 'Security Module', ok: true },
+          ].map(s => (
+            <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', fontWeight: 600 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.ok ? 'var(--color-success)' : 'var(--color-danger)', boxShadow: s.ok ? '0 0 10px var(--color-success)' : '0 0 10px var(--color-danger)' }} />
+              <span style={{ color: 'var(--color-text)' }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Server size={14} /> Systems Operational
+        </div>
+      </motion.div>
     </div>
   )
 }

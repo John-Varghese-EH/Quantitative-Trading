@@ -5,8 +5,10 @@ python-multipart==0.0.9
 pydantic==2.6.1
 pydantic-settings==2.2.1
 
-# Database (Firebase)
+# Database (Firebase & PostgreSQL)
 firebase-admin==6.4.0
+SQLAlchemy==2.0.27
+psycopg2-binary==2.9.9
 
 # Authentication
 python-jose[cryptography]==3.3.0
@@ -41,6 +43,12 @@ alpha-vantage==2.3.1
 plotly==5.19.0
 matplotlib==3.8.2
 seaborn==0.13.2
+
+# Threat Intelligence (Gemini)
+google-genai==0.3.0
+
+# Task Scheduling
+apscheduler==3.10.4
 
 # Utilities
 loguru==0.7.2

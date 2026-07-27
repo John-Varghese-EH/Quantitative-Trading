@@ -17,22 +17,45 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const symbol = searchParams.get('symbol') || 'AAPL';
   const interval = searchParams.get('interval') || '1d';
+  const startParam = searchParams.get('start');
+  const endParam = searchParams.get('end');
+
+  // Determine if this is an intraday interval
+  const isIntraday = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h'].includes(interval);
 
   try {
-    let period1 = new Date();
-    // fetch up to 2 years of data for accurate MA50 and indicators
-    period1.setFullYear(period1.getFullYear() - 2);
+    // Use the start/end params if provided, otherwise default based on interval
+    let period1: Date;
+    let period2: Date | undefined;
 
-    const result = await yahooFinance.chart(symbol, {
+    if (startParam) {
+      period1 = new Date(startParam);
+    } else {
+      period1 = new Date();
+      if (isIntraday) {
+        period1.setDate(period1.getDate() - 7);
+      } else {
+        period1.setFullYear(period1.getFullYear() - 1);
+      }
+    }
+
+    if (endParam) {
+      period2 = new Date(endParam);
+    }
+
+    const chartOptions: any = {
       period1,
       interval: interval as any,
-    });
+    };
+    if (period2) chartOptions.period2 = period2;
+
+    const result: any = await yahooFinance.chart(symbol, chartOptions);
 
     const validQuotes = (result.quotes || []).filter(
       (bar: any) => bar.date && bar.close !== null && bar.open !== null && bar.high !== null && bar.low !== null
     );
 
-    const closes = validQuotes.map(q => q.close!);
+    const closes = validQuotes.map((q: any) => q.close!);
     
     // Compute MACD (12, 26, 9)
     let macd: (number | null)[] = closes.map(() => null);
@@ -41,11 +64,11 @@ export async function GET(request: Request) {
     if (closes.length >= 26) {
       const ema12 = calcEMA(closes, 12);
       const ema26 = calcEMA(closes, 26);
-      const macdLine = ema12.map((v, i) => v - ema26[i]);
+      const macdLine = ema12.map((v: number, i: number) => v - ema26[i]);
       const signalLine = calcEMA(macdLine, 9);
       macd = macdLine;
       macd_signal = signalLine;
-      macd_hist = macdLine.map((v, i) => v - signalLine[i]);
+      macd_hist = macdLine.map((v: number, i: number) => v - signalLine[i]);
     }
 
     // Compute RSI 14
@@ -63,8 +86,8 @@ export async function GET(request: Request) {
       
       for (let i = 15; i < closes.length; i++) {
         const diff = closes[i] - closes[i - 1];
-        let gain = diff > 0 ? diff : 0;
-        let loss = diff < 0 ? Math.abs(diff) : 0;
+        const gain = diff > 0 ? diff : 0;
+        const loss = diff < 0 ? Math.abs(diff) : 0;
         avgGain = (avgGain * 13 + gain) / 14;
         avgLoss = (avgLoss * 13 + loss) / 14;
         rsi[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
@@ -73,16 +96,20 @@ export async function GET(request: Request) {
 
     // Compute MA20, MA50
     const formattedData = validQuotes.map((bar: any, i: number) => {
-      const dateStr = bar.date.toISOString().split('T')[0];
+      // For intraday, keep full ISO string so frontend can derive UNIX timestamps.
+      // For daily, use YYYY-MM-DD.
+      const dateStr = isIntraday
+        ? bar.date.toISOString()
+        : bar.date.toISOString().split('T')[0];
       
       let ma_20 = null;
       if (i >= 19) {
-        ma_20 = closes.slice(i - 19, i + 1).reduce((a, b) => a + b, 0) / 20;
+        ma_20 = closes.slice(i - 19, i + 1).reduce((a: number, b: number) => a + b, 0) / 20;
       }
       
       let ma_50 = null;
       if (i >= 49) {
-        ma_50 = closes.slice(i - 49, i + 1).reduce((a, b) => a + b, 0) / 50;
+        ma_50 = closes.slice(i - 49, i + 1).reduce((a: number, b: number) => a + b, 0) / 50;
       }
 
       return {
@@ -104,10 +131,14 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       symbol,
+      interval,
+      count: formattedData.length,
       data: formattedData
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800' // Cache for 15 minutes
+        'Cache-Control': isIntraday
+          ? 'public, s-maxage=60, stale-while-revalidate=120'
+          : 'public, s-maxage=900, stale-while-revalidate=1800'
       }
     });
   } catch (error: any) {

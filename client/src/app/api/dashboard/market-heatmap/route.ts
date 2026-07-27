@@ -44,7 +44,7 @@ export async function GET() {
             change: Number(changePct.toFixed(2)),
             symbols: sector.symbols
           };
-        } catch (e) {
+        } catch {
           return {
             sector: sector.name,
             change: 0.0,

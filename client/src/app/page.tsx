@@ -20,10 +20,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Activity, Menu, X, Sun, Moon, Shield, BarChart3, Globe, Zap, Database, LineChart, Star } from "lucide-react";
-import Head from "next/head";
+import { ArrowRight, Activity, Menu, X, Sun, Moon, Shield, Zap, Database, LineChart, Star } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { Logo } from "@/components/Logo";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -65,18 +65,7 @@ export default function LandingPage() {
     })
   };
 
-  const navLinks = ["Platform", "Solutions", "Infrastructure", "Company"];
 
-  const Logo = () => (
-    <div className="flex items-center gap-2.5">
-      <div className={`w-7 h-7 rounded-[6px] flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#192837]'}`}>
-        <Activity className={`w-4 h-4 ${isDark ? 'text-black' : 'text-white'}`} strokeWidth={3} />
-      </div>
-      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', letterSpacing: '-0.03em', color: isDark ? 'white' : '#192837' }}>
-        QuantAdv
-      </span>
-    </div>
-  );
 
   if (!mounted) return null;
 
@@ -100,7 +89,7 @@ export default function LandingPage() {
         {/* Navbar */}
         <div className={`fixed w-full z-50 transition-all duration-400 ${isScrolled ? (isDark ? 'top-0 bg-black/40 backdrop-blur-xl border-b border-white/10' : 'top-0 bg-white/50 backdrop-blur-xl border-b border-black/5') : 'top-3 sm:top-5 bg-transparent'}`}>
           <div className="relative w-full max-w-[1280px] mx-auto px-6 sm:px-8 py-4 flex items-center justify-between transition-all duration-300">
-            <Logo />
+            <Logo showText={true} />
             
             <div className="hidden md:flex items-center space-x-10">
               {['Platform', 'Solutions', 'Data', 'Pricing', 'Docs'].map((link) => (
@@ -180,7 +169,7 @@ export default function LandingPage() {
               className={`fixed inset-0 z-50 pt-24 px-6 pb-6 ${isDark ? 'bg-[#050505]' : 'bg-[#fafafa]'}`}
             >
               <div className="flex justify-between items-center absolute top-6 left-6 right-6">
-                <Logo />
+                <Logo showText={true} />
                 <button onClick={() => setIsMenuOpen(false)} className={`p-2 rounded-full ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>
                   <X size={20} />
                 </button>

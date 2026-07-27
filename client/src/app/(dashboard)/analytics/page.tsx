@@ -19,12 +19,15 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import api from '@/services/api'
+import { useAppStore } from '@/store/useAppStore'
+import { formatCurrency, formatCurrencyCompact } from '@/utils/currency'
 
 const COLORS = ['#00d4ff', '#7c3aed', '#10b981', '#f59e0b', '#f97316', '#ef4444']
 
 export default function AnalyticsPage() {
+  const { currency } = useAppStore()
   const { data: stats } = useQuery({ queryKey: ['dashboard-stats'], queryFn: () => api.get('/dashboard/stats').then(r => r.data) })
   const { data: portfolioData } = useQuery({ queryKey: ['portfolio-history-90'], queryFn: () => api.get('/dashboard/portfolio-history?days=90').then(r => r.data) })
   const { data: attackHistory } = useQuery({ queryKey: ['attack-history'], queryFn: () => api.get('/attacks/history').then(r => r.data.history) })
@@ -89,8 +92,8 @@ export default function AnalyticsPage() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => v.slice(5)} />
-            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => `$${(v/1000).toFixed(1)}k`} />
-            <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 8, fontSize: '0.8rem' }} formatter={(v: any) => [`$${Number(v).toLocaleString()}`, 'Value']} />
+            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => formatCurrencyCompact(v, currency)} />
+            <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 8, fontSize: '0.8rem' }} formatter={(v: any) => [formatCurrency(v, currency), 'Value']} />
             <Area type="monotone" dataKey="value" stroke="#7c3aed" strokeWidth={2} fill="url(#portfolioGrad90)" />
           </AreaChart>
         </ResponsiveContainer>

@@ -27,9 +27,34 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from auth.dependencies import get_current_user
 from utils.cache import cache_get, cache_set
 from utils.logger import logger
+from database.postgres import SessionLocal, MarketData, upsert_market_data
+import os
+import requests
 
 router = APIRouter()
 
+
+def _fetch_fmp(symbol: str, start: str, end: str, interval: str = "1d") -> pd.DataFrame:
+    """Fetch OHLCV data from Financial Modeling Prep (FMP) API."""
+    api_key = os.getenv("FMP_API_KEY")
+    if not api_key:
+        raise ValueError("FMP_API_KEY not set")
+    
+    # Map interval to FMP format
+    fmp_interval = "4hour" if interval == "1d" else "5min"
+    url = f"https://financialmodelingprep.com/api/v3/historical-chart/{fmp_interval}/{symbol}?apikey={api_key}&from={start}&to={end}"
+    
+    resp = requests.get(url)
+    resp.raise_for_status()
+    data = resp.json()
+    
+    if not data:
+        raise ValueError(f"No data for {symbol}")
+        
+    df = pd.DataFrame(data)
+    df = df.rename(columns={"date": "date", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"})
+    df["date"] = df["date"].astype(str).str[:10]
+    return df[::-1].reset_index(drop=True)  # Reverse to chronological order
 
 def _fetch_yfinance(symbol: str, start: str, end: str, interval: str = "1d") -> pd.DataFrame:
     """Fetch OHLCV data from Yahoo Finance."""
@@ -106,7 +131,48 @@ def get_ohlcv(
     if cached:
         return cached
 
-    df = _fetch_yfinance(symbol.upper(), start, end, interval)
+    # 1. Try fetching from PostgreSQL first
+    with SessionLocal() as session:
+        records = session.query(MarketData).filter(
+            MarketData.symbol == symbol.upper(),
+            MarketData.timestamp >= start,
+            MarketData.timestamp <= end,
+            MarketData.interval == interval
+        ).order_by(MarketData.timestamp.asc()).all()
+        
+    if len(records) > 10:  # Arbitrary threshold to assume we have enough data
+        df = pd.DataFrame([{
+            "date": r.timestamp.strftime("%Y-%m-%d"),
+            "open": r.open,
+            "high": r.high,
+            "low": r.low,
+            "close": r.close,
+            "volume": r.volume
+        } for r in records])
+    else:
+        # 2. Fallback to APIs if not in DB
+        try:
+            df = _fetch_fmp(symbol.upper(), start, end, interval)
+        except Exception as e:
+            logger.warning(f"FMP failed or not configured, falling back to yfinance: {e}")
+            df = _fetch_yfinance(symbol.upper(), start, end, interval)
+            
+        # Optional: Save back to Postgres
+        records_to_insert = []
+        for _, row in df.iterrows():
+            records_to_insert.append({
+                "symbol": symbol.upper(),
+                "timestamp": pd.to_datetime(row['date']).to_pydatetime(),
+                "interval": interval,
+                "open": float(row['open']),
+                "high": float(row['high']),
+                "low": float(row['low']),
+                "close": float(row['close']),
+                "volume": float(row['volume'])
+            })
+        if records_to_insert:
+            upsert_market_data(records_to_insert)
+
     df = _compute_indicators(df)
 
     result = {

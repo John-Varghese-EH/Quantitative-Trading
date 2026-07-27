@@ -21,8 +21,10 @@
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { AnimatePresence, motion } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import { useAppStore } from '@/store/useAppStore';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -36,14 +38,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // Add any role based routing here later if needed, e.g. checking user document from firestore
   }, [user, loading, router, pathname]);
 
+  const { sidebarOpen } = useAppStore();
+
   if (loading || !user) return null;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)' }}>
       <Sidebar />
-      <div className="main-layout" style={{ flex: 1 }}>
+      <div className={`main-layout ${!sidebarOpen ? 'collapsed' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <TopBar />
-        <main>{children}</main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            style={{ flex: 1 }}
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -28,6 +28,7 @@ from api.dashboard import router as dashboard_router
 from api.market_data import router as market_router
 from api.news import router as news_router
 from api.portfolio import router as portfolio_router
+from api.threat_intel import router as threat_intel_router
 from attacks.router import router as attacks_router
 
 # Routers
@@ -39,13 +40,26 @@ from trading.router import router as trading_router
 from utils.logger import logger
 
 
+from database.postgres import init_db
+from tasks.scheduler import start_scheduler, stop_scheduler
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown events."""
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     # Firebase is initialized on import via database.firestore
     logger.info("✅ Firebase Admin SDK ready")
+    
+    # Initialize PostgreSQL
+    init_db()
+    
+    # Start background ETL scheduler
+    start_scheduler()
+    
     yield
+    
+    # Shutdown gracefully
+    stop_scheduler()
     logger.info("👋 Shutting down QuantAdv Sandbox")
 
 
@@ -78,6 +92,7 @@ app.include_router(attacks_router,  prefix="/api/attacks",   tags=["Adversarial 
 app.include_router(defenses_router, prefix="/api/defenses",  tags=["Defense Mechanisms"])
 app.include_router(admin_router,    prefix="/api/admin",     tags=["Admin Panel"])
 app.include_router(news_router,     prefix="/api/news",      tags=["News & Sentiment"])
+app.include_router(threat_intel_router, prefix="/api/threat-intel", tags=["Threat Intelligence"])
 
 
 @app.get("/", tags=["Health"])

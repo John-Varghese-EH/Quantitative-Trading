@@ -23,11 +23,12 @@ import NextLink from 'next/link';
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, TrendingUp, Brain, Zap, Shield, FlaskConical,
-  BarChart3, Lightbulb, Bell, Settings, LogOut, ChevronLeft, Activity,
-  Newspaper, Users
+  BarChart3, Lightbulb, Bell, LogOut, Activity,
+  Users
 } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuth } from '@/contexts/AuthContext'
+import { Logo } from './Logo'
 
 const NAV_ITEMS = [
   { to: '/dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
@@ -43,7 +44,7 @@ const NAV_ITEMS = [
 ]
 
 export default function Sidebar() {
-  const { unreadCount } = useAppStore()
+  const { unreadCount, sidebarOpen } = useAppStore()
   const { user, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -54,27 +55,13 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
-      {/* Logo */}
+    <aside className={`sidebar ${!sidebarOpen ? 'collapsed' : ''}`}>
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ padding: '24px 20px', borderBottom: '1px solid var(--color-border)' }}
+        style={{ padding: '24px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: sidebarOpen ? 'flex-start' : 'center' }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 32, height: 32,
-            background: 'var(--color-text)',
-            borderRadius: 8,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Zap size={16} color="var(--color-bg)" />
-          </div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.03em' }}>QuantAdv</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)', fontWeight: 500 }}>AI Trading Sandbox</div>
-          </div>
-        </div>
+        <Logo size={32} showText={sidebarOpen} className="sidebar-logo-container" />
       </motion.div>
 
       {/* Navigation */}
@@ -89,10 +76,12 @@ export default function Sidebar() {
             <NextLink
               href={to}
               className={`sidebar-link ${pathname === to ? 'active' : ''}`}
+              style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', padding: sidebarOpen ? '10px 16px' : '10px' }}
+              title={!sidebarOpen ? label : undefined}
             >
               <Icon size={18} />
-              <span>{label}</span>
-              {to === '/notifications' && unreadCount > 0 && (
+              {sidebarOpen && <span>{label}</span>}
+              {to === '/notifications' && unreadCount > 0 && sidebarOpen && (
                 <span style={{
                   marginLeft: 'auto',
                   background: 'var(--color-danger)',
@@ -111,37 +100,43 @@ export default function Sidebar() {
 
         {/* Admin only */}
         {(user as any)?.role === 'admin' && (
-          <NextLink href="/admin" className={`sidebar-link ${pathname === '/admin' ? 'active' : ''}`}>
+          <NextLink href="/admin" className={`sidebar-link ${pathname === '/admin' ? 'active' : ''}`} style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', padding: sidebarOpen ? '10px 16px' : '10px' }} title={!sidebarOpen ? 'Admin Panel' : undefined}>
             <Users size={18} />
-            <span>Admin Panel</span>
+            {sidebarOpen && <span>Admin Panel</span>}
           </NextLink>
         )}
       </nav>
 
       {/* User section */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--color-border)' }}>
-        <div className="glass-light" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, borderRadius: 8 }}>
-          {user?.photoURL ? (
-            <img src={user.photoURL} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-          ) : (
-            <div style={{
-              width: 32, height: 32,
-              background: 'var(--color-border)',
-              borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 600, fontSize: '0.8rem', color: 'var(--color-text)', flexShrink: 0,
-            }}>
-              {(user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+      <div style={{ padding: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'center' }}>
+        {sidebarOpen ? (
+          <div className="glass-light" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, borderRadius: 8, width: '100%' }}>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+            ) : (
+              <div style={{
+                width: 32, height: 32,
+                background: 'var(--color-border)',
+                borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 600, fontSize: '0.8rem', color: 'var(--color-text)', flexShrink: 0,
+              }}>
+                {(user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
             </div>
-          )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+            <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4, display: 'flex' }}>
+              <LogOut size={16} />
+            </button>
           </div>
-          <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4, display: 'flex' }}>
-            <LogOut size={16} />
+        ) : (
+          <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 10, display: 'flex', borderRadius: 8 }} className="sidebar-link">
+            <LogOut size={18} />
           </button>
-        </div>
+        )}
       </div>
     </aside>
   )

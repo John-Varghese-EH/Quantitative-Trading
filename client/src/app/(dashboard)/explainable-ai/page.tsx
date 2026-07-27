@@ -20,8 +20,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Lightbulb, Brain } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts'
+import { Search, Lightbulb, Trophy, Zap, BookOpen } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import api from '@/services/api'
 
 export default function ExplainableAIPage() {
@@ -76,8 +76,9 @@ export default function ExplainableAIPage() {
         </div>
         <motion.button className="btn-primary" onClick={fetchExplanation} disabled={!modelId || loading}
           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-          style={{ padding: '12px 24px', opacity: !modelId || loading ? 0.7 : 1 }}>
-          {loading ? 'Explaining…' : '🔍 Explain'}
+          style={{ height: 42, padding: '0 24px', display: 'flex', alignItems: 'center', gap: 8, opacity: !modelId || loading ? 0.7 : 1 }}>
+          <Search size={16} />
+          {loading ? 'Explaining…' : 'Explain'}
         </motion.button>
       </div>
 
@@ -100,8 +101,8 @@ export default function ExplainableAIPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
             {/* Feature Importance */}
             <div className="glass" style={{ padding: 24 }}>
-              <h3 style={{ margin: '0 0 18px', fontWeight: 700 }}>
-                🏆 Global Feature Importance (SHAP)
+              <h3 style={{ margin: '0 0 16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Trophy size={18} className="text-warning" /> Global Feature Importance (SHAP)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={shapData.feature_importance?.slice(0, 10)} layout="vertical">
@@ -121,7 +122,9 @@ export default function ExplainableAIPage() {
 
             {/* Waterfall (single prediction) */}
             <div className="glass" style={{ padding: 24 }}>
-              <h3 style={{ margin: '0 0 18px', fontWeight: 700 }}>⚡ SHAP Waterfall (Latest Prediction)</h3>
+              <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Zap size={18} className="text-primary" /> SHAP Waterfall (Latest Prediction)
+              </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {(shapData.waterfall || []).slice(0, 10).map((item: any, i: number) => {
                   const isPositive = item.shap_value > 0
@@ -157,8 +160,10 @@ export default function ExplainableAIPage() {
           </div>
 
           {/* Feature Explanation Cards */}
-          <div className="glass" style={{ padding: 24 }}>
-            <h3 style={{ margin: '0 0 18px', fontWeight: 700 }}>📖 Feature Explanations</h3>
+          <div className="glass" style={{ padding: 24, alignSelf: 'start' }}>
+            <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <BookOpen size={18} className="text-primary" /> Feature Explanations
+            </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
               {(shapData.feature_importance || []).slice(0, 12).map((feat: any, i: number) => (
                 <div key={feat.feature} className="glass-light" style={{ padding: 14 }}>

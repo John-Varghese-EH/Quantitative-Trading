@@ -20,7 +20,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Shield } from 'lucide-react'
+import { Shield, ShieldCheck } from 'lucide-react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
@@ -58,7 +58,7 @@ export default function DefensePage() {
     mutationFn: (body: any) => api.post('/defenses/apply', body),
     onSuccess: (res) => {
       setResult(res.data)
-      toast.success(`🛡️ Defense applied! Security score: ${res.data.security_score}`)
+      toast.success(`Defense applied! Security score: ${res.data.security_score}`)
     },
     onError: (err: any) => toast.error(err.response?.data?.detail || 'Defense failed'),
   })
@@ -103,7 +103,7 @@ export default function DefensePage() {
                       <div style={{ fontWeight: 600, fontSize: '0.88rem', color: defenseType === d.id ? meta.color : 'var(--color-text)' }}>{d.name}</div>
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 3, paddingLeft: 22 }}>{d.description}</div>
-                    <div style={{ fontSize: '0.68rem', color: meta.color, marginTop: 3, paddingLeft: 22 }}>✓ {meta.risk}</div>
+                    <div style={{ fontSize: '0.68rem', color: meta.color, marginTop: 3, paddingLeft: 22, display: 'flex', alignItems: 'center', gap: 4 }}><ShieldCheck size={12} /> {meta.risk}</div>
                   </button>
                 )
               })}
@@ -123,13 +123,9 @@ export default function DefensePage() {
                 <label style={{ fontSize: '0.8rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Symbol</label>
                 <input className="input-field" value={symbol} onChange={e => setSymbol(e.target.value.toUpperCase())} />
               </div>
-              <motion.button
-                onClick={() => { if (!modelId) return toast.error('Select a model'); defenseMutation.mutate({ model_id: modelId, defense_type: defenseType, symbol }) }}
-                disabled={defenseMutation.isPending}
-                className="btn-primary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                style={{ padding: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: defenseMutation.isPending ? 0.7 : 1, background: 'linear-gradient(135deg, #10b981, #059669)' }}>
-                <Shield size={16} />{defenseMutation.isPending ? 'Applying…' : '🛡️ Apply Defense'}
-              </motion.button>
+              <button onClick={() => { if (!modelId) return toast.error('Select a model'); defenseMutation.mutate({ model_id: modelId, defense_type: defenseType, symbol }) }} disabled={defenseMutation.isPending} className="btn-primary" style={{ width: '100%', padding: 14, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Shield size={18} /> {defenseMutation.isPending ? 'Applying…' : 'Apply Defense'}
+              </button>
             </div>
           </div>
 
@@ -179,7 +175,7 @@ export default function DefensePage() {
                   { l: 'Accuracy After', v: (result.accuracy_after * 100).toFixed(1), color: 'var(--color-success)', suffix: '%' },
                   { l: 'Improvement', v: result.improvement_pct >= 0 ? `+${result.improvement_pct}` : result.improvement_pct, color: result.improvement_pct >= 0 ? 'var(--color-success)' : 'var(--color-danger)', suffix: '%' },
                   { l: 'Defense Type', v: result.defense_type.replace(/_/g, ' '), color: 'var(--color-primary)', suffix: '' },
-                  { l: 'Status', v: '✓ Applied', color: 'var(--color-success)', suffix: '' },
+                  { l: 'Status', v: 'Applied', color: 'var(--color-success)', suffix: '' },
                 ].map(m => (
                   <div key={m.l} className="glass" style={{ padding: 16 }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.l}</div>

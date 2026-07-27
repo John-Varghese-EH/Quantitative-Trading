@@ -63,11 +63,17 @@ interface AppState {
   // Active model
   activeModelId: string | null
   setActiveModelId: (id: string | null) => void
+
+  // Currency
+  currency: 'USD' | 'INR' | 'EUR' | 'GBP'
+  setCurrency: (c: 'USD' | 'INR' | 'EUR' | 'GBP') => void
+  exchangeRates: Record<string, number>
+  fetchRates: () => Promise<void>
 }
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // Auth
       user: null,
       accessToken: null,
@@ -114,10 +120,26 @@ export const useAppStore = create<AppState>()(
       // Active model
       activeModelId: null,
       setActiveModelId: (id) => set({ activeModelId: id }),
+
+      // Currency
+      currency: 'USD',
+      setCurrency: (c) => set({ currency: c }),
+      exchangeRates: { USD: 1, INR: 83.5, EUR: 0.92, GBP: 0.79 }, // Fallback rates
+      fetchRates: async () => {
+        try {
+          const res = await fetch('https://open.er-api.com/v6/latest/USD')
+          if (res.ok) {
+            const data = await res.json()
+            set({ exchangeRates: { USD: 1, INR: data.rates.INR, EUR: data.rates.EUR, GBP: data.rates.GBP } })
+          }
+        } catch (err) {
+          console.error('Failed to fetch live exchange rates:', err)
+        }
+      },
     }),
     {
       name: 'quantadv-store',
-      partialize: (s) => ({ user: s.user, accessToken: s.accessToken, isAuthenticated: s.isAuthenticated, theme: s.theme }),
+      partialize: (s) => ({ user: s.user, accessToken: s.accessToken, isAuthenticated: s.isAuthenticated, theme: s.theme, currency: s.currency }),
     }
   )
 )

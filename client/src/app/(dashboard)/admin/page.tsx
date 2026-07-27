@@ -19,7 +19,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Users, Trash2, ToggleLeft, ToggleRight, Activity, Shield, Brain, AlertTriangle } from 'lucide-react'
+import { Users, Trash2, ToggleLeft, ToggleRight, Activity, Brain, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 
@@ -122,7 +122,7 @@ export default function AdminPage() {
                   </td>
                   <td>
                     <span className={`badge ${u.is_verified ? 'badge-success' : 'badge-warning'}`}>
-                      {u.is_verified ? '✓ Verified' : 'Pending'}
+                      {u.is_verified ? <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={14} className="text-success" /> Verified</span> : <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={14} className="text-muted" /> Pending</span>}
                     </span>
                   </td>
                   <td style={{ color: 'var(--color-muted)', fontSize: '0.8rem' }}>
@@ -161,9 +161,9 @@ export default function AdminPage() {
             {(logs || []).map((l: any) => (
               <tr key={l.id}>
                 <td style={{ fontWeight: 600 }}>{l.action}</td>
-                <td style={{ color: 'var(--color-muted)', fontFamily: 'monospace', fontSize: '0.82rem' }}>{l.ip_address || '—'}</td>
+                <td style={{ color: 'var(--color-muted)', fontFamily: 'monospace', fontSize: '0.82rem' }}>{l.ip_address || '-'}</td>
                 <td style={{ color: 'var(--color-muted)', fontSize: '0.8rem' }}>
-                  {l.created_at ? new Date(l.created_at).toLocaleString() : '—'}
+                  {l.created_at ? new Date(l.created_at).toLocaleString() : '-'}
                 </td>
               </tr>
             ))}

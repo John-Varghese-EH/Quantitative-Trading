@@ -51,7 +51,12 @@ To run the application locally using Docker:
    ```bash
    cp .env.example .env
    ```
-   Add your API keys to the `.env` file if necessary.
+   
+   **Required API Keys (Free Tier Compatible):**
+   - `DATABASE_URL`: Your PostgreSQL connection string (e.g., from Supabase or Render).
+   - `FMP_API_KEY`: Financial Modeling Prep API key for high-frequency market data.
+   - `GEMINI_API_KEY`: Google Gemini API key for the Red Team threat intelligence analyst.
+   - Firebase Credentials: Set up a Firebase project, download the service account JSON, and place it in `server/credentials.json`.
 
 3. Start all services:
    ```bash
@@ -85,6 +90,10 @@ cd client
 npm run test
 ```
 
-## License
+## License & Open Source Guidelines
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details. This ensures that any modifications made to this software that are offered as a service over a network must also have their source code made openly available.
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for details. 
+
+**Network Interaction Clause:** The AGPLv3 specifically closes the "Application Service Provider loophole." This means that because this is a web application, anyone who modifies this code and hosts it publicly *must* offer their modified source code to the users interacting with it over the network. 
+
+*Note: This platform is for educational and sandbox purposes only. It is not intended for live financial trading.*

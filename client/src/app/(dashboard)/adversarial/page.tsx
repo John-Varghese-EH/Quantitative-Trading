@@ -19,9 +19,9 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Play, AlertTriangle } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from 'recharts'
+import { motion } from 'framer-motion'
+import { Zap, AlertTriangle, Sword } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 
@@ -61,7 +61,7 @@ export default function AdversarialPage() {
     mutationFn: (body: any) => api.post('/attacks/simulate', body),
     onSuccess: (res) => {
       setResult(res.data)
-      toast.error(`⚔️ Attack launched! ${res.data.attack_success_rate}% success rate`)
+      toast.error(`Attack launched! ${res.data.attack_success_rate}% success rate`)
     },
     onError: (err: any) => toast.error(err.response?.data?.detail || 'Attack failed'),
   })
@@ -127,11 +127,9 @@ export default function AdversarialPage() {
                     style={{ width: '100%', accentColor: '#ef4444' }} />
                 </div>
               )}
-              <motion.button className="btn-danger" onClick={handleAttack}
-                disabled={attackMutation.isPending} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                style={{ padding: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: attackMutation.isPending ? 0.7 : 1 }}>
-                <Zap size={16} />{attackMutation.isPending ? 'Attacking…' : '⚡ Launch Attack'}
-              </motion.button>
+              <button onClick={handleAttack} disabled={attackMutation.isPending} className="btn-danger" style={{ width: '100%', padding: 14, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Sword size={18} /> {attackMutation.isPending ? 'Attacking…' : 'Launch Attack'}
+              </button>
             </div>
           </div>
 
@@ -214,8 +212,10 @@ export default function AdversarialPage() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div>
-                    <div style={{ fontSize: '0.8rem', color: '#ef4444', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Adversarial Predictions ⚠</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.8rem', color: '#ef4444', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.07em', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      Adversarial Predictions <AlertTriangle size={14} />
+                    </div>
                     <ResponsiveContainer width="100%" height={180}>
                       <BarChart data={result.comparison}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -259,7 +259,7 @@ export default function AdversarialPage() {
                         <td><span className={`badge ${d.adversarial_pred ? 'badge-success' : 'badge-danger'}`}>{d.adversarial_pred ? 'BUY' : 'SELL'}</span></td>
                         <td>{(d.original_prob * 100).toFixed(1)}%</td>
                         <td>{(d.adversarial_prob * 100).toFixed(1)}%</td>
-                        <td>{d.flipped ? <span style={{ color: '#f97316', fontWeight: 700 }}>⚠ YES</span> : <span style={{ color: 'var(--color-muted)' }}>—</span>}</td>
+                        <td>{d.flipped ? <span style={{ color: '#f97316', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={14} /> YES</span> : <span style={{ color: 'var(--color-muted)' }}>-</span>}</td>
                       </tr>
                     ))}
                   </tbody>
