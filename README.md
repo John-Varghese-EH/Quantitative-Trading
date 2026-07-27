@@ -87,4 +87,4 @@ npm run test
 
 ## License
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details. This ensures that any modifications made to this software that are offered as a service over a network must also have their source code made openly available.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details. This ensures that any modifications made to this software that are offered as a service over a network must also have their source code made openly available. 
