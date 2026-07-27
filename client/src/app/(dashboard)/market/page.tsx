@@ -1,10 +1,34 @@
 "use client";
+/**
+ * QuantAdv - Quantitative Trading Platform
+ * Copyright (C) 2026 John Varghese (J0X)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
-import { Search, RefreshCw } from 'lucide-react'
+import { Search, RefreshCw, Star } from 'lucide-react'
+import { LightweightChart } from '@/components/LightweightChart'
 import api from '@/services/api'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { useAuth } from '@/contexts/AuthContext'
+import { doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 const SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'BTC-USD', 'ETH-USD', 'SPY', 'AMZN', 'META']
 const INTERVALS = [{ v: '1d', l: '1 Day' }, { v: '1wk', l: '1 Week' }, { v: '1mo', l: '1 Month' }]
@@ -25,27 +49,71 @@ function CustomCandlestick(props: any) {
 }
 
 export default function MarketDataPage() {
+  const { user } = useAuth()
   const [symbol, setSymbol] = useState('AAPL')
   const [interval, setInterval] = useState('1d')
   const [customSymbol, setCustomSymbol] = useState('')
+  const [watchlist, setWatchlist] = useState<string[]>([])
 
   const activeSymbol = customSymbol || symbol
 
+  // Fetch watchlist on mount
+  useState(() => {
+    if (user?.uid) {
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        if (snap.exists()) setWatchlist(snap.data().watchlist || [])
+      })
+    }
+  })
+
+  const toggleWatchlist = async () => {
+    if (!user?.uid) return toast.error("Please login to save watchlists")
+    const isWatched = watchlist.includes(activeSymbol)
+    const newWatchlist = isWatched ? watchlist.filter(s => s !== activeSymbol) : [...watchlist, activeSymbol]
+    setWatchlist(newWatchlist)
+    try {
+      await updateDoc(doc(db, 'users', user.uid), {
+        watchlist: isWatched ? arrayRemove(activeSymbol) : arrayUnion(activeSymbol)
+      })
+      toast.success(isWatched ? 'Removed from watchlist' : 'Added to watchlist')
+    } catch (e) {
+      toast.error('Failed to update watchlist')
+    }
+  }
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['ohlcv', activeSymbol, interval],
-    queryFn: () => api.get(`/market/ohlcv?symbol=${activeSymbol}&interval=${interval}`).then(r => r.data),
+    queryFn: () => axios.get(`/api/market/ohlcv?symbol=${activeSymbol}&interval=${interval}`).then(r => r.data),
   })
 
   const { data: quote } = useQuery({
     queryKey: ['quote', activeSymbol],
-    queryFn: () => api.get(`/market/quote?symbol=${activeSymbol}`).then(r => r.data),
+    queryFn: () => axios.get(`/api/market/quote?symbol=${activeSymbol}`).then(r => r.data),
     refetchInterval: 30_000,
   })
 
-  const chartData = (data?.data || []).slice(-120).map((d: any, i: number) => ({
+  const chartDataRecharts = (data?.data || []).slice(-120).map((d: any, i: number) => ({
     ...d,
-    date: d.date?.slice(5),
-    wickTop: null, wickBottom: null,
+    date: d.date?.slice(5, 10),
+  }))
+
+  const candlestickData = (data?.data || []).map((d: any) => ({
+    time: d.date.split('T')[0],
+    open: d.open,
+    high: d.high,
+    low: d.low,
+    close: d.close,
+  }))
+
+  const volumeData = (data?.data || []).map((d: any) => ({
+    time: d.date.split('T')[0],
+    value: d.volume,
+    color: d.close >= d.open ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)'
+  }))
+
+  const ma20Data = (data?.data || []).filter((d: any) => d.ma_20).map((d: any) => ({
+    time: d.date.split('T')[0],
+    value: d.ma_20
   }))
 
   return (
@@ -58,14 +126,14 @@ export default function MarketDataPage() {
       </motion.div>
 
       {/* Controls */}
-      <div className="glass" style={{ padding: 20, marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+      <div className="glass" style={{ padding: '12px 20px', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {SYMBOLS.map(s => (
             <button key={s} onClick={() => { setSymbol(s); setCustomSymbol('') }} style={{
-              padding: '6px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem',
-              background: (customSymbol ? false : symbol === s) ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)',
-              color: (customSymbol ? false : symbol === s) ? '#000' : 'var(--color-muted)',
-              transition: 'all 0.2s',
+              padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: '0.82rem',
+              background: (customSymbol ? false : symbol === s) ? 'var(--color-text)' : 'transparent',
+              color: (customSymbol ? false : symbol === s) ? 'var(--color-bg)' : 'var(--color-muted)',
+              transition: 'all 0.15s',
             }}>{s}</button>
           ))}
         </div>
@@ -87,10 +155,24 @@ export default function MarketDataPage() {
 
       {/* Quote Card */}
       {quote && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: 20, marginBottom: 20, display: 'flex', gap: 32, alignItems: 'center' }}>
+        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: 20, marginBottom: 20, display: 'flex', gap: 32, alignItems: 'center', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 4 }}>{quote.symbol}</div>
-            <div style={{ fontSize: '2rem', fontWeight: 800 }}>${quote.price?.toLocaleString()}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 4 }}>
+              {quote.symbol} {quote.name && `— ${quote.name}`}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>${quote.price?.toLocaleString()}</div>
+              <button onClick={toggleWatchlist} style={{
+                background: watchlist.includes(activeSymbol) ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                border: `1px solid ${watchlist.includes(activeSymbol) ? '#f59e0b' : 'var(--color-border)'}`,
+                color: watchlist.includes(activeSymbol) ? '#f59e0b' : 'var(--color-muted)',
+                borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                fontSize: '0.8rem', fontWeight: 500, transition: 'all 0.15s'
+              }}>
+                <Star size={14} fill={watchlist.includes(activeSymbol) ? '#f59e0b' : 'none'} />
+                {watchlist.includes(activeSymbol) ? 'Saved' : 'Watch'}
+              </button>
+            </div>
           </div>
           {[
             { l: 'Change', v: `${quote.change >= 0 ? '+' : ''}$${quote.change?.toFixed(2)}`, pos: quote.change >= 0 },
@@ -113,27 +195,18 @@ export default function MarketDataPage() {
         <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}><div className="spinner" /></div>
       ) : (
         <>
-          {/* Price Chart (simplified as line + bars) */}
+          {/* Price Chart */}
           <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
             <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>
-              {activeSymbol} — Price & Volume
+              {quote?.name ? `${activeSymbol} (${quote.name})` : activeSymbol} — Advanced Chart
               <span style={{ fontWeight: 400, color: 'var(--color-muted)', fontSize: '0.85rem', marginLeft: 12 }}>{data?.count} candles</span>
             </h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <ComposedChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="price" orientation="right" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false}
-                  tickFormatter={v => `$${v.toFixed(0)}`} />
-                <YAxis yAxisId="vol" orientation="left" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false}
-                  tickFormatter={v => `${(v/1e6).toFixed(0)}M`} />
-                <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 8, fontSize: '0.8rem' }} />
-                <Bar yAxisId="vol" dataKey="volume" fill="rgba(124,58,237,0.3)" radius={[2,2,0,0]} />
-                <Line yAxisId="price" type="monotone" dataKey="close" stroke="#00d4ff" strokeWidth={2} dot={false} />
-                <Line yAxisId="price" type="monotone" dataKey="ma_20" stroke="#f59e0b" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
-                <Line yAxisId="price" type="monotone" dataKey="ma_50" stroke="#a78bfa" strokeWidth={1.5} dot={false} strokeDasharray="6 3" />
-              </ComposedChart>
-            </ResponsiveContainer>
+            
+            <LightweightChart 
+              data={candlestickData} 
+              volumeData={volumeData}
+              maData={ma20Data}
+            />
             <div style={{ display: 'flex', gap: 20, marginTop: 10, fontSize: '0.78rem' }}>
               {[
                 { color: '#00d4ff', label: 'Price' },
@@ -154,11 +227,11 @@ export default function MarketDataPage() {
             <div className="glass" style={{ padding: 20 }}>
               <h4 style={{ margin: '0 0 14px', fontWeight: 700, color: 'var(--color-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>RSI (14)</h4>
               <ResponsiveContainer width="100%" height={140}>
-                <AreaChart data={chartData}>
+                <AreaChart data={chartDataRecharts}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                   <XAxis dataKey="date" hide />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 6, fontSize: '0.75rem' }} />
+                  <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-glass-border)', borderRadius: 6, fontSize: '0.75rem' }} />
                   <Area type="monotone" dataKey="rsi" stroke="#f59e0b" strokeWidth={2} fill="rgba(245,158,11,0.1)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -167,11 +240,11 @@ export default function MarketDataPage() {
             <div className="glass" style={{ padding: 20 }}>
               <h4 style={{ margin: '0 0 14px', fontWeight: 700, color: 'var(--color-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>MACD</h4>
               <ResponsiveContainer width="100%" height={140}>
-                <ComposedChart data={chartData}>
+                <ComposedChart data={chartDataRecharts}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                   <XAxis dataKey="date" hide />
                   <YAxis tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 6, fontSize: '0.75rem' }} />
+                  <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-glass-border)', borderRadius: 6, fontSize: '0.75rem' }} />
                   <Bar dataKey="macd_hist" fill="rgba(0,212,255,0.3)" radius={[2,2,0,0]} />
                   <Line type="monotone" dataKey="macd" stroke="#00d4ff" strokeWidth={1.5} dot={false} />
                   <Line type="monotone" dataKey="macd_signal" stroke="#f97316" strokeWidth={1.5} dot={false} />
@@ -184,11 +257,11 @@ export default function MarketDataPage() {
           <div className="glass" style={{ padding: 24 }}>
             <h4 style={{ margin: '0 0 14px', fontWeight: 700 }}>Bollinger Bands</h4>
             <ResponsiveContainer width="100%" height={180}>
-              <AreaChart data={chartData}>
+              <AreaChart data={chartDataRecharts}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => `$${v.toFixed(0)}`} />
-                <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 6, fontSize: '0.75rem' }} />
+                <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-glass-border)', borderRadius: 6, fontSize: '0.75rem' }} />
                 <Area type="monotone" dataKey="bb_upper" stroke="rgba(124,58,237,0.5)" fill="rgba(124,58,237,0.05)" strokeWidth={1} />
                 <Area type="monotone" dataKey="bb_lower" stroke="rgba(124,58,237,0.5)" fill="rgba(124,58,237,0.05)" strokeWidth={1} />
                 <Line type="monotone" dataKey="close" stroke="#00d4ff" strokeWidth={2} dot={false} />

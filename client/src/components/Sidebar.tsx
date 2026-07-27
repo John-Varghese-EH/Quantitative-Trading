@@ -1,4 +1,22 @@
 "use client";
+/**
+ * QuantAdv - Quantitative Trading Platform
+ * Copyright (C) 2026 John Varghese (J0X)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 import { usePathname, useRouter } from 'next/navigation';
 import NextLink from 'next/link';
@@ -9,6 +27,7 @@ import {
   Newspaper, Users
 } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
+import { useAuth } from '@/contexts/AuthContext'
 
 const NAV_ITEMS = [
   { to: '/dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
@@ -24,12 +43,13 @@ const NAV_ITEMS = [
 ]
 
 export default function Sidebar() {
-  const { user, clearAuth, unreadCount } = useAppStore()
+  const { unreadCount } = useAppStore()
+  const { user, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
-  const handleLogout = () => {
-    clearAuth()
+  const handleLogout = async () => {
+    await logout()
     router.push('/login')
   }
 
@@ -37,23 +57,22 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         style={{ padding: '24px 20px', borderBottom: '1px solid var(--color-border)' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
-            width: 40, height: 40,
-            background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
-            borderRadius: 10,
+            width: 32, height: 32,
+            background: 'var(--color-text)',
+            borderRadius: 8,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(0,212,255,0.4)',
           }}>
-            <Zap size={20} color="#fff" />
+            <Zap size={16} color="var(--color-bg)" />
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1rem' }} className="gradient-text">QuantAdv</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>AI Trading Sandbox</div>
+            <div style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.03em' }}>QuantAdv</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)', fontWeight: 500 }}>AI Trading Sandbox</div>
           </div>
         </div>
       </motion.div>
@@ -91,7 +110,7 @@ export default function Sidebar() {
         ))}
 
         {/* Admin only */}
-        {user?.role === 'admin' && (
+        {(user as any)?.role === 'admin' && (
           <NextLink href="/admin" className={`sidebar-link ${pathname === '/admin' ? 'active' : ''}`}>
             <Users size={18} />
             <span>Admin Panel</span>
@@ -101,21 +120,25 @@ export default function Sidebar() {
 
       {/* User section */}
       <div style={{ padding: '16px', borderTop: '1px solid var(--color-border)' }}>
-        <div className="glass-light" style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 36, height: 36,
-            background: 'linear-gradient(135deg, #7c3aed, #00d4ff)',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '0.85rem', color: '#fff', flexShrink: 0,
-          }}>
-            {user?.username?.[0]?.toUpperCase() || 'U'}
-          </div>
+        <div className="glass-light" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, borderRadius: 8 }}>
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+          ) : (
+            <div style={{
+              width: 32, height: 32,
+              background: 'var(--color-border)',
+              borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 600, fontSize: '0.8rem', color: 'var(--color-text)', flexShrink: 0,
+            }}>
+              {(user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.username}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
           </div>
-          <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4 }}>
+          <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4, display: 'flex' }}>
             <LogOut size={16} />
           </button>
         </div>

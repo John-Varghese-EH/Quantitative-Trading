@@ -1,4 +1,22 @@
 "use client";
+/**
+ * QuantAdv - Quantitative Trading Platform
+ * Copyright (C) 2026 John Varghese (J0X)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import {
@@ -9,10 +27,10 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 import api from '@/services/api'
 
 const CARD_VARIANTS = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({ 
-    opacity: 1, y: 0, scale: 1, 
-    transition: { delay: i * 0.08, type: 'spring' as const, stiffness: 120, damping: 14 } 
+    opacity: 1, y: 0, 
+    transition: { delay: i * 0.05, duration: 0.3, ease: "easeOut" } 
   }),
 }
 
@@ -38,8 +56,8 @@ function StatCardComponent({ card, index }: { card: StatCard; index: number }) {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <p style={{ margin: '0 0 8px', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{card.label}</p>
-          <h3 style={{ margin: '0 0 6px', fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text)' }}>{card.value}</h3>
+          <p style={{ margin: '0 0 4px', color: 'var(--color-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.label}</p>
+          <h3 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)' }}>{card.value}</h3>
           {card.change && (
             <span style={{ fontSize: '0.8rem', color: card.positive ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 600 }}>
               {card.positive ? '▲' : '▼'} {card.change}
@@ -47,10 +65,11 @@ function StatCardComponent({ card, index }: { card: StatCard; index: number }) {
           )}
         </div>
         <div style={{
-          width: 48, height: 48, borderRadius: 12,
-          background: `${card.color}22`,
-          border: `1px solid ${card.color}44`,
+          width: 40, height: 40, borderRadius: 8,
+          background: `rgba(var(--color-${card.color}-rgb), 0.1)`,
+          border: `1px solid ${card.color}22`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: card.color
         }}>
           {card.icon}
         </div>
@@ -90,45 +109,45 @@ export default function DashboardPage() {
     {
       label: 'Portfolio Value', value: `$${stats.portfolio_value?.toLocaleString() ?? '—'}`,
       change: `${Math.abs(stats.daily_pnl_pct)}%`, positive: stats.daily_pnl_pct >= 0,
-      icon: <DollarSign size={22} color="#00d4ff" />, color: '#00d4ff', glowColor: 'rgba(0,212,255,0.3)',
+      icon: <DollarSign size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
     },
     {
       label: 'Daily P&L', value: `${stats.daily_pnl >= 0 ? '+' : ''}$${stats.daily_pnl?.toFixed(2) ?? '—'}`,
       positive: stats.daily_pnl >= 0,
-      icon: stats.daily_pnl >= 0 ? <TrendingUp size={22} color="#10b981" /> : <TrendingDown size={22} color="#ef4444" />,
-      color: stats.daily_pnl >= 0 ? '#10b981' : '#ef4444', glowColor: 'rgba(16,185,129,0.3)',
+      icon: stats.daily_pnl >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />,
+      color: stats.daily_pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)', glowColor: 'transparent',
     },
     {
       label: 'AI Confidence', value: `${stats.ai_confidence ?? 0}%`,
-      icon: <Brain size={22} color="#7c3aed" />, color: '#7c3aed', glowColor: 'rgba(124,58,237,0.3)',
+      icon: <Brain size={20} />, color: 'var(--color-accent)', glowColor: 'transparent',
     },
     {
       label: 'Model Accuracy', value: `${stats.model_accuracy ?? 0}%`,
-      icon: <Target size={22} color="#f59e0b" />, color: '#f59e0b', glowColor: 'rgba(245,158,11,0.3)',
+      icon: <Target size={20} />, color: 'var(--color-warning)', glowColor: 'transparent',
     },
     {
       label: 'Risk Score', value: `${stats.risk_score ?? 0}`,
-      icon: <AlertTriangle size={22} color="#ef4444" />, color: '#ef4444', glowColor: 'rgba(239,68,68,0.3)',
+      icon: <AlertTriangle size={20} />, color: 'var(--color-danger)', glowColor: 'transparent',
     },
     {
       label: 'Open Positions', value: stats.open_positions ?? 0,
-      icon: <Activity size={22} color="#06b6d4" />, color: '#06b6d4', glowColor: 'rgba(6,182,212,0.3)',
+      icon: <Activity size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
     },
     {
       label: 'Total Trades', value: stats.total_trades ?? 0,
-      icon: <BarChart2 size={22} color="#a78bfa" />, color: '#a78bfa', glowColor: 'rgba(167,139,250,0.3)',
+      icon: <BarChart2 size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
     },
     {
       label: 'Attacks Simulated', value: stats.total_attacks ?? 0,
-      icon: <Zap size={22} color="#f97316" />, color: '#f97316', glowColor: 'rgba(249,115,22,0.3)',
+      icon: <Zap size={20} />, color: 'var(--color-text)', glowColor: 'transparent',
     },
   ] : []
 
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
-          Trading <span className="gradient-text">Dashboard</span>
+        <h1 style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
+          Trading Dashboard
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Adversarial ML Sandbox — Paper Trading Mode</p>
       </motion.div>
@@ -155,14 +174,14 @@ export default function DashboardPage() {
                   <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false}
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-muted)' }} tickLine={false} axisLine={false}
                 tickFormatter={(v) => v.slice(5)} />
-              <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false}
+              <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted)' }} tickLine={false} axisLine={false}
                 tickFormatter={(v) => `$${(v/1000).toFixed(1)}k`} />
-              <Tooltip contentStyle={{ background: '#0d1429', border: '1px solid rgba(99,179,237,0.2)', borderRadius: 8, color: '#e2e8f0' }}
+              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 6, color: 'var(--color-text)' }}
                 formatter={(v: any) => [`$${Number(v).toLocaleString()}`, 'Value']} />
-              <Area type="monotone" dataKey="value" stroke="#00d4ff" strokeWidth={2} fill="url(#portfolioGrad)" />
+              <Area type="monotone" dataKey="value" stroke="var(--color-accent)" strokeWidth={2} fill="url(#portfolioGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -172,14 +191,14 @@ export default function DashboardPage() {
           <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Market Heatmap</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {(heatmap || []).map((s: any) => (
-              <motion.div key={s.sector} whileHover={{ scale: 1.05 }} style={{
-                padding: '10px 8px', borderRadius: 10, textAlign: 'center',
-                background: s.change >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-                border: `1px solid ${s.change >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              <motion.div key={s.sector} whileHover={{ y: -2 }} transition={{ duration: 0.15 }} style={{
+                padding: '10px 8px', borderRadius: 8, textAlign: 'center',
+                background: s.change >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                border: `1px solid ${s.change >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
                 cursor: 'default',
               }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)', marginBottom: 4 }}>{s.sector}</div>
-                <div style={{ fontWeight: 700, color: s.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontSize: '0.9rem' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: 2, fontWeight: 500 }}>{s.sector}</div>
+                <div style={{ fontWeight: 600, color: s.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontSize: '0.85rem' }}>
                   {s.change >= 0 ? '+' : ''}{s.change}%
                 </div>
               </motion.div>
@@ -227,9 +246,8 @@ export default function DashboardPage() {
           <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>📰 Market News & Sentiment</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {(news || []).slice(0, 5).map((article: any, i: number) => (
-              <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                whileHover={{ scale: 1.01, x: 4 }}
-                className="glass-light" style={{ padding: 14, cursor: 'pointer' }}>
+              <motion.div key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="glass-light" style={{ padding: '12px 16px', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>{article.source}</span>
                   <span className={`badge ${article.impact === 'bullish' ? 'badge-success' : 'badge-danger'}`}>

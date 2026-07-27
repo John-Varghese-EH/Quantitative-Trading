@@ -1,8 +1,26 @@
 "use client";
+/**
+ * QuantAdv - Quantitative Trading Platform
+ * Copyright (C) 2026 John Varghese (J0X)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw } from 'lucide-react'
+import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw, MessageSquareQuote, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
@@ -27,6 +45,10 @@ export default function AIPredictionPage() {
   const [startDate, setStartDate] = useState('2022-01-01')
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10))
   const [selectedModel, setSelectedModel] = useState<any>(null)
+
+  // Sentiment State
+  const [activeTab, setActiveTab] = useState<'ml' | 'sentiment'>('sentiment')
+  const [sentimentSymbol, setSentimentSymbol] = useState('AAPL')
 
   const { data: models, refetch: refetchModels } = useQuery({
     queryKey: ['ml-models'],
@@ -57,6 +79,19 @@ export default function AIPredictionPage() {
     onError: (err: any) => toast.error(err.response?.data?.detail || 'Prediction failed'),
   })
 
+  const sentimentQuery = useQuery({
+    queryKey: ['ai-sentiment', sentimentSymbol],
+    queryFn: async () => {
+      const res = await fetch(`/api/market/sentiment?symbol=${sentimentSymbol}`)
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to fetch sentiment')
+      }
+      return res.json()
+    },
+    enabled: false,
+  })
+
   const handleTrain = () => {
     if (!modelName.trim()) return toast.error('Enter a model name')
     trainMutation.mutate({ name: modelName, model_type: modelType, symbol, start_date: startDate, end_date: endDate })
@@ -70,15 +105,123 @@ export default function AIPredictionPage() {
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
-          AI <span className="gradient-text">Prediction</span>
-        </h1>
-        <p style={{ color: 'var(--color-muted)', margin: 0 }}>Train ML models to predict market direction</p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+            AI <span className="gradient-text">Prediction</span>
+          </h1>
+          <p style={{ color: 'var(--color-muted)', margin: 0 }}>Train ML models & analyze live sentiment</p>
+        </div>
+        
+        <div style={{ display: 'flex', background: 'var(--color-glass)', padding: 4, borderRadius: 12, border: '1px solid var(--color-glass-border)' }}>
+          <button 
+            onClick={() => setActiveTab('sentiment')}
+            style={{ 
+              padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6,
+              background: activeTab === 'sentiment' ? 'var(--color-glass-hover)' : 'transparent',
+              color: activeTab === 'sentiment' ? 'var(--color-text)' : 'var(--color-muted)',
+            }}
+          >
+            <MessageSquareQuote size={16} /> LLM Sentiment
+          </button>
+          <button 
+            onClick={() => setActiveTab('ml')}
+            style={{ 
+              padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6,
+              background: activeTab === 'ml' ? 'var(--color-glass-hover)' : 'transparent',
+              color: activeTab === 'ml' ? 'var(--color-text)' : 'var(--color-muted)',
+            }}
+          >
+            <Brain size={16} /> Quantitative ML
+          </button>
+        </div>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
-        {/* Train Panel */}
+      {activeTab === 'sentiment' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: 24 }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+            <input 
+              className="input-field" 
+              style={{ maxWidth: 300, fontSize: '1.2rem', textTransform: 'uppercase' }}
+              value={sentimentSymbol} 
+              onChange={e => setSentimentSymbol(e.target.value.toUpperCase())} 
+              placeholder="e.g. AAPL" 
+              onKeyDown={e => e.key === 'Enter' && sentimentQuery.refetch()}
+            />
+            <button 
+              className="btn-primary" 
+              onClick={() => sentimentQuery.refetch()}
+              disabled={sentimentQuery.isFetching}
+              style={{ padding: '0 24px', display: 'flex', alignItems: 'center', gap: 8, opacity: sentimentQuery.isFetching ? 0.7 : 1 }}
+            >
+              {sentimentQuery.isFetching ? <RefreshCw size={18} className="animate-spin" /> : <Brain size={18} />}
+              Analyze Sentiment
+            </button>
+          </div>
+
+          {sentimentQuery.error && (
+            <div style={{ padding: 16, background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              {sentimentQuery.error.message}
+            </div>
+          )}
+
+          {sentimentQuery.data?.sentiment && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20 }}>
+                {/* Score Panel */}
+                <div className="glass-light" style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
+                    {sentimentQuery.data.name} ({sentimentQuery.data.symbol})
+                  </div>
+                  
+                  {sentimentQuery.data.sentiment.sentimentLabel === 'Bullish' && <TrendingUp size={48} color="var(--color-success)" style={{ marginBottom: 12 }} />}
+                  {sentimentQuery.data.sentiment.sentimentLabel === 'Bearish' && <TrendingDown size={48} color="var(--color-danger)" style={{ marginBottom: 12 }} />}
+                  {sentimentQuery.data.sentiment.sentimentLabel === 'Neutral' && <Minus size={48} color="var(--color-warning)" style={{ marginBottom: 12 }} />}
+                  
+                  <div style={{ 
+                    fontSize: '2.5rem', fontWeight: 900,
+                    color: sentimentQuery.data.sentiment.sentimentLabel === 'Bullish' ? 'var(--color-success)' : 
+                           sentimentQuery.data.sentiment.sentimentLabel === 'Bearish' ? 'var(--color-danger)' : 'var(--color-warning)'
+                  }}>
+                    {sentimentQuery.data.sentiment.sentimentLabel}
+                  </div>
+                  <div style={{ fontSize: '1rem', color: 'var(--color-text)', marginTop: 8, fontWeight: 600 }}>
+                    Confidence Score: {sentimentQuery.data.sentiment.sentimentScore}/100
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--color-muted)', marginTop: 8 }}>
+                    Current Price: ${sentimentQuery.data.price} ({sentimentQuery.data.changePercent > 0 ? '+' : ''}{sentimentQuery.data.changePercent?.toFixed(2)}%)
+                  </div>
+                </div>
+
+                {/* Reasoning & Takeaways */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="glass-light" style={{ padding: 24 }}>
+                    <h3 style={{ margin: '0 0 12px', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Brain size={18} color="var(--color-primary)" /> AI Reasoning
+                    </h3>
+                    <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, fontSize: '0.95rem' }}>
+                      {sentimentQuery.data.sentiment.reasoning}
+                    </p>
+                  </div>
+                  
+                  <div className="glass-light" style={{ padding: 24, flex: 1 }}>
+                    <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Key Takeaways</h3>
+                    <ul style={{ margin: 0, padding: '0 0 0 20px', color: 'var(--color-text)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {sentimentQuery.data.sentiment.keyTakeaways.map((point: string, i: number) => (
+                        <li key={i} style={{ lineHeight: 1.5, fontSize: '0.95rem' }}>{point}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
+
+      {activeTab === 'ml' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
+          {/* Train Panel */}
         <div>
           <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
             <h3 style={{ margin: '0 0 20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -263,7 +406,8 @@ export default function AIPredictionPage() {
             )}
           </AnimatePresence>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

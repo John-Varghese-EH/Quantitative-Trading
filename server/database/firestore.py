@@ -1,18 +1,42 @@
+# QuantAdv - Quantitative Trading Platform
+# Copyright (C) 2026 John Varghese (J0X)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 from config import settings
 from utils.logger import logger
 
+import json
+
 def init_firebase():
     """Initialize Firebase Admin SDK"""
     if not firebase_admin._apps:
         try:
-            # Check if service account file exists
-            if os.path.exists(settings.FIREBASE_SERVICE_ACCOUNT_PATH):
+            # Check if JSON string is provided in env (e.g. on Render)
+            if settings.FIREBASE_SERVICE_ACCOUNT_JSON:
+                cred_dict = json.loads(settings.FIREBASE_SERVICE_ACCOUNT_JSON)
+                cred = credentials.Certificate(cred_dict)
+                firebase_admin.initialize_app(cred)
+                logger.info("✅ Firebase Admin SDK initialized from JSON environment variable.")
+            # Check if service account file exists (Local dev)
+            elif os.path.exists(settings.FIREBASE_SERVICE_ACCOUNT_PATH):
                 cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT_PATH)
                 firebase_admin.initialize_app(cred)
-                logger.info("✅ Firebase Admin SDK initialized with service account.")
+                logger.info("✅ Firebase Admin SDK initialized with service account file.")
             elif settings.FIREBASE_PROJECT_ID:
                 # Use default credentials (e.g., in Google Cloud environment)
                 firebase_admin.initialize_app(options={'projectId': settings.FIREBASE_PROJECT_ID})

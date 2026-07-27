@@ -1,14 +1,37 @@
 "use client";
+/**
+ * QuantAdv - Quantitative Trading Platform
+ * Copyright (C) 2026 John Varghese (J0X)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Bell, Search, TrendingUp, TrendingDown, Sun, Moon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useAppStore } from '@/store/useAppStore'
+import { useAuth } from '@/contexts/AuthContext'
 import api from '@/services/api'
+import axios from 'axios'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export default function TopBar() {
-  const { unreadCount, user } = useAppStore()
+  const { unreadCount } = useAppStore()
+  const { user } = useAuth()
   const { theme, setTheme, resolvedTheme } = useTheme()
   
   const [searchQuery, setSearchQuery] = useState('')
@@ -24,7 +47,7 @@ export default function TopBar() {
     }
     const delay = setTimeout(() => {
       setIsSearching(true)
-      api.get(`/market/search?q=${searchQuery}`)
+      axios.get(`/api/market/search?q=${searchQuery}`)
         .then(r => setSearchResults(r.data.results || []))
         .catch(() => setSearchResults([]))
         .finally(() => setIsSearching(false))
@@ -42,21 +65,32 @@ export default function TopBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const [watchlist, setWatchlist] = useState<string[]>([])
+
+  useEffect(() => {
+    if (user?.uid) {
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        if (snap.exists()) {
+          setWatchlist(snap.data().watchlist || [])
+        }
+      })
+    }
+  }, [user?.uid])
+
   const { data: prices } = useQuery({
-    queryKey: ['live-prices'],
-    queryFn: () => api.get('/market/live-prices').then(r => r.data.prices),
+    queryKey: ['live-prices', watchlist],
+    queryFn: () => axios.get(`/api/market/live-prices${watchlist.length ? `?symbols=${watchlist.join(',')}` : ''}`).then(r => r.data.prices),
     refetchInterval: 30_000,
   })
 
   return (
     <header style={{
-      position: 'fixed', top: 0, left: 280, right: 0, height: 72,
-      background: 'var(--color-glass)',
-      backdropFilter: 'blur(30px)',
-      borderBottom: '1px solid var(--color-glass-border)',
+      position: 'fixed', top: 0, left: 280, right: 0, height: 64,
+      background: 'var(--color-surface)',
+      borderBottom: '1px solid var(--color-border)',
       zIndex: 99,
-      display: 'flex', alignItems: 'center', gap: 16, padding: '0 32px',
-      transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      display: 'flex', alignItems: 'center', gap: 16, padding: '0 24px',
+      transition: 'left 0.15s ease',
     }}>
       {/* Live Ticker */}
       <div className="ticker-wrapper" style={{ flex: 1, maxWidth: 600 }}>
@@ -94,14 +128,14 @@ export default function TopBar() {
             }}
             style={{
               width: '100%',
-              background: 'var(--color-glass-light)',
-              border: '1px solid var(--color-glass-border)',
-              borderRadius: 20,
-              padding: '8px 16px 8px 36px',
+              background: 'transparent',
+              border: '1px solid var(--color-border)',
+              borderRadius: 8,
+              padding: '6px 16px 6px 36px',
               color: 'var(--color-text)',
               fontSize: '0.85rem',
               outline: 'none',
-              transition: 'border-color 0.2s',
+              transition: 'border-color 0.15s',
             }}
           />
         </div>
@@ -109,11 +143,11 @@ export default function TopBar() {
         {/* Search Results Dropdown */}
         {showDropdown && (searchQuery.trim() !== '') && (
           <div style={{
-            position: 'absolute', top: 44, left: 0, right: 0,
+            position: 'absolute', top: 40, left: 0, right: 0,
             background: 'var(--color-surface)',
-            border: '1px solid var(--color-glass-border)',
-            borderRadius: 12,
-            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 8,
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             zIndex: 100,
             maxHeight: 300,
             overflowY: 'auto',
@@ -180,21 +214,25 @@ export default function TopBar() {
         {/* User pill */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: 'rgba(255,255,255,0.04)',
+          background: 'transparent',
           border: '1px solid var(--color-border)',
-          borderRadius: 24, padding: '6px 14px',
+          borderRadius: 8, padding: '4px 10px',
           fontSize: '0.85rem',
         }}>
-          <div style={{
-            width: 24, height: 24, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #7c3aed, #00d4ff)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.7rem', fontWeight: 700, color: '#fff',
-          }}>
-            {user?.username?.[0]?.toUpperCase()}
-          </div>
-          <span style={{ color: 'var(--color-text)' }}>{user?.username}</span>
-          {user?.role === 'admin' && (
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt="Avatar" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+          ) : (
+            <div style={{
+              width: 24, height: 24, borderRadius: '50%',
+              background: 'var(--color-border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text)',
+            }}>
+              {(user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+            </div>
+          )}
+          <span style={{ color: 'var(--color-text)' }}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</span>
+          {(user as any)?.role === 'admin' && (
             <span className="badge badge-purple" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>ADMIN</span>
           )}
         </div>
