@@ -66,7 +66,7 @@ export default function LoginPage() {
     try {
       await loginWithGoogle();
       toast.success('Authentication successful');
-    } catch {
+    } catch (err: any) {
       console.error(err);
       toast.error(`Google authentication failed: ${err.message || 'Unknown error'}`);
     } finally {
