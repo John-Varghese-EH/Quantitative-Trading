@@ -92,8 +92,4 @@ npm run test
 
 ## License & Open Source Guidelines
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for details. 
-
-**Network Interaction Clause:** The AGPLv3 specifically closes the "Application Service Provider loophole." This means that because this is a web application, anyone who modifies this code and hosts it publicly *must* offer their modified source code to the users interacting with it over the network. 
-
-*Note: This platform is for educational and sandbox purposes only. It is not intended for live financial trading.*
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details. This ensures that any modifications made to this software that are offered as a service over a network must also have their source code made openly available. 
