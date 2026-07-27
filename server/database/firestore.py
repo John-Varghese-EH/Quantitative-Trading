@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import json
 import os
+
 import firebase_admin
 from firebase_admin import credentials, firestore
+
 from config import settings
 from utils.logger import logger
 
-import json
 
 def init_firebase():
     """Initialize Firebase Admin SDK"""

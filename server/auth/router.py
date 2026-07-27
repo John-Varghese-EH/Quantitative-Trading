@@ -18,11 +18,12 @@
 Auth router: simplified for Firebase Authentication.
 """
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from database.firestore import get_db
 from auth.dependencies import get_current_user
+from database.firestore import get_db
 
 router = APIRouter()
 

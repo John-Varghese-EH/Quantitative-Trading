@@ -18,13 +18,13 @@
 All 5 defense mechanism implementations.
 Each defense takes a model + data and returns an improved model or sanitized data.
 """
+
 import numpy as np
-from typing import Tuple
 
 
 # ─── Adversarial Training ────────────────────────────────────────────────────
 def adversarial_training(model, X_train: np.ndarray, y_train: np.ndarray,
-                          epsilon: float = 0.01, model_type: str = "random_forest") -> Tuple[object, dict]:
+                          epsilon: float = 0.01, model_type: str = "random_forest") -> tuple[object, dict]:
     """Retrain model including adversarially perturbed samples."""
     from attacks.attacks import fgsm_attack
     X_adv, _ = fgsm_attack(model, X_train, epsilon)
@@ -38,7 +38,7 @@ def adversarial_training(model, X_train: np.ndarray, y_train: np.ndarray,
 
 # ─── Input Validation ────────────────────────────────────────────────────────
 def input_validation(X: np.ndarray, X_train: np.ndarray,
-                      z_thresh: float = 3.0) -> Tuple[np.ndarray, dict]:
+                      z_thresh: float = 3.0) -> tuple[np.ndarray, dict]:
     """
     Validate inputs by clipping to z-score bounds learned from training data.
     Rejects/clips features that are statistically anomalous.
@@ -65,7 +65,7 @@ def input_validation(X: np.ndarray, X_train: np.ndarray,
 
 # ─── Outlier Detection ────────────────────────────────────────────────────────
 def outlier_detection(X: np.ndarray, X_train: np.ndarray,
-                       contamination: float = 0.05) -> Tuple[np.ndarray, dict]:
+                       contamination: float = 0.05) -> tuple[np.ndarray, dict]:
     """Use Isolation Forest to detect and remove adversarial outliers."""
     from sklearn.ensemble import IsolationForest
     
@@ -89,7 +89,7 @@ def outlier_detection(X: np.ndarray, X_train: np.ndarray,
 
 # ─── Defensive Distillation ──────────────────────────────────────────────────
 def defensive_distillation(model, X_train: np.ndarray, y_train: np.ndarray,
-                             temperature: float = 10.0, model_type: str = "random_forest") -> Tuple[object, dict]:
+                             temperature: float = 10.0, model_type: str = "random_forest") -> tuple[object, dict]:
     """
     Train a student model on soft labels from teacher model.
     Soft labels are smoothed to reduce gradient sharpness.
@@ -113,7 +113,7 @@ def defensive_distillation(model, X_train: np.ndarray, y_train: np.ndarray,
 
 # ─── Feature Sanitization ────────────────────────────────────────────────────
 def feature_sanitization(X: np.ndarray, X_train: np.ndarray,
-                           variance_threshold: float = 0.01) -> Tuple[np.ndarray, dict]:
+                           variance_threshold: float = 0.01) -> tuple[np.ndarray, dict]:
     """
     Remove features with anomalously high variance or correlation.
     Apply PCA-based reconstruction for noise reduction.

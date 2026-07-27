@@ -61,7 +61,6 @@ reportlab==4.1.0
 
 # Cache
 cachetools==5.3.2
-textblob\nfeedparser
 
 textblob
 feedparser

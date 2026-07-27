@@ -54,7 +54,7 @@ export default function LoginPage() {
       await login(data.username, data.password);
       toast.success('Authentication successful');
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch {
       toast.error('Invalid credentials');
     } finally {
       setLoading(false);
@@ -66,7 +66,7 @@ export default function LoginPage() {
     try {
       await loginWithGoogle();
       toast.success('Authentication successful');
-    } catch (err: any) {
+    } catch {
       console.error(err);
       toast.error(`Google authentication failed: ${err.message || 'Unknown error'}`);
     } finally {

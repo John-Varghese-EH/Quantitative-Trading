@@ -17,8 +17,8 @@
 """
 LSTM model using TensorFlow/Keras for sequential financial time series.
 """
+
 import numpy as np
-from typing import Tuple
 
 
 def _reshape_for_lstm(X: np.ndarray, timesteps: int = 10) -> np.ndarray:
@@ -35,7 +35,6 @@ def _reshape_for_lstm(X: np.ndarray, timesteps: int = 10) -> np.ndarray:
 
 
 def train(X_train, X_test, y_train, params: dict):
-    import tensorflow as tf
     from tensorflow import keras
 
     timesteps = params.get("timesteps", 10)

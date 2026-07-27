@@ -18,9 +18,9 @@
 Vectorized backtesting engine.
 Runs a strategy function over historical OHLCV and computes performance metrics.
 """
-import numpy as np
+from collections.abc import Callable
+
 import pandas as pd
-from typing import Callable, Dict, List
 
 
 def run_backtest(
@@ -28,7 +28,7 @@ def run_backtest(
     strategy_fn: Callable,
     initial_capital: float = 10_000.0,
     commission: float = 0.001,
-) -> Dict:
+) -> dict:
     """
     Run a backtest for a given strategy function.
     
@@ -94,7 +94,10 @@ def run_backtest(
     returns = pd.Series([e["value"] for e in equity_curve])
     
     from trading.metrics import (
-        compute_sharpe, compute_max_drawdown, compute_win_rate, compute_cagr
+        compute_cagr,
+        compute_max_drawdown,
+        compute_sharpe,
+        compute_win_rate,
     )
 
     return {

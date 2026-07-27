@@ -15,21 +15,24 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Adversarial attacks API router (Firestore)."""
-import numpy as np
-from datetime import datetime, timezone
 import uuid
+from datetime import datetime, timezone
+
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from database.firestore import get_db
-from auth.dependencies import get_current_user
-from ml.trainer import load_model
-from ml.feature_engineering import engineer_features, FEATURE_COLUMNS
 from api.market_data import _fetch_yfinance
 from attacks.attacks import (
-    fgsm_attack, pgd_attack, data_poisoning_attack,
-    label_flipping_attack, feature_manipulation_attack, noise_injection_attack,
+    feature_manipulation_attack,
+    fgsm_attack,
+    noise_injection_attack,
+    pgd_attack,
 )
+from auth.dependencies import get_current_user
+from database.firestore import get_db
+from ml.feature_engineering import FEATURE_COLUMNS, engineer_features
+from ml.trainer import load_model
 
 router = APIRouter()
 

@@ -15,9 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Trading performance metrics."""
+
 import numpy as np
 import pandas as pd
-from typing import List
 
 
 def compute_sharpe(returns: pd.Series, risk_free_rate: float = 0.05) -> float:
@@ -34,7 +34,7 @@ def compute_max_drawdown(equity: pd.Series) -> float:
     return round(float(drawdown.min() * 100), 2)
 
 
-def compute_win_rate(trade_log: List[dict]) -> float:
+def compute_win_rate(trade_log: list[dict]) -> float:
     sells = [t for t in trade_log if t.get("type") == "SELL"]
     if not sells:
         return 0.0

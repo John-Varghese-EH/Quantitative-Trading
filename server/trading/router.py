@@ -15,16 +15,17 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Trading simulator API router (Firestore)."""
+import uuid
 from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from database.firestore import get_db
-from auth.dependencies import get_current_user
 from api.market_data import _fetch_yfinance
+from auth.dependencies import get_current_user
+from database.firestore import get_db
 from trading.backtester import run_backtest
 from trading.strategies import STRATEGY_MAP
-import uuid
 
 router = APIRouter()
 

@@ -15,11 +15,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """SHAP-based explainability for model predictions."""
+
 import numpy as np
-from typing import List, Optional
 
 
-def get_shap_values(model, X: np.ndarray, feature_names: List[str], model_type: str) -> dict:
+def get_shap_values(model, X: np.ndarray, feature_names: list[str], model_type: str) -> dict:
     """
     Compute SHAP values for the given model.
     Falls back to feature importance for tree models; uses KernelExplainer for others.
@@ -66,7 +66,7 @@ def get_shap_values(model, X: np.ndarray, feature_names: List[str], model_type: 
         return _fallback_importance(model, feature_names, str(e))
 
 
-def _fallback_importance(model, feature_names: List[str], error: str = "") -> dict:
+def _fallback_importance(model, feature_names: list[str], error: str = "") -> dict:
     """Use sklearn feature_importances_ if SHAP fails."""
     try:
         importances = model.feature_importances_
@@ -95,7 +95,7 @@ def _fallback_importance(model, feature_names: List[str], error: str = "") -> di
         }
 
 
-def explain_prediction(model, x: np.ndarray, feature_names: List[str], model_type: str) -> dict:
+def explain_prediction(model, x: np.ndarray, feature_names: list[str], model_type: str) -> dict:
     """
     Explain a single prediction: what features pushed the decision
     toward BUY or SELL.

@@ -21,7 +21,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Play, Trash2, CheckCircle, Clock, XCircle, RefreshCw, MessageSquareQuote, TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 import { useAppStore } from '@/store/useAppStore'
@@ -38,7 +38,7 @@ const SYMBOLS = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'BTC-USD', 'ETH-USD', 
 
 export default function AIPredictionPage() {
   const qc = useQueryClient()
-  const { setActiveModelId } = useAppStore()
+  
   const [modelType, setModelType] = useState('random_forest')
   const [symbol, setSymbol] = useState('AAPL')
   const [modelName, setModelName] = useState('')
@@ -58,7 +58,7 @@ export default function AIPredictionPage() {
 
   const trainMutation = useMutation({
     mutationFn: (body: any) => api.post('/ml/train', body),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(`Training started for ${modelType}!`)
       qc.invalidateQueries({ queryKey: ['ml-models'] })
     },

@@ -18,13 +18,13 @@
 Dashboard API — aggregated portfolio and system metrics (Firestore).
 """
 from datetime import datetime, timedelta
+
 import yfinance as yf
 from fastapi import APIRouter, Depends
 
-from database.firestore import get_db
-from auth.dependencies import get_current_user
 from api.portfolio import get_current_prices
-from google.cloud.firestore_v1.base_query import FieldFilter
+from auth.dependencies import get_current_user
+from database.firestore import get_db
 
 router = APIRouter()
 

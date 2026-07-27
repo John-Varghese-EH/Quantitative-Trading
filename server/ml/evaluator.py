@@ -15,11 +15,16 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Model evaluation utilities: metrics, confusion matrix, loss curves."""
+
 import numpy as np
-from typing import List, Optional
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, log_loss, confusion_matrix,
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    log_loss,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
 
 
@@ -27,7 +32,7 @@ def compute_metrics(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     y_prob: np.ndarray,
-    feature_names: List[str],
+    feature_names: list[str],
     X_test: np.ndarray,
 ) -> dict:
     """Compute full classification metrics."""

@@ -15,9 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Simple TTL-based in-memory cache for market data."""
-import time
 from functools import wraps
-from typing import Any, Optional, Dict
+from typing import Any
+
 from cachetools import TTLCache
 
 from config import settings
@@ -25,7 +25,7 @@ from config import settings
 _cache: TTLCache = TTLCache(maxsize=200, ttl=settings.CACHE_TTL_SECONDS)
 
 
-def cache_get(key: str) -> Optional[Any]:
+def cache_get(key: str) -> Any | None:
     return _cache.get(key)
 
 

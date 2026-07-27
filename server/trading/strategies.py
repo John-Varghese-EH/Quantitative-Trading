@@ -15,7 +15,6 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """All 5 trading strategy signal generators."""
-import numpy as np
 import pandas as pd
 
 

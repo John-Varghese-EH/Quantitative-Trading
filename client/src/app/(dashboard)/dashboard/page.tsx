@@ -18,7 +18,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import {
   DollarSign, TrendingUp, TrendingDown, Brain, Activity, Shield,
   Zap, BarChart2, Target, AlertTriangle
@@ -26,7 +26,7 @@ import {
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '@/services/api'
 
-const CARD_VARIANTS = {
+const CARD_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({ 
     opacity: 1, y: 0, 

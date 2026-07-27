@@ -18,7 +18,7 @@
  */
 
 import { motion } from 'framer-motion'
-import { FlaskConical, Play, RotateCcw, Download } from 'lucide-react'
+import { FlaskConical, Play } from 'lucide-react'
 import NextLink from 'next/link'
 
 const SANDBOX_STEPS = [

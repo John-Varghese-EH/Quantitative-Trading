@@ -15,11 +15,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Portfolio API — open positions and P&L tracking (Firestore)."""
-from fastapi import APIRouter, Depends
-from database.firestore import get_db
-from auth.dependencies import get_current_user
-from google.cloud.firestore_v1.base_query import FieldFilter
 import yfinance as yf
+from fastapi import APIRouter, Depends
+from google.cloud.firestore_v1.base_query import FieldFilter
+
+from auth.dependencies import get_current_user
+from database.firestore import get_db
 
 router = APIRouter()
 

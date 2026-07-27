@@ -18,12 +18,12 @@
 Unified model trainer — dispatches to model-specific implementations (Firestore).
 """
 import os
-import joblib
 from datetime import datetime, timezone
-from typing import Optional
 
-from ml.feature_engineering import prepare_dataset, normalize_features
+import joblib
+
 from ml.evaluator import compute_metrics
+from ml.feature_engineering import normalize_features, prepare_dataset
 from utils.logger import logger
 
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "../../models")
@@ -99,7 +99,7 @@ def _dispatch_train(model_type: str, X_train, X_test, y_train, params):
     return train(X_train, X_test, y_train, params)
 
 
-def load_model(model_id: str) -> Optional[dict]:
+def load_model(model_id: str) -> dict | None:
     """Load a saved model artifact."""
     path = os.path.join(MODELS_DIR, f"{model_id}.pkl")
     if not os.path.exists(path):

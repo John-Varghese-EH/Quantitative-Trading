@@ -15,9 +15,8 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Linear Regression model for binary classification via threshold."""
-import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.linear_model import LogisticRegression
 
 
 def train(X_train, X_test, y_train, params: dict):

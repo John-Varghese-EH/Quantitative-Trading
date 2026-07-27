@@ -18,10 +18,9 @@
 Feature engineering for financial time series.
 Creates ML-ready features from OHLCV + technical indicators.
 """
+
 import numpy as np
 import pandas as pd
-from typing import Tuple, List
-
 
 FEATURE_COLUMNS = [
     "returns", "log_returns", "volatility",
@@ -107,7 +106,7 @@ def prepare_dataset(
     df: pd.DataFrame,
     horizon: int = 1,
     test_size: float = 0.2,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
     """
     Full pipeline: engineer features → create targets → train/test split.
     Returns: X_train, X_test, y_train, y_test, feature_names

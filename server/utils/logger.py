@@ -15,8 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Structured logging with loguru."""
-import sys
 import io
+import sys
+
 from loguru import logger
 
 # Force UTF-8 on Windows to avoid cp1252 UnicodeEncodeError

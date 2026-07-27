@@ -19,12 +19,12 @@ All 6 adversarial attack implementations.
 Each attack takes a model, input features X, and parameters.
 Returns perturbed inputs and metadata.
 """
+
 import numpy as np
-from typing import Tuple
 
 
 # ─── FGSM — Fast Gradient Sign Method ────────────────────────────────────────
-def fgsm_attack(model, X: np.ndarray, epsilon: float = 0.01) -> Tuple[np.ndarray, dict]:
+def fgsm_attack(model, X: np.ndarray, epsilon: float = 0.01) -> tuple[np.ndarray, dict]:
     """
     FGSM: perturb inputs in the direction of the gradient sign.
     Approximated for black-box models using finite differences.
@@ -47,7 +47,7 @@ def fgsm_attack(model, X: np.ndarray, epsilon: float = 0.01) -> Tuple[np.ndarray
 
 # ─── PGD — Projected Gradient Descent ────────────────────────────────────────
 def pgd_attack(model, X: np.ndarray, epsilon: float = 0.05,
-               alpha: float = 0.01, num_steps: int = 10) -> Tuple[np.ndarray, dict]:
+               alpha: float = 0.01, num_steps: int = 10) -> tuple[np.ndarray, dict]:
     """
     PGD: iterative FGSM with projection back into epsilon-ball.
     """
@@ -71,7 +71,7 @@ def pgd_attack(model, X: np.ndarray, epsilon: float = 0.05,
 
 
 # ─── Data Poisoning ──────────────────────────────────────────────────────────
-def data_poisoning_attack(X: np.ndarray, y: np.ndarray, poison_rate: float = 0.1) -> Tuple[np.ndarray, np.ndarray, dict]:
+def data_poisoning_attack(X: np.ndarray, y: np.ndarray, poison_rate: float = 0.1) -> tuple[np.ndarray, np.ndarray, dict]:
     """
     Inject poisoned samples into training data.
     Perturbs random samples and optionally flips their labels.
@@ -91,7 +91,7 @@ def data_poisoning_attack(X: np.ndarray, y: np.ndarray, poison_rate: float = 0.1
 
 
 # ─── Label Flipping ──────────────────────────────────────────────────────────
-def label_flipping_attack(y: np.ndarray, flip_rate: float = 0.15) -> Tuple[np.ndarray, dict]:
+def label_flipping_attack(y: np.ndarray, flip_rate: float = 0.15) -> tuple[np.ndarray, dict]:
     """Randomly flip training labels to corrupt the model."""
     n_flip = max(1, int(len(y) * flip_rate))
     indices = np.random.choice(len(y), n_flip, replace=False)
@@ -102,7 +102,7 @@ def label_flipping_attack(y: np.ndarray, flip_rate: float = 0.15) -> Tuple[np.nd
 
 # ─── Feature Manipulation ────────────────────────────────────────────────────
 def feature_manipulation_attack(X: np.ndarray, target_feature_idx: list = None,
-                                  manipulation_factor: float = 2.0) -> Tuple[np.ndarray, dict]:
+                                  manipulation_factor: float = 2.0) -> tuple[np.ndarray, dict]:
     """Scale specific features to manipulate model behavior."""
     X_manip = X.copy()
     if target_feature_idx is None:
@@ -120,7 +120,7 @@ def feature_manipulation_attack(X: np.ndarray, target_feature_idx: list = None,
 
 # ─── Noise Injection ─────────────────────────────────────────────────────────
 def noise_injection_attack(X: np.ndarray, noise_type: str = "gaussian",
-                            noise_scale: float = 0.1) -> Tuple[np.ndarray, dict]:
+                            noise_scale: float = 0.1) -> tuple[np.ndarray, dict]:
     """Inject random noise into input features."""
     X_noisy = X.copy().astype(float)
     if noise_type == "gaussian":

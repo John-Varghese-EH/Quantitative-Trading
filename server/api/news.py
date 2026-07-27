@@ -16,9 +16,11 @@
 
 """News and sentiment feed (Real Yahoo Finance RSS)."""
 from datetime import datetime, timezone
+
 import feedparser
-from textblob import TextBlob
 from fastapi import APIRouter, Depends, Query
+from textblob import TextBlob
+
 from auth.dependencies import get_current_user
 
 router = APIRouter()
@@ -115,7 +117,7 @@ def get_market_sentiment(current_user: dict = Depends(get_current_user)):
             "reddit_sentiment": round(avg_score * 0.9, 3),
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
-    except Exception as e:
+    except Exception:
         return {
             "fear_greed_index": 50,
             "fear_greed_label": "Neutral",

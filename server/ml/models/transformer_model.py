@@ -19,7 +19,7 @@ Transformer model using PyTorch for financial time series classification.
 """
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 

@@ -15,22 +15,25 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Defenses API router (Firestore)."""
-import numpy as np
-from datetime import datetime, timezone, timedelta
 import uuid
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-
-from database.firestore import get_db
-from auth.dependencies import get_current_user
-from ml.trainer import load_model
-from ml.feature_engineering import engineer_features, FEATURE_COLUMNS, prepare_dataset, normalize_features
-from api.market_data import _fetch_yfinance
-from defenses.defenses import (
-    adversarial_training, input_validation,
-    outlier_detection, defensive_distillation, feature_sanitization,
-)
 from sklearn.metrics import accuracy_score
+
+from api.market_data import _fetch_yfinance
+from auth.dependencies import get_current_user
+from database.firestore import get_db
+from defenses.defenses import (
+    adversarial_training,
+    defensive_distillation,
+    feature_sanitization,
+    input_validation,
+    outlier_detection,
+)
+from ml.feature_engineering import normalize_features, prepare_dataset
+from ml.trainer import load_model
 
 router = APIRouter()
 
@@ -111,7 +114,7 @@ def apply_defense(
     acc_after = round(float(accuracy_score(y_test[:min_len2], y_pred_after[:min_len2])), 4)
 
     improvement = round((acc_after - acc_before) * 100, 2)
-    security_score = min(100, round(acc_after * 80 + (improvement if improvement > 0 else 0) + 10, 1))
+    security_score = min(100, round(acc_after * 80 + (max(0, improvement)) + 10, 1))
 
     log_id = str(uuid.uuid4())
     log_data = {

@@ -15,10 +15,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Admin panel API — user management, logs, system stats (Firestore)."""
-from fastapi import APIRouter, Depends, HTTPException, Query
-from database.firestore import get_db
-from auth.dependencies import require_admin
 import platform
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+
+from auth.dependencies import require_admin
+from database.firestore import get_db
 
 router = APIRouter()
 

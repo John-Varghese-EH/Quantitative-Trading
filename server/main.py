@@ -18,25 +18,25 @@
 QuantAdv Sandbox — FastAPI Application Entry Point
 """
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from config import settings
-from database.firestore import init_firebase
-from utils.logger import logger
+from api.admin import router as admin_router
+from api.dashboard import router as dashboard_router
+from api.market_data import router as market_router
+from api.news import router as news_router
+from api.portfolio import router as portfolio_router
+from attacks.router import router as attacks_router
 
 # Routers
 from auth.router import router as auth_router
-from api.market_data import router as market_router
-from api.dashboard import router as dashboard_router
-from api.portfolio import router as portfolio_router
-from api.admin import router as admin_router
-from api.news import router as news_router
+from config import settings
+from defenses.router import router as defenses_router
 from ml.router import router as ml_router
 from trading.router import router as trading_router
-from attacks.router import router as attacks_router
-from defenses.router import router as defenses_router
+from utils.logger import logger
 
 
 @asynccontextmanager

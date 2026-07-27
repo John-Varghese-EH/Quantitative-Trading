@@ -19,16 +19,12 @@ Market Data API — fetches OHLCV, computes technical indicators.
 Uses yfinance as primary source; stubs for Alpha Vantage and Binance.
 """
 from datetime import datetime, timedelta
-from typing import List, Optional
-import pandas as pd
+
 import numpy as np
-
-from fastapi import APIRouter, Depends, Query, HTTPException
-
-
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from auth.dependencies import get_current_user
-
 from utils.cache import cache_get, cache_set
 from utils.logger import logger
 
@@ -49,7 +45,7 @@ def _fetch_yfinance(symbol: str, start: str, end: str, interval: str = "1d") -> 
         return df
     except Exception as e:
         logger.error(f"yfinance error for {symbol}: {e}")
-        raise HTTPException(status_code=422, detail=f"Could not fetch data for {symbol}: {str(e)}")
+        raise HTTPException(status_code=422, detail=f"Could not fetch data for {symbol}: {e!s}")
 
 
 def _compute_indicators(df: pd.DataFrame) -> pd.DataFrame:

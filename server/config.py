@@ -18,7 +18,7 @@
 Application configuration using Pydantic Settings.
 Reads from environment variables and .env file.
 """
-from typing import List
+
 from pydantic_settings import BaseSettings
 
 
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS_STR: str = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
 
     @property
-    def ALLOWED_ORIGINS(self) -> List[str]:
+    def ALLOWED_ORIGINS(self) -> list[str]:
         return [o.strip() for o in self.ALLOWED_ORIGINS_STR.split(",")]
 
     # ── External APIs ────────────────────────────────────────────────

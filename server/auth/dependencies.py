@@ -16,8 +16,9 @@
 
 """FastAPI dependencies for authentication and authorization using Firebase."""
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth
+
 from database.firestore import get_db
 
 security = HTTPBearer()
@@ -37,7 +38,7 @@ def get_current_user(
         token = cred.credentials
         decoded_token = auth.verify_id_token(token)
         uid = decoded_token.get("uid")
-    except Exception as e:
+    except Exception:
         raise credentials_exception
 
     # Fetch user data from Firestore

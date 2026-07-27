@@ -18,10 +18,12 @@
 Data Access Objects (DAOs) for Firebase Firestore.
 Replaces SQLAlchemy ORM models.
 """
-from typing import Optional, Dict, Any, List
-from google.cloud.firestore_v1.client import Client
-from datetime import datetime, timezone
 import uuid
+from datetime import datetime, timezone
+from typing import Any
+
+from google.cloud.firestore_v1.client import Client
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -31,7 +33,7 @@ class UserDAO:
     collection = "users"
 
     @classmethod
-    def create_or_update(cls, db: Client, uid: str, email: str, username: str, full_name: str, role: str = "user") -> Dict[str, Any]:
+    def create_or_update(cls, db: Client, uid: str, email: str, username: str, full_name: str, role: str = "user") -> dict[str, Any]:
         ref = db.collection(cls.collection).document(uid)
         doc = ref.get()
         if not doc.exists:
@@ -55,7 +57,7 @@ class UserDAO:
         return data
 
     @classmethod
-    def get_by_id(cls, db: Client, uid: str) -> Optional[Dict[str, Any]]:
+    def get_by_id(cls, db: Client, uid: str) -> dict[str, Any] | None:
         doc = db.collection(cls.collection).document(uid).get()
         return doc.to_dict() if doc.exists else None
 
@@ -64,7 +66,7 @@ class MLModelDAO:
     collection = "ml_models"
 
     @classmethod
-    def create(cls, db: Client, user_id: str, name: str, model_type: str, status: str = "untrained") -> Dict[str, Any]:
+    def create(cls, db: Client, user_id: str, name: str, model_type: str, status: str = "untrained") -> dict[str, Any]:
         doc_id = str(uuid.uuid4())
         data = {
             "id": doc_id,
@@ -81,7 +83,7 @@ class MLModelDAO:
         return data
 
     @classmethod
-    def get_by_user(cls, db: Client, user_id: str) -> List[Dict[str, Any]]:
+    def get_by_user(cls, db: Client, user_id: str) -> list[dict[str, Any]]:
         docs = db.collection(cls.collection).where("user_id", "==", user_id).stream()
         return [doc.to_dict() for doc in docs]
 
@@ -90,7 +92,7 @@ class TradeDAO:
     collection = "trades"
 
     @classmethod
-    def create(cls, db: Client, user_id: str, symbol: str, quantity: float, price: float, trade_type: str, model_id: Optional[str] = None) -> Dict[str, Any]:
+    def create(cls, db: Client, user_id: str, symbol: str, quantity: float, price: float, trade_type: str, model_id: str | None = None) -> dict[str, Any]:
         doc_id = str(uuid.uuid4())
         data = {
             "id": doc_id,
@@ -106,7 +108,7 @@ class TradeDAO:
         return data
 
     @classmethod
-    def get_by_user(cls, db: Client, user_id: str) -> List[Dict[str, Any]]:
+    def get_by_user(cls, db: Client, user_id: str) -> list[dict[str, Any]]:
         docs = db.collection(cls.collection).where("user_id", "==", user_id).stream()
         return [doc.to_dict() for doc in docs]
 
@@ -115,7 +117,7 @@ class AttackDAO:
     collection = "attacks"
 
     @classmethod
-    def create(cls, db: Client, user_id: str, model_id: str, attack_type: str, success: bool, confidence_drop: float) -> Dict[str, Any]:
+    def create(cls, db: Client, user_id: str, model_id: str, attack_type: str, success: bool, confidence_drop: float) -> dict[str, Any]:
         doc_id = str(uuid.uuid4())
         data = {
             "id": doc_id,
@@ -130,6 +132,6 @@ class AttackDAO:
         return data
 
     @classmethod
-    def get_by_user(cls, db: Client, user_id: str) -> List[Dict[str, Any]]:
+    def get_by_user(cls, db: Client, user_id: str) -> list[dict[str, Any]]:
         docs = db.collection(cls.collection).where("user_id", "==", user_id).stream()
         return [doc.to_dict() for doc in docs]

@@ -18,20 +18,18 @@
 ML API Router — train, predict, explain, list models (Firestore).
 Training runs in a background thread to avoid blocking the API.
 """
-import threading
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 
 import pandas as pd
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
-from database.firestore import get_db
-from auth.dependencies import get_current_user
-from ml.trainer import load_model, train_model_firestore
-from ml.explainer import explain_prediction, get_shap_values
 from api.market_data import _fetch_yfinance
+from auth.dependencies import get_current_user
+from database.firestore import get_db
+from ml.explainer import explain_prediction, get_shap_values
+from ml.trainer import load_model, train_model_firestore
 
 router = APIRouter()
 
@@ -50,8 +48,8 @@ class TrainRequest(BaseModel):
 class PredictRequest(BaseModel):
     model_id: str
     symbol: str
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    start_date: str | None = None
+    end_date: str | None = None
 
 
 # ─── Endpoints ───────────────────────────────────────────────────────────────
@@ -179,7 +177,7 @@ def predict(
     start = body.start_date or (datetime.now() - timedelta(days=200)).strftime("%Y-%m-%d")
     df = _fetch_yfinance(body.symbol, start, end)
 
-    from ml.feature_engineering import engineer_features, FEATURE_COLUMNS
+    from ml.feature_engineering import FEATURE_COLUMNS, engineer_features
     df_feat = engineer_features(df)
     feat_cols = [c for c in FEATURE_COLUMNS if c in df_feat.columns]
     df_feat = df_feat[feat_cols].dropna()
@@ -229,7 +227,8 @@ def explain_model(
         raise HTTPException(status_code=404, detail="Model artifact not found")
 
     from datetime import timedelta
-    from ml.feature_engineering import engineer_features, FEATURE_COLUMNS
+
+    from ml.feature_engineering import FEATURE_COLUMNS, engineer_features
     df = _fetch_yfinance(symbol, 
                          (datetime.now() - timedelta(days=300)).strftime("%Y-%m-%d"),
                          datetime.now().strftime("%Y-%m-%d"))
