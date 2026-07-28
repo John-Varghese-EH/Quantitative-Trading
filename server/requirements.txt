@@ -20,29 +20,29 @@ httpx==0.26.0
 aiohttp==3.9.3
 
 # Machine Learning
-scikit-learn==1.4.0
-xgboost==2.0.3
-numpy==1.26.4
-pandas==2.2.0
-pandas-ta-classic==0.3.14b2
-scipy==1.12.0
+scikit-learn>=1.4.0
+xgboost>=2.0.3
+numpy>=1.26.4
+pandas>=2.2.0
+pandas-ta-classic>=0.3.14b2
+scipy>=1.12.0
 
 # Deep Learning
-tensorflow==2.15.0
-torch==2.2.0
-torchvision==0.17.0
+tensorflow>=2.15.0
+torch>=2.2.0
+torchvision>=0.17.0
 
 # Explainable AI
-shap==0.44.1
+shap>=0.44.1
 
 # Financial Data
-yfinance==0.2.36
+yfinance>=0.2.36
 alpha-vantage==2.3.1
 
 # Visualization
-plotly==5.19.0
-matplotlib==3.8.2
-seaborn==0.13.2
+plotly>=5.19.0
+matplotlib>=3.8.2
+seaborn>=0.13.2
 
 # Threat Intelligence (Gemini)
 google-genai==0.3.0
