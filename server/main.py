@@ -96,10 +96,12 @@ app.include_router(threat_intel_router, prefix="/api/threat-intel", tags=["Threa
 
 
 @app.get("/", tags=["Health"])
+@app.head("/", tags=["Health"])
 async def root():
     return {"status": "online", "app": settings.APP_NAME, "version": settings.APP_VERSION}
 
 
 @app.get("/health", tags=["Health"])
+@app.head("/health", tags=["Health"])
 async def health_check():
     return JSONResponse({"status": "healthy", "database": "connected"})
