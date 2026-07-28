@@ -34,7 +34,7 @@ export default function SandboxPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 32 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           <FlaskConical size={28} style={{ verticalAlign: 'middle', marginRight: 8 }} color="var(--color-primary)" />
           Sandbox <span className="gradient-text">Environment</span>
         </h1>
@@ -62,7 +62,7 @@ export default function SandboxPage() {
       <h2 style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: 8 }}>
         <RefreshCw size={18} className="text-primary" /> ML Trading Workflow
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16, marginBottom: 40 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 mb-10">
         {WORKFLOW_STEPS.map((s, i) => (
           <motion.div
             key={s.step}

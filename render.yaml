@@ -2,7 +2,7 @@ services:
   - type: web
     name: quantadv-backend
     env: python
-    buildCommand: "cd server && pip install -r requirements.txt"
+    buildCommand: "cd server && pip install wheel setuptools && pip install -r requirements.txt"
     startCommand: "cd server && uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION

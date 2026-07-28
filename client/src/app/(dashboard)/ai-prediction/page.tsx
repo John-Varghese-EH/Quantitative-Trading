@@ -107,9 +107,9 @@ export default function AIPredictionPage() {
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
-          <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+          <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
             AI <span className="gradient-text">Prediction</span>
           </h1>
           <p style={{ color: 'var(--color-muted)', margin: 0 }}>Train ML models & analyze live sentiment</p>
@@ -140,11 +140,10 @@ export default function AIPredictionPage() {
       </motion.div>
 
       {activeTab === 'sentiment' && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: 24 }}>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full">
             <input 
-              className="input-field" 
-              style={{ maxWidth: 300, fontSize: '1.2rem', textTransform: 'uppercase' }}
+              className="input-field w-full sm:max-w-[300px] text-lg sm:text-xl uppercase"
               value={sentimentSymbol} 
               onChange={e => setSentimentSymbol(e.target.value.toUpperCase())} 
               placeholder="e.g. AAPL" 
@@ -169,9 +168,9 @@ export default function AIPredictionPage() {
 
           {sentimentQuery.data?.sentiment && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20 }}>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-5">
                 {/* Score Panel */}
-                <div className="glass-light" style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                <div className="glass-light p-4 sm:p-6 flex flex-col justify-center items-center text-center">
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
                     {sentimentQuery.data.name} ({sentimentQuery.data.symbol})
                   </div>
@@ -197,7 +196,7 @@ export default function AIPredictionPage() {
 
                 {/* Reasoning & Takeaways */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <div className="glass-light" style={{ padding: 24 }}>
+                  <div className="glass-light p-4 sm:p-6">
                     <h3 style={{ margin: '0 0 12px', fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <Brain size={18} color="var(--color-primary)" /> AI Reasoning
                     </h3>
@@ -206,7 +205,7 @@ export default function AIPredictionPage() {
                     </p>
                   </div>
                   
-                  <div className="glass-light" style={{ padding: 24, flex: 1 }}>
+                  <div className="glass-light p-4 sm:p-6 flex-1">
                     <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Key Takeaways</h3>
                     <ul style={{ margin: 0, padding: '0 0 0 20px', color: 'var(--color-text)', display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {sentimentQuery.data.sentiment.keyTakeaways.map((point: string, i: number) => (
@@ -222,10 +221,10 @@ export default function AIPredictionPage() {
       )}
 
       {activeTab === 'ml' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-5">
           {/* Train Panel */}
         <div>
-          <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
+          <div className="glass p-4 sm:p-6 mb-5">
             <h3 style={{ margin: '0 0 20px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Brain size={20} color="var(--color-primary)" /> Train New Model
             </h3>
@@ -264,7 +263,7 @@ export default function AIPredictionPage() {
                   {SYMBOLS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label style={{ fontSize: '0.8rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Start Date</label>
                   <input type="date" className="input-field" value={startDate} onChange={e => setStartDate(e.target.value)} />
@@ -285,8 +284,8 @@ export default function AIPredictionPage() {
 
         {/* Models List + Results */}
         <div>
-          <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div className="glass p-4 sm:p-6 mb-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <h3 style={{ margin: 0, fontWeight: 700 }}>Your Models</h3>
               <button onClick={() => refetchModels()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)' }}>
                 <RefreshCw size={16} />
@@ -301,9 +300,9 @@ export default function AIPredictionPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {models.map((m: any) => (
                   <motion.div key={m.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                    className="glass-light" style={{ padding: 14, cursor: 'pointer', border: selectedModel?.id === m.id ? '1px solid var(--color-primary)' : '1px solid transparent' }}
+                    className="glass-light p-3 sm:p-4 cursor-pointer" style={{ border: selectedModel?.id === m.id ? '1px solid var(--color-primary)' : '1px solid transparent'  }}
                     onClick={() => setSelectedModel(m)}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <StatusIcon status={m.status} />
                         <div>
@@ -325,7 +324,7 @@ export default function AIPredictionPage() {
                       </div>
                     </div>
                     {m.status === 'ready' && m.metrics && (
-                      <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+                      <div className="flex flex-wrap gap-4 mt-3">
                         {[
                           { l: 'Accuracy', v: `${(m.metrics.accuracy * 100).toFixed(1)}%` },
                           { l: 'Precision', v: `${(m.metrics.precision * 100).toFixed(1)}%` },
@@ -349,14 +348,13 @@ export default function AIPredictionPage() {
           <AnimatePresence>
             {selectedModel?.status === 'ready' && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="glass" style={{ padding: 24 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                className="glass p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                   <h3 style={{ margin: 0, fontWeight: 700 }}>Run Prediction - {selectedModel.name}</h3>
                   <button 
                     onClick={() => predictMutation.mutate({ model_id: selectedModel.id, symbol: selectedModel.symbol })} 
                     disabled={predictMutation.isPending}
-                    className="btn-primary" 
-                    style={{ width: '100%', padding: '12px', fontSize: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                    className="btn-primary w-full p-3 text-base flex justify-center items-center gap-2"
                   >
                     <Zap size={18} />
                     {predictMutation.isPending ? 'Predicting…' : 'Predict'}
@@ -365,8 +363,8 @@ export default function AIPredictionPage() {
 
                 {selectedModel.prediction && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                      <div className="glass-light" style={{ padding: 20, textAlign: 'center' }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="glass-light p-3 sm:p-5 text-center">
                         <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8 }}>Prediction</div>
                         <div style={{
                           fontSize: '2rem', fontWeight: 900,
@@ -378,9 +376,9 @@ export default function AIPredictionPage() {
                           Confidence: {(selectedModel.prediction.prediction.confidence * 100).toFixed(1)}%
                         </div>
                       </div>
-                      <div className="glass-light" style={{ padding: 20, textAlign: 'center' }}>
+                      <div className="glass-light p-3 sm:p-5 text-center">
                         <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8 }}>Current Price</div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{formatCurrency(selectedModel.prediction.current_price, currency)}</div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{formatCurrency(selectedModel.prediction.current_price, currency)}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginTop: 6 }}>
                           Model accuracy: {(selectedModel.prediction.model_accuracy * 100).toFixed(1)}%
                         </div>

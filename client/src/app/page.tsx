@@ -25,6 +25,15 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Logo } from "@/components/Logo";
 
+const navLinks = [
+  { name: 'Platform', href: '/dashboard' },
+  { name: 'Solutions', href: '/coming-soon' },
+  { name: 'Learn', href: '/learn' },
+  { name: 'Data', href: '/coming-soon' },
+  { name: 'Pricing', href: '/coming-soon' },
+  { name: 'Docs', href: '/coming-soon' }
+];
+
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -92,14 +101,14 @@ export default function LandingPage() {
             <Logo showText={true} />
             
             <div className="hidden md:flex items-center space-x-10">
-              {['Platform', 'Solutions', 'Data', 'Pricing', 'Docs'].map((link) => (
-                <a key={link} href="#" className={`text-sm font-medium transition-colors ${
+              {navLinks.map((link) => (
+                <Link key={link.name} href={link.href} className={`text-sm font-medium transition-colors ${
                   !isScrolled 
                     ? (isDark ? 'text-white/90 hover:text-white' : 'text-black/80 hover:text-black') 
                     : (isDark ? 'text-zinc-300 hover:text-white' : 'text-zinc-500 hover:text-black')
                 }`}>
-                  {link}
-                </a>
+                  {link.name}
+                </Link>
               ))}
             </div>
 
@@ -163,28 +172,33 @@ export default function LandingPage() {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: "100%" }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className={`fixed inset-0 z-50 pt-24 px-6 pb-6 ${isDark ? 'bg-[#050505]' : 'bg-[#fafafa]'}`}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className={`fixed inset-0 z-[100] flex flex-col pt-24 px-6 pb-6 backdrop-blur-3xl ${isDark ? 'bg-[#050505]/95' : 'bg-white/95'}`}
             >
-              <div className="flex justify-between items-center absolute top-6 left-6 right-6">
+              <div className="flex justify-between items-center absolute top-3 sm:top-5 left-6 right-6">
                 <Logo showText={true} />
-                <button onClick={() => setIsMenuOpen(false)} className={`p-2 rounded-full ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>
+                <button onClick={() => setIsMenuOpen(false)} className={`p-2 rounded-full transition-transform active:scale-95 ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>
                   <X size={20} />
                 </button>
               </div>
               <div className="flex flex-col gap-6 mt-8">
-                {['Platform', 'Solutions', 'Data', 'Pricing', 'Docs'].map((link) => (
-                  <a key={link} href="#" className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
-                    {link}
-                  </a>
+                {navLinks.map((link, i) => (
+                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} key={link.name}>
+                    <Link href={link.href} onClick={() => setIsMenuOpen(false)} className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
+                      {link.name}
+                    </Link>
+                  </motion.div>
                 ))}
-                <div className="h-[1px] w-full my-4 bg-zinc-500/20" />
-                <Link href="/login" className={`text-xl font-bold ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>Sign In</Link>
-                <Link href="/register" className={`mt-2 py-4 text-center rounded-full text-lg font-bold ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
-                  Get Started
-                </Link>
+                <div className="h-[1px] w-full my-6 bg-zinc-500/20" />
+                <div className="flex flex-col gap-4">
+                  <Link href="/login" className={`text-xl font-bold ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>Sign In</Link>
+                  <Link href="/register" className={`py-4 mt-2 text-center rounded-full text-lg font-bold shadow-xl transition-transform active:scale-95 ${isDark ? 'bg-white text-black hover:bg-zinc-200' : 'bg-black text-white hover:bg-zinc-800'}`}>
+                    Get Started
+                  </Link>
+                </div>
               </div>
             </motion.div>
           )}
@@ -222,12 +236,12 @@ export default function LandingPage() {
               <motion.h1
                 custom={0} initial="hidden" animate="visible" variants={fadeUp}
                 style={{ 
-                  fontFamily: 'var(--font-heading)', fontSize: 'clamp(3rem, 7vw, 6.5rem)', lineHeight: 0.95, letterSpacing: '-0.04em', color: isDark ? 'white' : '#111827', marginBottom: '32px',
+                  fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.5rem, 8vw, 6.5rem)', lineHeight: 0.95, letterSpacing: '-0.04em', color: isDark ? 'white' : '#111827', marginBottom: '32px',
                   textShadow: isDark ? '0 2px 10px rgba(0,0,0,0.2)' : '0 2px 15px rgba(255,255,255,0.6)'
                 }}
               >
-                The intelligence <br />
-                behind modern <br />
+                The intelligence <br className="hidden sm:block" />
+                behind modern <br className="hidden sm:block" />
                 trading.
               </motion.h1>
 
@@ -301,9 +315,9 @@ export default function LandingPage() {
         </div>
 
         {/* METRICS SECTION */}
-        <div className={`relative z-10 w-full pt-32 pb-16 ${isDark ? 'bg-black' : 'bg-white'}`}>
+        <div className={`relative z-10 w-full pt-20 md:pt-32 pb-12 md:pb-16 ${isDark ? 'bg-black' : 'bg-white'}`}>
           <div className="max-w-[1280px] mx-auto px-6 sm:px-8">
-            <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x ${isDark ? 'divide-white/10' : 'divide-black/5'}`}>
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-y-0 md:divide-x ${isDark ? 'divide-white/10' : 'divide-black/5'}`}>
               {[
                 { label: 'Trading Volume', value: '$50B+' },
                 { label: 'Latency', value: '0.5ms' },
@@ -324,7 +338,7 @@ export default function LandingPage() {
         </div>
 
         {/* BENTO BOX FEATURES */}
-        <div className={`relative z-10 w-full pb-32 overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
+        <div className={`relative z-10 w-full pb-20 md:pb-32 overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
           {/* Ambient Background Auras */}
           <div className={`absolute top-1/4 -left-[10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none transition-opacity duration-1000 ${isDark ? 'bg-blue-600/10' : 'bg-blue-400/5'}`} />
           <div className={`absolute bottom-1/4 -right-[10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none transition-opacity duration-1000 ${isDark ? 'bg-purple-600/10' : 'bg-purple-400/5'}`} />
@@ -435,7 +449,7 @@ export default function LandingPage() {
         </div>
 
         {/* HOW IT WORKS SECTION */}
-        <div className={`relative z-10 w-full py-32 ${isDark ? 'bg-[#050505] border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
+        <div className={`relative z-10 w-full py-20 md:py-32 ${isDark ? 'bg-[#050505] border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
           <div className="max-w-[1280px] mx-auto px-6 sm:px-8">
             <div className="mb-20 text-center max-w-3xl mx-auto">
               <h2 style={{ fontFamily: 'var(--font-heading)' }} className={`text-4xl md:text-5xl mb-6 tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
@@ -491,8 +505,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className={`relative text-center flex flex-col items-center justify-center min-h-[400px] overflow-hidden ${
               isDark 
-                ? 'rounded-2xl border-[0.5px] border-white/20 shadow-2xl shadow-white/5 p-16 md:p-24' 
-                : 'w-full py-24 md:py-32'
+                ? 'rounded-2xl border-[0.5px] border-white/20 shadow-2xl shadow-white/5 p-10 md:p-24' 
+                : 'w-full py-16 md:py-32'
             }`}
           >
             {/* Background Video */}
@@ -522,10 +536,10 @@ export default function LandingPage() {
         </div>
 
         {/* FOOTER */}
-        <footer className={`relative z-10 w-full py-16 md:py-24 ${isDark ? 'bg-[#050505] border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
+        <footer className={`relative z-10 w-full py-8 md:py-24 ${isDark ? 'bg-[#050505] border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
           <div className="max-w-[1280px] mx-auto px-6 sm:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-10 md:gap-6 mb-16">
-              <div className="col-span-2 md:col-span-2 flex flex-col items-start pr-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8 md:mb-16">
+              <div className="col-span-2 md:col-span-2 flex flex-col items-start pr-0 md:pr-4">
                 <div className="flex items-center gap-2 mb-6">
                   <Activity className={`w-6 h-6 ${isDark ? 'text-white' : 'text-black'}`} />
                   <span className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-black'}`} style={{ fontFamily: 'var(--font-heading)' }}>QuantAdv</span>
@@ -543,36 +557,58 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>Product</h4>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Platform</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Backtesting Engine</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Live Trading</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Pricing</Link>
+                <Link href="/dashboard" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Platform</Link>
+                <Link href="/coming-soon" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Backtesting</Link>
+                <Link href="/dashboard" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Live Trading</Link>
+                <Link href="/coming-soon" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Pricing</Link>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>Resources</h4>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Documentation</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>API Reference</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Community</Link>
-                <Link href="#" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Blog</Link>
+                <Link href="/learn" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Learn</Link>
+                <Link href="/coming-soon" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Docs</Link>
+                <Link href="/coming-soon" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>API</Link>
+                <a href="https://github.com/John-Varghese-EH/Quantitative-Trading/" target="_blank" rel="noopener noreferrer" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Community</a>
+                <Link href="/coming-soon" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Blog</Link>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 col-span-2 md:col-span-1 mt-4 md:mt-0">
                 <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>Legal</h4>
-                <Link href="/terms" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Terms of Service</Link>
-                <Link href="/privacy" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Privacy Policy</Link>
-                <Link href="/cookies" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Cookie Policy</Link>
-                <Link href="/disclaimer" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Risk Disclaimer</Link>
-                <a href="https://github.com/John-Varghese-EH/Quantitative-Trading/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>AGPLv3 License</a>
+                <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
+                  <Link href="/terms" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Terms</Link>
+                  <Link href="/privacy" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Privacy</Link>
+                  <Link href="/cookies" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Cookies</Link>
+                  <Link href="/disclaimer" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>Disclaimer</Link>
+                  <a href="https://github.com/John-Varghese-EH/Quantitative-Trading/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className={`text-sm ${isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-black'} transition-colors`}>AGPLv3</a>
+                </div>
               </div>
             </div>
 
-            <div className={`pt-8 border-t ${isDark ? 'border-white/10' : 'border-black/10'} flex flex-col md:flex-row items-center justify-between gap-4`}>
-              <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
-                &copy; {new Date().getFullYear()} QuantAdv. Open source under AGPLv3.
-              </p>
+            <div className={`pt-6 border-t ${isDark ? 'border-white/10' : 'border-black/10'} flex flex-col md:flex-row items-center justify-between gap-4`}>
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                  &copy; {new Date().getFullYear()} QuantAdv. Open source under AGPLv3.
+                </p>
+                <a 
+                  href="https://stats.uptimerobot.com/9XYlyDjlsn" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 border ${
+                    isDark 
+                      ? 'bg-white/5 border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white' 
+                      : 'bg-black/5 border-black/10 hover:bg-black/10 text-zinc-600 hover:text-black'
+                  }`}
+                >
+                  <div className="relative flex items-center justify-center w-2.5 h-2.5">
+                    <div className="absolute w-full h-full bg-emerald-500/20 rounded-full animate-pulse" />
+                    <div className="absolute w-2 h-2 bg-emerald-500/40 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                    <div className="relative w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_6px_1px_rgba(16,185,129,0.6)]" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Operational</span>
+                </a>
+              </div>
               <div className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
                 Built by the Quantitative Community.
               </div>

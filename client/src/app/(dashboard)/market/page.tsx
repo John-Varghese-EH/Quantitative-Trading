@@ -279,15 +279,15 @@ export default function MarketDataPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Market <span className="gradient-text">Data</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Real-time financial data with technical indicators</p>
       </motion.div>
 
       {/* Controls */}
-      <div className="glass" style={{ padding: '12px 20px', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div className="glass p-3 md:p-4 mb-5 flex flex-col xl:flex-row gap-4 xl:items-center">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2 xl:pb-0 w-full xl:w-auto">
           {SYMBOLS.map(s => (
             <button key={s} onClick={() => { setSymbol(s); setSearchQuery('') }} style={{
               padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: '0.82rem',
@@ -298,9 +298,9 @@ export default function MarketDataPage() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto' }}>
+        <div className="flex flex-col md:flex-row gap-3 md:items-center xl:ml-auto w-full xl:w-auto">
           {/* ── Search with Autocomplete ── */}
-          <div ref={searchRef} style={{ position: 'relative', width: 260 }}>
+          <div ref={searchRef} className="relative w-full md:w-[260px]">
             <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-muted)', zIndex: 2 }} />
             {searchQuery && (
               <button
@@ -441,8 +441,8 @@ export default function MarketDataPage() {
 
       {/* Quote Card */}
       {quote && (
-        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: 20, marginBottom: 20, display: 'flex', gap: 32, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div>
+        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="glass p-4 sm:p-5 mb-5 flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-12 md:items-center">
+          <div className="w-full md:w-auto">
             <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 4 }}>
               {quote.symbol} {quote.name && `- ${quote.name}`}
             </div>
@@ -460,20 +460,22 @@ export default function MarketDataPage() {
               </button>
             </div>
           </div>
-          {[
-            { l: 'Change', v: `${quote.change >= 0 ? '+' : ''}${formatCurrency(Math.abs(quote.change), currency)}`, pos: quote.change >= 0 },
-            { l: 'Change %', v: `${quote.change_pct >= 0 ? '+' : ''}${quote.change_pct?.toFixed(2)}%`, pos: quote.change_pct >= 0 },
-            { l: 'Volume', v: formatCurrencyCompact(quote.volume, currency), pos: true },
-            { l: 'High', v: formatCurrency(quote.high, currency), pos: true },
-            { l: 'Low', v: formatCurrency(quote.low, currency), pos: true },
-          ].map((item) => (
-            <div key={item.l}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-4 md:gap-6 lg:gap-8 w-full md:w-auto">
+            {[
+              { l: 'Change', v: `${quote.change >= 0 ? '+' : ''}${formatCurrency(Math.abs(quote.change), currency)}`, pos: quote.change >= 0 },
+              { l: 'Change %', v: `${quote.change_pct >= 0 ? '+' : ''}${quote.change_pct?.toFixed(2)}%`, pos: quote.change_pct >= 0 },
+              { l: 'Volume', v: formatCurrencyCompact(quote.volume, currency), pos: true },
+              { l: 'High', v: formatCurrency(quote.high, currency), pos: true },
+              { l: 'Low', v: formatCurrency(quote.low, currency), pos: true },
+            ].map((item) => (
+              <div key={item.l}>
               <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: 4 }}>{item.l}</div>
               <div style={{ fontWeight: 700, color: item.l === 'Change' || item.l === 'Change %' ? (item.pos ? 'var(--color-success)' : 'var(--color-danger)') : 'var(--color-text)' }}>
                 {item.v}
               </div>
             </div>
           ))}
+          </div>
         </motion.div>
       )}
 
@@ -482,19 +484,19 @@ export default function MarketDataPage() {
       ) : (
         <>
           {/* Price Chart */}
-          <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: 16, gap: 12 }}>
-              <h3 style={{ margin: 0, fontWeight: 700 }}>
+          <div className="glass p-3 sm:p-6 mb-5">
+            <div className="flex flex-col xl:flex-row justify-between xl:items-center gap-4 mb-4">
+              <h3 style={{ margin: 0, fontWeight: 700 }} className="flex flex-wrap items-center gap-2">
                 {quote?.name ? `${activeSymbol} (${quote.name})` : activeSymbol} - Advanced Chart
-                <span style={{ fontWeight: 400, color: 'var(--color-muted)', fontSize: '0.85rem', marginLeft: 12 }}>{data?.count} candles</span>
+                <span style={{ fontWeight: 400, color: 'var(--color-muted)', fontSize: '0.85rem' }}>{data?.count} candles</span>
               </h3>
               
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setShowVolume(!showVolume)} className={`btn-secondary ${showVolume ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showVolume ? 'var(--color-primary)' : 'transparent', color: showVolume ? 'var(--color-bg)' : 'var(--color-text)' }}>Volume</button>
-                <button onClick={() => setShowMA(!showMA)} className={`btn-secondary ${showMA ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA ? 'var(--color-primary)' : 'transparent', color: showMA ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 20</button>
-                <button onClick={() => setShowMA50(!showMA50)} className={`btn-secondary ${showMA50 ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA50 ? 'var(--color-primary)' : 'transparent', color: showMA50 ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 50</button>
-                <button onClick={() => setShowMA200(!showMA200)} className={`btn-secondary ${showMA200 ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA200 ? 'var(--color-primary)' : 'transparent', color: showMA200 ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 200</button>
-                <button onClick={() => setShowBB(!showBB)} className={`btn-secondary ${showBB ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showBB ? 'var(--color-primary)' : 'transparent', color: showBB ? 'var(--color-bg)' : 'var(--color-text)' }}>BB</button>
+              <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2 xl:pb-0 w-full xl:w-auto">
+                <button onClick={() => setShowVolume(!showVolume)} className={`btn-secondary whitespace-nowrap ${showVolume ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showVolume ? 'var(--color-primary)' : 'transparent', color: showVolume ? 'var(--color-bg)' : 'var(--color-text)' }}>Volume</button>
+                <button onClick={() => setShowMA(!showMA)} className={`btn-secondary whitespace-nowrap ${showMA ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA ? 'var(--color-primary)' : 'transparent', color: showMA ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 20</button>
+                <button onClick={() => setShowMA50(!showMA50)} className={`btn-secondary whitespace-nowrap ${showMA50 ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA50 ? 'var(--color-primary)' : 'transparent', color: showMA50 ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 50</button>
+                <button onClick={() => setShowMA200(!showMA200)} className={`btn-secondary whitespace-nowrap ${showMA200 ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showMA200 ? 'var(--color-primary)' : 'transparent', color: showMA200 ? 'var(--color-bg)' : 'var(--color-text)' }}>MA 200</button>
+                <button onClick={() => setShowBB(!showBB)} className={`btn-secondary whitespace-nowrap ${showBB ? 'active' : ''}`} style={{ padding: '4px 10px', fontSize: '0.75rem', background: showBB ? 'var(--color-primary)' : 'transparent', color: showBB ? 'var(--color-bg)' : 'var(--color-text)' }}>BB</button>
               </div>
             </div>
             
@@ -508,7 +510,7 @@ export default function MarketDataPage() {
               bbUpperData={showBB ? bbUpperData : undefined}
               bbLowerData={showBB ? bbLowerData : undefined}
             />
-            <div style={{ display: 'flex', gap: 20, marginTop: 10, fontSize: '0.78rem' }}>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3" style={{ fontSize: '0.78rem' }}>
               {[
                 { color: '#00d4ff', label: 'Price' },
                 { color: '#f59e0b', label: 'MA 20', show: showMA },
@@ -526,8 +528,8 @@ export default function MarketDataPage() {
           </div>
 
           {/* RSI Chart */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
-            <div className="glass" style={{ padding: 20 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+            <div className="glass p-4 sm:p-5">
               <h4 style={{ margin: '0 0 14px', fontWeight: 700, color: 'var(--color-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>RSI (14)</h4>
               <ResponsiveContainer width="100%" height={140}>
                 <AreaChart data={chartDataRecharts}>
@@ -540,7 +542,7 @@ export default function MarketDataPage() {
               </ResponsiveContainer>
             </div>
 
-            <div className="glass" style={{ padding: 20 }}>
+            <div className="glass p-4 sm:p-5">
               <h4 style={{ margin: '0 0 14px', fontWeight: 700, color: 'var(--color-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>MACD</h4>
               <ResponsiveContainer width="100%" height={140}>
                 <ComposedChart data={chartDataRecharts}>

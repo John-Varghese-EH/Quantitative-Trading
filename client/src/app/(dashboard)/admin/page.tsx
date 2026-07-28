@@ -55,7 +55,7 @@ export default function AdminPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Admin <span className="gradient-text">Panel</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>System management and monitoring</p>
@@ -63,7 +63,7 @@ export default function AdminPage() {
 
       {/* System Stats */}
       {systemStats && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
             { l: 'Total Users', v: systemStats.total_users, icon: <Users size={18} color="#00d4ff" />, color: '#00d4ff' },
             { l: 'ML Models', v: systemStats.total_models, icon: <Brain size={18} color="#7c3aed" />, color: '#7c3aed' },
@@ -84,7 +84,7 @@ export default function AdminPage() {
       )}
 
       {/* Users Table */}
-      <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
+      <div className="glass p-4 sm:p-6 mb-5">
         <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Users size={18} color="var(--color-primary)" /> User Management
           <span style={{ marginLeft: 'auto', fontSize: '0.85rem', fontWeight: 400, color: 'var(--color-muted)' }}>
@@ -153,7 +153,7 @@ export default function AdminPage() {
       </div>
 
       {/* Activity Logs */}
-      <div className="glass" style={{ padding: 24 }}>
+      <div className="glass p-4 sm:p-6">
         <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Recent Activity Logs</h3>
         <table className="data-table">
           <thead><tr><th>Action</th><th>IP Address</th><th>Time</th></tr></thead>
@@ -169,7 +169,7 @@ export default function AdminPage() {
             ))}
           </tbody>
         </table>
-      </div>
+              </div>
     </div>
   )
 }

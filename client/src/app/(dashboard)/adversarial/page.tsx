@@ -74,16 +74,16 @@ export default function AdversarialPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Adversarial <span style={{ background: 'linear-gradient(135deg, #ef4444, #f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Attacks</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Simulate adversarial attacks on trained ML models</p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
         {/* Attack Config */}
         <div>
-          <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+          <div className="glass p-4 sm:p-6 mb-4">
             <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Zap size={18} color="#ef4444" /> Configure Attack
             </h3>
@@ -134,7 +134,7 @@ export default function AdversarialPage() {
           </div>
 
           {/* Attack History */}
-          <div className="glass" style={{ padding: 20 }}>
+          <div className="glass p-4 sm:p-5">
             <h4 style={{ margin: '0 0 12px', fontWeight: 700, fontSize: '0.9rem' }}>Attack History</h4>
             {(!history || history.length === 0) ? (
               <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', textAlign: 'center' }}>No attacks yet</p>
@@ -161,14 +161,14 @@ export default function AdversarialPage() {
         {/* Results */}
         <div>
           {!result && !attackMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
               <AlertTriangle size={64} opacity={0.2} color="#ef4444" style={{ marginBottom: 16 }} />
               <h3 style={{ color: 'var(--color-muted)', fontWeight: 400 }}>Configure and launch an attack to see results</h3>
             </div>
           )}
 
           {attackMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
               <div className="spinner" />
             </div>
           )}
@@ -176,7 +176,7 @@ export default function AdversarialPage() {
           {result && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {/* Attack Metrics */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                 {[
                   { l: 'Attack Success Rate', v: `${result.attack_success_rate}%`, color: result.attack_success_rate > 30 ? 'var(--color-danger)' : 'var(--color-success)' },
                   { l: 'Confidence Drop', v: `${result.confidence_drop_pct}%`, color: 'var(--color-warning)' },
@@ -193,9 +193,9 @@ export default function AdversarialPage() {
               </div>
 
               {/* Before vs After Comparison */}
-              <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+              <div className="glass p-4 sm:p-6 mb-4">
                 <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Prediction Comparison: Original vs Adversarial</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Original Predictions</div>
                     <ResponsiveContainer width="100%" height={180}>
@@ -231,7 +231,7 @@ export default function AdversarialPage() {
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: '0.78rem' }}>
+                <div className="flex flex-wrap gap-3 mt-3 text-xs">
                   {[
                     { color: '#10b981', label: 'BUY (original)' },
                     { color: '#ef4444', label: 'SELL (original)' },
@@ -245,7 +245,7 @@ export default function AdversarialPage() {
               </div>
 
               {/* Flipped predictions table */}
-              <div className="glass" style={{ padding: 20 }}>
+              <div className="glass p-4 sm:p-5">
                 <h4 style={{ margin: '0 0 12px', fontWeight: 700 }}>
                   Flipped Predictions <span style={{ color: 'var(--color-danger)', fontWeight: 400, fontSize: '0.85rem' }}>({result.comparison.filter((d: any) => d.flipped).length} flipped)</span>
                 </h4>

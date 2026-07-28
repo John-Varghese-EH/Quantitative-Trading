@@ -55,7 +55,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className={`sidebar ${!sidebarOpen ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${!sidebarOpen ? 'collapsed' : 'open'}`}>
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

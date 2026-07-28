@@ -58,14 +58,14 @@ export default function AnalyticsPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Analytics <span className="gradient-text">Dashboard</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Comprehensive performance analytics and insights</p>
       </motion.div>
 
       {/* Summary Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { l: 'Total Models', v: stats?.total_models ?? 0, color: '#00d4ff' },
           { l: 'Backtests Run', v: btHistory?.length ?? 0, color: '#10b981' },
@@ -80,7 +80,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Portfolio Growth */}
-      <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
+      <div className="glass p-4 sm:p-6 mb-5">
         <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Portfolio Growth (90 days)</h3>
         <ResponsiveContainer width="100%" height={220}>
           <AreaChart data={portfolioData?.history || []}>
@@ -99,9 +99,9 @@ export default function AnalyticsPage() {
         </ResponsiveContainer>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         {/* Model Accuracy */}
-        <div className="glass" style={{ padding: 24 }}>
+        <div className="glass p-4 sm:p-6">
           <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Model Accuracy Comparison</h3>
           {modelAccuracy.length === 0 ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)' }}>Train models to see comparison</div>
@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Attack Distribution Pie */}
-        <div className="glass" style={{ padding: 24 }}>
+        <div className="glass p-4 sm:p-6">
           <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Attack Type Distribution</h3>
           {attackDist.length === 0 ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)' }}>No attacks simulated yet</div>
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Strategy Performance */}
-      <div className="glass" style={{ padding: 24, marginBottom: 20 }}>
+      <div className="glass p-4 sm:p-6 mb-5">
         <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Strategy Performance Comparison</h3>
         {strategyPerf.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)' }}>Run backtests to compare strategies</div>
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Defense vs Attack */}
-      <div className="glass" style={{ padding: 24 }}>
+      <div className="glass p-4 sm:p-6">
         <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Defense Effectiveness Scores</h3>
         {(!defenseHistory || defenseHistory.length === 0) ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)' }}>Apply defenses to see effectiveness scores</div>

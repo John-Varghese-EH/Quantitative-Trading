@@ -56,7 +56,7 @@ export default function NotificationsPage() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+            <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
               <Bell size={24} style={{ verticalAlign: 'middle', marginRight: 8 }} /> Notifications
             </h1>
             <p style={{ color: 'var(--color-muted)', margin: 0 }}>
@@ -109,7 +109,7 @@ export default function NotificationsPage() {
         ))}
 
         {allNotifs.length === 0 && (
-          <div className="glass" style={{ padding: 60, textAlign: 'center' }}>
+          <div className="glass" style={{ padding: '24px 16px', textAlign: 'center' }}>
             <Bell size={48} opacity={0.2} style={{ marginBottom: 12 }} />
             <p style={{ color: 'var(--color-muted)' }}>No notifications yet</p>
           </div>

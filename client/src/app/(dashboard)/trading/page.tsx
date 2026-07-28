@@ -69,16 +69,16 @@ export default function TradingSimulatorPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Trading <span className="gradient-text">Simulator</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Backtest strategies on historical data - no real money</p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
         {/* Config Panel */}
         <div>
-          <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+          <div className="glass p-4 sm:p-6 mb-4">
             <h3 style={{ margin: '0 0 18px', fontWeight: 700 }}>Strategy Config</h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
@@ -101,7 +101,7 @@ export default function TradingSimulatorPage() {
                   {SYMBOLS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label style={{ fontSize: '0.8rem', color: 'var(--color-muted)', display: 'block', marginBottom: 5 }}>Start</label>
                   <input type="date" className="input-field" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ fontSize: '0.82rem' }} />
@@ -124,7 +124,7 @@ export default function TradingSimulatorPage() {
           </div>
 
           {/* History */}
-          <div className="glass" style={{ padding: 20 }}>
+          <div className="glass p-4 sm:p-5">
             <h4 style={{ margin: '0 0 12px', fontWeight: 700, fontSize: '0.9rem' }}>Recent Backtests</h4>
             {(!history || history.length === 0) ? (
               <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', textAlign: 'center' }}>No backtests yet</p>
@@ -151,14 +151,14 @@ export default function TradingSimulatorPage() {
         {/* Results */}
         <div>
           {!result && !backtestMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <Activity size={64} opacity={0.2} style={{ marginBottom: 16 }} />
               <h3 style={{ color: 'var(--color-muted)', fontWeight: 400 }}>Configure a strategy and run a backtest</h3>
             </div>
           )}
 
           {backtestMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div className="spinner" />
             </div>
           )}
@@ -166,7 +166,7 @@ export default function TradingSimulatorPage() {
           {result && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {/* Metric Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 {[
                   { l: 'Total Return', v: `${result.total_return >= 0 ? '+' : ''}${result.total_return?.toFixed(2)}%`, color: result.total_return >= 0 ? 'var(--color-success)' : 'var(--color-danger)' },
                   { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'var(--color-text)' },
@@ -185,7 +185,7 @@ export default function TradingSimulatorPage() {
               </div>
 
               {/* Equity Curve */}
-              <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+              <div className="glass p-4 sm:p-6 mb-4">
                 <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>
                   Equity Curve - {activeStrategy?.name} on {result.symbol}
                 </h3>
@@ -209,7 +209,7 @@ export default function TradingSimulatorPage() {
 
               {/* Trade Log */}
               {result.trade_log?.length > 0 && (
-                <div className="glass" style={{ padding: 20 }}>
+                <div className="glass p-4 sm:p-5">
                   <h4 style={{ margin: '0 0 14px', fontWeight: 700 }}>Recent Trades</h4>
                   <table className="data-table">
                     <thead>
@@ -234,7 +234,7 @@ export default function TradingSimulatorPage() {
                       ))}
                     </tbody>
                   </table>
-                </div>
+              </div>
               )}
             </motion.div>
           )}

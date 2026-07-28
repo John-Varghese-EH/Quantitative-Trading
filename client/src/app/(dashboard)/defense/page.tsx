@@ -74,16 +74,16 @@ export default function DefensePage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Defense <span className="gradient-text">Module</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Apply defense mechanisms to harden AI models against attacks</p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
         {/* Config */}
         <div>
-          <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+          <div className="glass p-4 sm:p-6 mb-4">
             <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Shield size={18} color="var(--color-success)" /> Apply Defense
             </h3>
@@ -130,7 +130,7 @@ export default function DefensePage() {
           </div>
 
           {/* History */}
-          <div className="glass" style={{ padding: 20 }}>
+          <div className="glass p-4 sm:p-5">
             <h4 style={{ margin: '0 0 12px', fontWeight: 700, fontSize: '0.9rem' }}>Defense History</h4>
             {(!history || history.length === 0) ? (
               <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', textAlign: 'center' }}>No defenses applied yet</p>
@@ -153,14 +153,14 @@ export default function DefensePage() {
         {/* Results */}
         <div>
           {!result && !defenseMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
               <Shield size={64} opacity={0.2} color="#10b981" style={{ marginBottom: 16 }} />
               <h3 style={{ color: 'var(--color-muted)', fontWeight: 400 }}>Select a defense mechanism and apply it to see results</h3>
             </div>
           )}
 
           {defenseMutation.isPending && (
-            <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+            <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
               <div className="spinner" />
             </div>
           )}
@@ -168,7 +168,7 @@ export default function DefensePage() {
           {result && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {/* Score Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                 {[
                   { l: 'Security Score', v: result.security_score, color: 'var(--color-success)', suffix: '' },
                   { l: 'Accuracy Before', v: (result.accuracy_before * 100).toFixed(1), color: 'var(--color-warning)', suffix: '%' },
@@ -185,9 +185,9 @@ export default function DefensePage() {
               </div>
 
               {/* Radar Chart */}
-              <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
+              <div className="glass p-4 sm:p-6 mb-4">
                 <h3 style={{ margin: '0 0 16px', fontWeight: 700 }}>Security Radar: Before vs After Defense</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'center' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
                   <ResponsiveContainer width="100%" height={260}>
                     <RadarChart data={radarData}>
                       <PolarGrid stroke="rgba(255,255,255,0.1)" />

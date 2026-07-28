@@ -53,7 +53,7 @@ export default function ExplainableAIPage() {
   return (
     <div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 800 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 800 }}>
           Explainable <span className="gradient-text">AI</span>
         </h1>
         <p style={{ color: 'var(--color-muted)', margin: 0 }}>Understand why the AI makes its predictions using SHAP values</p>
@@ -83,14 +83,14 @@ export default function ExplainableAIPage() {
       </div>
 
       {!shapData && !loading && (
-        <div className="glass" style={{ padding: 60, textAlign: 'center' }}>
+        <div className="glass" style={{ padding: '24px 16px', textAlign: 'center' }}>
           <Lightbulb size={64} opacity={0.2} style={{ marginBottom: 16 }} />
           <h3 style={{ color: 'var(--color-muted)', fontWeight: 400 }}>Select a model and click Explain to see SHAP values</h3>
         </div>
       )}
 
       {loading && (
-        <div className="glass" style={{ padding: 60, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="glass" style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="spinner" />
         </div>
       )}
@@ -98,9 +98,9 @@ export default function ExplainableAIPage() {
       {shapData && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Explainability Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {/* Feature Importance */}
-            <div className="glass" style={{ padding: 24 }}>
+            <div className="glass p-4 sm:p-6">
               <h3 style={{ margin: '0 0 16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Trophy size={18} className="text-warning" /> Global Feature Importance (SHAP)
               </h3>
@@ -121,7 +121,7 @@ export default function ExplainableAIPage() {
             </div>
 
             {/* Waterfall (single prediction) */}
-            <div className="glass" style={{ padding: 24 }}>
+            <div className="glass p-4 sm:p-6">
               <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Zap size={18} className="text-primary" /> SHAP Waterfall (Latest Prediction)
               </h3>
@@ -164,7 +164,7 @@ export default function ExplainableAIPage() {
             <h3 style={{ margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
               <BookOpen size={18} className="text-primary" /> Feature Explanations
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
               {(shapData.feature_importance || []).slice(0, 12).map((feat: any, i: number) => (
                 <div key={feat.feature} className="glass-light" style={{ padding: 14 }}>
                   <div style={{ fontWeight: 700, fontSize: '0.88rem', color: colors[i % colors.length], marginBottom: 6 }}>{feat.feature}</div>

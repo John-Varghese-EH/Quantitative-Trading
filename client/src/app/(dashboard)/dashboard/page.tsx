@@ -131,7 +131,13 @@ export default function DashboardPage() {
 
   const { data: holdings } = useQuery({
     queryKey: ['portfolio-holdings'],
-    queryFn: () => api.get('/dashboard/portfolio').then(r => r.data.holdings).catch(() => []),
+    queryFn: () => api.get('/portfolio/positions').then(r => r.data.positions.map((p: any) => ({
+      symbol: p.symbol,
+      shares: p.quantity,
+      avg_price: p.entry_price,
+      current_price: p.current_price,
+      pnl: p.unrealized_pnl
+    }))).catch(() => []),
   })
 
   const CARDS: StatCard[] = stats ? [
@@ -192,7 +198,7 @@ export default function DashboardPage() {
             Algorithmic Sandbox <span style={{ opacity: 0.5 }}>•</span> Paper Trading Mode
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div className="flex flex-wrap md:flex-nowrap gap-3 mt-4 md:mt-0 overflow-x-auto hide-scrollbar pb-2 md:pb-0 w-full md:w-auto">
           {[
             { label: 'Train Model', href: '/ai-prediction', color: 'var(--color-accent)', icon: <Brain size={16} /> },
             { label: 'Run Backtest', href: '/trading', color: 'var(--color-success)', icon: <Activity size={16} /> },
@@ -204,7 +210,8 @@ export default function DashboardPage() {
               border: `1px solid color-mix(in srgb, ${action.color} 30%, transparent)`,
               color: action.color, textDecoration: 'none', transition: 'all 0.2s',
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              boxShadow: `0 4px 12px color-mix(in srgb, ${action.color} 10%, transparent)`
+              boxShadow: `0 4px 12px color-mix(in srgb, ${action.color} 10%, transparent)`,
+              whiteSpace: 'nowrap'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.background = action.color;
@@ -225,16 +232,16 @@ export default function DashboardPage() {
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}><div className="spinner" /></div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20, marginBottom: 32 }}>
+        <div className="dashboard-grid mb-8">
           {CARDS.map((c, i) => <StatCardComponent key={c.label} card={c} index={i} />)}
         </div>
       )}
 
       {/* Main Content Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 24 }}>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
         
         {/* Portfolio Growth Chart */}
-        <motion.div className="glass" style={{ padding: '24px 24px 12px', gridColumn: 'span 2' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <motion.div className="glass p-4 sm:p-6 xl:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem' }}>Portfolio Growth (30 Days)</h3>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-muted)', background: 'var(--color-border)', padding: '4px 12px', borderRadius: 20 }}>
@@ -263,9 +270,9 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Market Heatmap */}
-        <motion.div className="glass" style={{ padding: 24 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <motion.div className="glass p-4 sm:p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem' }}>Sector Heatmap</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+          <div className="grid grid-cols-2 gap-3">
             {(heatmap || []).map((s: any) => {
               const isPositive = s.change >= 0;
               const colorBase = isPositive ? 'var(--color-success)' : 'var(--color-danger)';
@@ -288,7 +295,7 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 24 }}>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
         {/* Portfolio Holdings */}
         <motion.div className="glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -330,7 +337,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* News Feed */}
-        <motion.div className="glass" style={{ padding: 24 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+        <motion.div className="glass p-4 sm:p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Newspaper size={20} style={{ color: 'var(--color-accent)' }} /> Market Signals
           </h3>
@@ -366,8 +373,8 @@ export default function DashboardPage() {
       </div>
 
       {/* System Status Footer */}
-      <motion.div className="glass" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderRadius: 'var(--radius-md)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+      <motion.div className="glass p-4 sm:p-6 rounded-md flex flex-col md:flex-row items-center justify-between gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
           {[
             { label: 'API Connection', ok: true },
             { label: 'ML Engine', ok: true },
