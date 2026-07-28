@@ -95,13 +95,20 @@ app.include_router(news_router,     prefix="/api/news",      tags=["News & Senti
 app.include_router(threat_intel_router, prefix="/api/threat-intel", tags=["Threat Intelligence"])
 
 
+from fastapi import Response
+
 @app.get("/", tags=["Health"])
 @app.head("/", tags=["Health"])
 async def root():
     return {"status": "online", "app": settings.APP_NAME, "version": settings.APP_VERSION}
 
-
 @app.get("/health", tags=["Health"])
 @app.head("/health", tags=["Health"])
 async def health_check():
     return JSONResponse({"status": "healthy", "database": "connected"})
+
+@app.get("/ping", tags=["Health"])
+@app.head("/ping", tags=["Health"])
+async def ping():
+    """Dedicated endpoint for UptimeRobot to keep the free Render instance alive."""
+    return Response(status_code=200)
