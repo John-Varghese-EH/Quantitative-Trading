@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -988,7 +989,7 @@ export default function LearnPage() {
           <div className="sm:hidden font-bold tracking-tight text-sm" style={{ fontFamily: 'var(--font-heading)' }}>Academy</div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-6">
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Course Progress</span>
             <span className="text-sm font-bold">{Math.round(progress)}% Complete</span>
@@ -1002,6 +1003,7 @@ export default function LearnPage() {
               transition={{ duration: 0.8, ease: "easeOut" }}
             />
           </div>
+          <ThemeToggle />
         </div>
       </div>
 
