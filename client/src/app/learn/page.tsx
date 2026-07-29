@@ -9,7 +9,8 @@ import {
   BrainCircuit, Check, Menu, X, Play, TrendingUp, ShieldAlert, BarChart2,
   FileText, Download, ExternalLink, Video, ChevronDown, Shield, Zap,
   AlertTriangle, Eye, Lock, Cpu, Database, Globe, BookMarked, GraduationCap,
-  Layers, Target, Bug, Library
+  Layers, Target, Bug, Library, Rocket, HelpCircle, Presentation,
+  Workflow, FlaskConical, Boxes
 } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -762,6 +763,169 @@ const courseModules = [
       ans: 2
     }
   },
+  {
+    id: "platform",
+    title: "7. Platform Overview",
+    icon: <Rocket size={18} />,
+    content: (
+      <div className="space-y-6">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+          Platform Overview
+        </h1>
+        <p className="text-sm sm:text-base italic text-zinc-500 dark:text-zinc-400 mb-6 sm:mb-8 border-l-2 border-blue-500 pl-4">
+          The QuantAdv Adversarial Machine Learning Sandbox
+        </p>
+
+        <p className="text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 font-medium">
+          An AI-powered simulation platform that combines quantitative finance, machine learning, and cybersecurity to provide a secure environment for developing, testing, and evaluating automated trading strategies—without risking real capital.
+        </p>
+
+        {/* Problem Statement */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-red-50/50 dark:bg-red-900/5 border border-red-200/50 dark:border-red-900/20">
+          <h3 className="text-lg sm:text-xl font-bold mb-3 flex items-center gap-2">
+            <AlertTriangle size={18} className="text-red-500" /> Problem Statement
+          </h3>
+          <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">
+            Modern financial markets increasingly rely on AI-driven trading systems. However, these systems are vulnerable to adversarial machine learning attacks, where attackers manipulate input data or poison training datasets to influence predictions and cause significant financial losses. There is a critical need for a secure, interactive platform where developers can safely study these vulnerabilities.
+          </p>
+        </div>
+
+        {/* Objectives */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-blue-50/50 dark:bg-blue-900/5 border border-blue-200/50 dark:border-blue-900/20">
+          <h3 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+            <Target size={18} className="text-blue-500" /> Core Objectives
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            {[
+              "Develop AI models for predicting market trends",
+              "Simulate algorithmic trading strategies virtually",
+              "Demonstrate adversarial attacks on ML models",
+              "Implement defense mechanisms for model robustness",
+              "Visualize trading performance & security metrics",
+            ].map((obj, i) => (
+              <div key={i} className="flex items-start gap-2.5 p-3 bg-white dark:bg-[#0a0a0a] rounded-xl border border-black/5 dark:border-white/5">
+                <CheckCircle size={14} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">{obj}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Key Features */}
+        <h3 className="text-xl sm:text-2xl font-bold mt-6 sm:mt-8">Key Features</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+          {[
+            { icon: TrendingUp, label: "Real-Time Market Data", sub: "Stocks, Crypto, Forex" },
+            { icon: BrainCircuit, label: "AI Price Prediction", sub: "ML-driven forecasts" },
+            { icon: Play, label: "Paper Trading", sub: "Risk-free simulation" },
+            { icon: BarChart2, label: "Strategy Backtesting", sub: "Historical validation" },
+            { icon: Zap, label: "Adversarial Attacks", sub: "Security testing" },
+            { icon: Shield, label: "Defense Testing", sub: "Robustness evaluation" },
+            { icon: Activity, label: "Portfolio Analytics", sub: "Risk metrics" },
+            { icon: Eye, label: "Explainable AI", sub: "XAI transparency" },
+            { icon: FileText, label: "Performance Reports", sub: "Detailed analytics" },
+          ].map((feat, i) => (
+            <div key={i} className="p-3 sm:p-4 rounded-xl bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 text-center">
+              <feat.icon size={20} className="mx-auto mb-2 text-blue-500" />
+              <p className="text-xs sm:text-sm font-bold mb-0.5">{feat.label}</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500">{feat.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Working Process */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+          <h3 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+            <Workflow size={18} className="text-emerald-500" /> Working Process
+          </h3>
+          <div className="space-y-2">
+            {[
+              "Collect historical financial market data",
+              "Clean and preprocess the data",
+              "Train ML models for price prediction",
+              "Generate Buy/Sell/Hold trading signals",
+              "Execute simulated trades in sandbox",
+              "Perform adversarial attacks to test vulnerabilities",
+              "Apply defensive AI techniques to strengthen the model",
+              "Analyze portfolio performance, accuracy & security metrics",
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-3 p-2.5 sm:p-3">
+                <div className="shrink-0 w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-xs font-bold">{i + 1}</div>
+                <span className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">{step}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tech Stack */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-purple-50/50 dark:bg-purple-900/5 border border-purple-200/50 dark:border-purple-900/20">
+          <h3 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+            <Boxes size={18} className="text-purple-500" /> Technology Stack
+          </h3>
+          <div className="space-y-3">
+            {[
+              { cat: "Frontend", tech: "React.js, TypeScript, Tailwind CSS, Framer Motion, TradingView Charts, Plotly" },
+              { cat: "Backend", tech: "FastAPI, Python" },
+              { cat: "Machine Learning", tech: "Scikit-learn, TensorFlow, PyTorch, XGBoost" },
+              { cat: "Database", tech: "PostgreSQL / MongoDB" },
+              { cat: "APIs", tech: "Yahoo Finance, Alpha Vantage, Binance" },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 p-3 bg-white dark:bg-[#0a0a0a] rounded-xl border border-black/5 dark:border-white/5">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider shrink-0 w-28">{item.cat}</span>
+                <span className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">{item.tech}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Applications */}
+        <h3 className="text-xl sm:text-2xl font-bold mt-6 sm:mt-8">Applications</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+          {[
+            "Algorithmic Trading", "Financial Risk Analysis", "AI Security Research",
+            "Cybersecurity Education", "FinTech Product Dev", "University Projects",
+          ].map((app, i) => (
+            <div key={i} className="p-3 sm:p-4 rounded-xl bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 text-center">
+              <p className="text-xs sm:text-sm font-bold">{app}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Future Scope */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-amber-50/50 dark:bg-amber-900/5 border border-amber-200/50 dark:border-amber-900/20">
+          <h3 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+            <FlaskConical size={18} className="text-amber-500" /> Future Scope
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {[
+              "Reinforcement Learning-based trading agents",
+              "Live paper trading with real-time market feeds",
+              "Sentiment analysis from news & social media",
+              "Blockchain-based trade verification",
+              "Federated Learning for secure collaborative AI",
+              "Multi-agent AI trading simulations",
+              "Automated portfolio optimization via deep RL",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <Zap size={12} className="text-amber-500 mt-0.5 shrink-0" />
+                <span className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    quiz: {
+      q: "What is the primary purpose of the QuantAdv Adversarial ML Sandbox?",
+      opts: [
+        "To trade with real money on live markets",
+        "To safely experiment with trading algorithms and study AI vulnerabilities without risking real capital",
+        "To replace human traders with AI permanently",
+        "To hack into real trading platforms"
+      ],
+      ans: 1
+    }
+  },
 ];
 
 // --- Tab types for the main page sections ---
@@ -1132,6 +1296,24 @@ export default function LearnPage() {
                   description="Comprehensive guide to MLOps security: CI/CD pipeline hardening, container security, drift detection, and supply chain vulnerability mitigation."
                   icon={Lock}
                   color="blue"
+                />
+              </ScrollReveal>
+              <ScrollReveal delay={0.3}>
+                <EmbeddedPDF
+                  title="QuantAdv Platform Presentation"
+                  filename="QuantAdv_Presentation.pdf"
+                  description="Complete platform presentation covering the QuantAdv sandbox architecture, features, objectives, working process, and technology stack."
+                  icon={Presentation}
+                  color="purple"
+                />
+              </ScrollReveal>
+              <ScrollReveal delay={0.4}>
+                <EmbeddedPDF
+                  title="QuantAdv FAQs"
+                  filename="QuantAdv_FAQs.pdf"
+                  description="Frequently asked questions about the Adversarial ML Trading Sandbox—covering algorithmic trading concepts, AI security, platform usage, and research applications."
+                  icon={HelpCircle}
+                  color="emerald"
                 />
               </ScrollReveal>
             </div>
