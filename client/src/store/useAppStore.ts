@@ -69,6 +69,10 @@ interface AppState {
   setCurrency: (c: 'USD' | 'INR' | 'EUR' | 'GBP') => void
   exchangeRates: Record<string, number>
   fetchRates: () => Promise<void>
+
+  // Trading Experience Mode
+  tradingMode: 'novice' | 'pro'
+  setTradingMode: (mode: 'novice' | 'pro') => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -136,10 +140,21 @@ export const useAppStore = create<AppState>()(
           console.error('Failed to fetch live exchange rates:', err)
         }
       },
+
+      // Trading Experience Mode
+      tradingMode: 'novice',
+      setTradingMode: (m) => set({ tradingMode: m }),
     }),
     {
       name: 'quantadv-store',
-      partialize: (s) => ({ user: s.user, accessToken: s.accessToken, isAuthenticated: s.isAuthenticated, theme: s.theme, currency: s.currency }),
+      partialize: (s) => ({
+        user: s.user,
+        accessToken: s.accessToken,
+        isAuthenticated: s.isAuthenticated,
+        theme: s.theme,
+        currency: s.currency,
+        tradingMode: s.tradingMode,
+      }),
     }
   )
 )

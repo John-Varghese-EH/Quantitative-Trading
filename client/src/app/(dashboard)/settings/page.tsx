@@ -24,6 +24,7 @@ import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateProfile } from 'firebase/auth';
 import { User, Sliders, Key, Bell, Save, AlertTriangle, Shield } from 'lucide-react';
+import { BrokerConfigWizard } from '@/components/BrokerConfigWizard';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -232,45 +233,9 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* 3. APIs Tab */}
+                {/* 3. APIs Tab - Multi-Broker Auto-Config Wizard */}
                 {activeTab === 'apis' && (
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-xl font-semibold mb-2 flex items-center gap-2"><Key size={20}/> Exchange API Keys</h2>
-                      <p className="text-sm text-zinc-400">Connect external exchange accounts for live trading execution.</p>
-                    </div>
-
-                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-start gap-3">
-                      <Shield className="text-blue-500 mt-0.5 flex-shrink-0" size={18} />
-                      <p className="text-xs text-blue-300 leading-relaxed">
-                        Your API keys are encrypted at rest using AES-256 and never logged. Ensure you configure your API keys on the exchange side to <strong>restrict withdrawal permissions</strong>. We only require trading and read permissions.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 mt-6">
-                      {['Binance', 'Alpaca', 'Interactive Brokers'].map((exchange) => (
-                        <div key={exchange} className="p-5 border border-white/10 rounded-xl bg-white/5">
-                          <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-white">{exchange}</h3>
-                            <span className="text-xs font-medium px-2 py-1 bg-zinc-800 text-zinc-400 rounded-md">Not Connected</span>
-                          </div>
-                          <div className="space-y-3">
-                            <input 
-                              type="password" 
-                              placeholder="API Key" 
-                              className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-                            />
-                            <input 
-                              type="password" 
-                              placeholder="Secret Key" 
-                              className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-                            />
-                            <button className="btn-secondary text-sm w-full mt-2">Connect {exchange}</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <BrokerConfigWizard />
                 )}
 
                 {/* 4. Notifications Tab */}
