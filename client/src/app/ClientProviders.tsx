@@ -23,6 +23,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 if (typeof window !== 'undefined') {
   const originalError = console.error;
@@ -49,8 +50,9 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          {children}
-          <Toaster 
+          <TooltipProvider>
+            {children}
+            <Toaster 
             position="top-right"
             toastOptions={{
               className: 'dark:bg-zinc-900 dark:text-white',
@@ -62,6 +64,7 @@ export default function ClientProviders({ children }: { children: React.ReactNod
               }
             }} 
           />
+          </TooltipProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

@@ -12,3 +12,4 @@ export { default as ActiveBotsWidget } from './ActiveBotsWidget';
 export { default as MarketScannerWidget } from './MarketScannerWidget';
 export { default as ComplianceWidget } from './ComplianceWidget';
 export { default as QuickActionsBar } from './QuickActionsBar';
+export { QuickStartWizard } from './QuickStartWizard';

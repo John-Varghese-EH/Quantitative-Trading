@@ -15,7 +15,9 @@ import {
   Layers, Play,
   RefreshCw, Scale, BarChart3
 } from 'lucide-react'
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ReferenceLine } from 'recharts'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Info } from 'lucide-react'
 import api from '@/services/api'
 import { useAppStore } from '@/store/useAppStore'
 import { formatCurrency } from '@/utils/currency'
@@ -154,8 +156,21 @@ export function OptionsDerivativesChain({
 
           {/* Max Pain Strike */}
           <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-            <span className="text-[10px] text-slate-400 block uppercase">Max Pain Pin-Risk</span>
-            <div className="flex items-center gap-2 mt-0.5">
+            <HoverCard>
+              <HoverCardTrigger className="flex items-center gap-1 cursor-help w-max">
+                <span className="text-[10px] text-slate-400 uppercase border-b border-dashed border-slate-500 pb-0.5">Max Pain Pin-Risk</span>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 text-xs">
+                <div className="space-y-2">
+                  <h4 className="font-bold">What is Max Pain?</h4>
+                  <p className="text-muted-foreground">
+                    Max Pain is the strike price where the highest number of options contracts will expire worthless. 
+                    Institutional market makers are often incentivized to push the stock price towards this level to minimize their payouts to retail traders.
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            <div className="flex items-center gap-2 mt-1.5">
               <span className="text-base font-extrabold text-amber-400 font-mono">
                 ${chainData.max_pain_strike}
               </span>
@@ -168,8 +183,23 @@ export function OptionsDerivativesChain({
 
           {/* Put-Call Ratio (PCR) */}
           <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-            <span className="text-[10px] text-slate-400 block uppercase">Put-Call Ratio (PCR)</span>
-            <div className="flex items-center gap-2 mt-0.5">
+            <HoverCard>
+              <HoverCardTrigger className="flex items-center gap-1 cursor-help w-max">
+                <span className="text-[10px] text-slate-400 uppercase border-b border-dashed border-slate-500 pb-0.5">Put-Call Ratio (PCR)</span>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 text-xs">
+                <div className="space-y-2">
+                  <h4 className="font-bold">What is the Put-Call Ratio?</h4>
+                  <p className="text-muted-foreground">
+                    It measures market sentiment by dividing Put volume by Call volume. 
+                    <br/><br/>
+                    • <strong>High PCR (› 1.0):</strong> Bearish sentiment (fear). Often a contrarian signal that a bottom is near.<br/>
+                    • <strong>Low PCR (‹ 0.7):</strong> Bullish sentiment (greed). Often a contrarian signal that a top is near.
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            <div className="flex items-center gap-2 mt-1.5">
               <span className="text-base font-extrabold text-emerald-400 font-mono">
                 {chainData.put_call_ratio}
               </span>
@@ -236,8 +266,24 @@ export function OptionsDerivativesChain({
                 <tr>
                   {/* Calls Side */}
                   <th className="py-2.5 px-3 text-emerald-400 font-bold">Call Price</th>
-                  <th className="py-2.5 px-2 text-slate-300">Delta (Δ)</th>
-                  <th className="py-2.5 px-2 text-slate-300">Theta (Θ)</th>
+                  <th className="py-2.5 px-2 text-slate-300">
+                    <HoverCard>
+                      <HoverCardTrigger className="cursor-help border-b border-dashed border-slate-500 pb-0.5">Delta (Δ)</HoverCardTrigger>
+                      <HoverCardContent className="w-80 text-xs text-left font-sans normal-case text-foreground">
+                        <strong className="block mb-1">Delta (Δ)</strong>
+                        Measures how much the option's price changes for every $1 move in the underlying stock. A Delta of 0.50 means the option gains $0.50 if the stock goes up by $1. It also roughly represents the probability of the option expiring in the money.
+                      </HoverCardContent>
+                    </HoverCard>
+                  </th>
+                  <th className="py-2.5 px-2 text-slate-300">
+                    <HoverCard>
+                      <HoverCardTrigger className="cursor-help border-b border-dashed border-slate-500 pb-0.5">Theta (Θ)</HoverCardTrigger>
+                      <HoverCardContent className="w-80 text-xs text-left font-sans normal-case text-foreground">
+                        <strong className="block mb-1">Theta (Θ)</strong>
+                        Time decay. Represents how much value the option loses each day just from time passing, assuming the stock price doesn't move. Option buyers bleed Theta; option sellers collect it.
+                      </HoverCardContent>
+                    </HoverCard>
+                  </th>
                   <th className="py-2.5 px-2 text-slate-300 text-right">Call OI</th>
 
                   {/* Center Strike */}
@@ -430,7 +476,7 @@ export function OptionsDerivativesChain({
                 </defs>
                 <XAxis dataKey="price" stroke="#64748b" tickFormatter={(v) => `$${v}`} />
                 <YAxis stroke="#64748b" tickFormatter={(v) => `$${v}`} />
-                <Tooltip
+                <RechartsTooltip
                   formatter={(val: any) => [`$${val}`, 'P&L']}
                   labelFormatter={(lbl) => `Price: $${lbl}`}
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}

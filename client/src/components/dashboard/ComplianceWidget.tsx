@@ -9,6 +9,7 @@
 import React from "react";
 import { ShieldAlert, ShieldCheck, ShieldBan, Shield, Globe, MapPin, Network, Activity } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { useComplianceStatus } from "@/hooks/useDashboardData";
 
 function DoubleBezel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -28,9 +29,42 @@ export default function ComplianceWidget() {
               Compliance Firewall
             </div>
             {status && (
-              <span className="text-xs font-mono font-bold bg-primary/10 px-2 py-1 rounded-md text-primary flex items-center gap-1">
-                <Globe className="w-3 h-3" /> {status.jurisdiction}
-              </span>
+              <HoverCard>
+                <HoverCardTrigger className="cursor-help">
+                  <span className="text-xs font-mono font-bold bg-primary/10 px-2 py-1 rounded-md text-primary flex items-center gap-1 border border-primary/20 hover:bg-primary/20 transition-colors">
+                    <Globe className="w-3 h-3" /> {status.jurisdiction}
+                  </span>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-72 text-xs font-sans text-left normal-case text-foreground">
+                  <strong className="block mb-1">Jurisdiction: {status.jurisdiction}</strong>
+                  <div className="space-y-1 mt-2 text-muted-foreground">
+                    {status.jurisdiction === 'US' && (
+                      <>
+                        <p>• SEC Rule 15c3-5 (Market Access)</p>
+                        <p>• FINRA PDT Rule (Pattern Day Trader)</p>
+                      </>
+                    )}
+                    {status.jurisdiction === 'IN' && (
+                      <>
+                        <p>• SEBI Circuit Limits (Max 10-20% daily)</p>
+                        <p>• IST Market Hours enforcement</p>
+                      </>
+                    )}
+                    {status.jurisdiction === 'EU' && (
+                      <>
+                        <p>• MiFID II RTS 6 (Order Throttling)</p>
+                        <p>• ESMA Leverage Limits</p>
+                      </>
+                    )}
+                    {status.jurisdiction === 'GLOBAL' && (
+                      <>
+                        <p>• Baseline Risk Limits</p>
+                        <p>• Max Daily Drawdown: 5%</p>
+                      </>
+                    )}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
             )}
           </CardTitle>
           <CardDescription>Pre-trade risk & regulatory management</CardDescription>

@@ -29,6 +29,7 @@ import {
   MarketScannerWidget,
   ComplianceWidget,
   QuickActionsBar,
+  QuickStartWizard,
 } from "@/components/dashboard";
 
 // ─── Animation variants ─────────────────────────────────────────────────────
@@ -40,6 +41,9 @@ const fadeIn = {
 export default function DashboardPage() {
   return (
     <div className="space-y-5 pb-8">
+      {/* ── Section: Quick Start Wizard ───────────────────────────── */}
+      <QuickStartWizard />
+
       {/* ── Section: Header ──────────────────────────────────────────── */}
       <motion.div {...fadeIn} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
         <div className="flex items-center justify-between">

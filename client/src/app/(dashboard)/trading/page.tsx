@@ -22,6 +22,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { LightweightChart } from '@/components/LightweightChart'
 import { XaiWaterfallOverlay } from '@/components/XaiWaterfallOverlay'
 import { AutonomousBotManagerModal } from '@/components/AutonomousBotManagerModal'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Info } from 'lucide-react'
 
 import api from '@/services/api'
 import toast from 'react-hot-toast'
@@ -382,11 +384,27 @@ export default function TradingPage() {
 
                     <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border text-[11px]">
                       <div>
-                        <span className="text-muted-foreground block">Win Rate</span>
+                        <HoverCard>
+                          <HoverCardTrigger className="cursor-help border-b border-dashed border-slate-500/50 pb-0.5 mb-1 text-muted-foreground w-max flex items-center gap-1">
+                            Win Rate
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 text-xs font-sans text-left normal-case text-foreground">
+                            <strong className="block mb-1">Win Rate</strong>
+                            The percentage of trades that resulted in a profit. A higher win rate generally means more consistent, smaller wins, while a lower win rate with a high return indicates a strategy relying on infrequent but massive wins.
+                          </HoverCardContent>
+                        </HoverCard>
                         <span className="font-bold text-emerald-400">{bot.winRate}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground block">Risk Level</span>
+                        <HoverCard>
+                          <HoverCardTrigger className="cursor-help border-b border-dashed border-slate-500/50 pb-0.5 mb-1 text-muted-foreground w-max flex items-center gap-1">
+                            Risk Level
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 text-xs font-sans text-left normal-case text-foreground">
+                            <strong className="block mb-1">Risk Level</strong>
+                            How volatile and exposed the strategy is. High risk can mean large drawdowns, while low risk generally means stable but potentially lower absolute returns.
+                          </HoverCardContent>
+                        </HoverCard>
                         <span className="font-medium text-muted-foreground">{bot.risk}</span>
                       </div>
                     </div>
@@ -519,12 +537,27 @@ export default function TradingPage() {
                         }`}>
                           {c.tag}
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                          {c.volume_surge_ratio}x Vol
-                        </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                          RSI {c.rsi}
-                        </span>
+                        <HoverCard>
+                          <HoverCardTrigger className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground cursor-help border-b border-dashed border-slate-500/50">
+                            {c.volume_surge_ratio}x Vol
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 text-xs font-sans text-left normal-case text-foreground">
+                            <strong className="block mb-1">Volume Surge</strong>
+                            This asset is trading at {c.volume_surge_ratio} times its average trading volume. High volume indicates strong institutional conviction behind the current price movement.
+                          </HoverCardContent>
+                        </HoverCard>
+                        <HoverCard>
+                          <HoverCardTrigger className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground cursor-help border-b border-dashed border-slate-500/50">
+                            RSI {c.rsi}
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 text-xs font-sans text-left normal-case text-foreground">
+                            <strong className="block mb-1">RSI (Relative Strength Index)</strong>
+                            A momentum oscillator that measures the speed and change of price movements. 
+                            <br/><br/>
+                            • <strong>RSI › 70:</strong> Overbought (potential top).<br/>
+                            • <strong>RSI ‹ 30:</strong> Oversold (potential bottom).
+                          </HoverCardContent>
+                        </HoverCard>
                       </div>
 
                       <p className="text-[11px] text-muted-foreground line-clamp-2 mb-3">
@@ -1151,17 +1184,25 @@ export default function TradingPage() {
                   {/* Metric Cards Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { l: 'Total Return', v: `${result.total_return >= 0 ? '+' : ''}${result.total_return?.toFixed(2)}%`, color: result.total_return >= 0 ? 'text-emerald-400' : 'text-rose-400' },
-                      { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'text-foreground' },
-                      { l: 'Max Drawdown', v: `${result.max_drawdown?.toFixed(2)}%`, color: 'text-rose-400' },
-                      { l: 'Win Rate', v: `${result.win_rate?.toFixed(1)}%`, color: 'text-emerald-400' },
-                      { l: 'Final Value', v: formatCurrency(result.final_value, currency), color: 'text-foreground' },
-                      { l: 'Total Trades', v: result.total_trades, color: 'text-foreground' },
-                      { l: 'CAGR', v: `${result.cagr?.toFixed(2)}%`, color: 'text-amber-400' },
-                      { l: 'Initial Capital', v: formatCurrency(result.initial_capital, currency), color: 'text-muted-foreground' },
+                      { l: 'Total Return', v: `${result.total_return >= 0 ? '+' : ''}${result.total_return?.toFixed(2)}%`, color: result.total_return >= 0 ? 'text-emerald-400' : 'text-rose-400', desc: "The overall net profit or loss generated by the strategy across the backtest period." },
+                      { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'text-foreground', desc: "A measure of risk-adjusted return. A Sharpe ratio > 1 is good, > 2 is very good. It tells you if your returns are due to smart decisions or a result of taking excess risk." },
+                      { l: 'Max Drawdown', v: `${result.max_drawdown?.toFixed(2)}%`, color: 'text-rose-400', desc: "The maximum observed loss from a peak to a trough of a portfolio before a new peak is attained. This is the worst-case scenario you would have experienced." },
+                      { l: 'Win Rate', v: `${result.win_rate?.toFixed(1)}%`, color: 'text-emerald-400', desc: "The percentage of trades that were profitable." },
+                      { l: 'Final Value', v: formatCurrency(result.final_value, currency), color: 'text-foreground', desc: "The ending portfolio value after all trades are executed." },
+                      { l: 'Total Trades', v: result.total_trades, color: 'text-foreground', desc: "Total number of round-trip trades executed by the strategy." },
+                      { l: 'CAGR', v: `${result.cagr?.toFixed(2)}%`, color: 'text-amber-400', desc: "Compound Annual Growth Rate. The annualized rate of return you would have earned." },
+                      { l: 'Initial Capital', v: formatCurrency(result.initial_capital, currency), color: 'text-muted-foreground', desc: "The starting balance for the backtest." },
                     ].map(stat => (
                       <div key={stat.l} className="glass p-3 rounded-xl border border-border">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide block">{stat.l}</span>
+                        <HoverCard>
+                          <HoverCardTrigger className="cursor-help border-b border-dashed border-slate-500/50 pb-0.5 text-[10px] text-muted-foreground uppercase tracking-wide block w-max mb-1 flex items-center gap-1">
+                            {stat.l}
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 text-xs font-sans text-left normal-case text-foreground tracking-normal">
+                            <strong className="block mb-1">{stat.l}</strong>
+                            {stat.desc}
+                          </HoverCardContent>
+                        </HoverCard>
                         <span className={`text-base font-extrabold ${stat.color}`}>{stat.v}</span>
                       </div>
                     ))}
