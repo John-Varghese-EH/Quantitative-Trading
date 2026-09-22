@@ -34,51 +34,52 @@
 
 /* ── Design Tokens ───────────────────────────────────────────── */
 :root {
-  /* shadcn base variables */
-  --background: #F7F6F3;
-  --foreground: #111111;
+  /* Apple-inspired premium light mode */
+  --background: #F5F5F7;
+  --foreground: #1D1D1F;
   --card: #FFFFFF;
-  --card-foreground: #111111;
+  --card-foreground: #1D1D1F;
   --popover: #FFFFFF;
-  --popover-foreground: #111111;
-  --primary: #111111;
-  --primary-foreground: #F7F6F3;
-  --secondary: #EAEAEA;
-  --secondary-foreground: #111111;
-  --muted: #F9F9F8;
-  --muted-foreground: #787774;
-  --accent: #EAEAEA;
-  --accent-foreground: #111111;
-  --destructive: #9F2F2D;
-  --destructive-foreground: #F7F6F3;
-  --border: #EAEAEA;
-  --input: #EAEAEA;
-  --ring: #111111;
-  --chart-1: #956400;
-  --chart-2: #346538;
-  --chart-3: #9F2F2D;
-  --chart-4: #4B6EAF;
-  --chart-5: #6F4E37;
-  --radius: 0.5rem;
-
-  /* legacy custom vars */
-  --color-bg: #F7F6F3;
-  --color-surface: #FFFFFF;
-  --color-card: #FFFFFF;
-  --color-border: #EAEAEA;
-  --color-primary: #111111;
-  --color-secondary: #787774;
-  --color-accent: #111111;
-  --color-success: #346538;
-  --color-danger: #9F2F2D;
-  --color-warning: #956400;
-  --color-text: #111111;
-  --color-muted: #787774;
+  --popover-foreground: #1D1D1F;
+  --primary: #000000;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F2F2F7;
+  --secondary-foreground: #1D1D1F;
+  --muted: #F2F2F7;
+  --muted-foreground: #86868B;
+  --accent: #E5E5EA;
+  --accent-foreground: #1D1D1F;
+  --destructive: #FF3B30;
+  --destructive-foreground: #FFFFFF;
+  --border: #D1D1D6;
+  --input: #E5E5EA;
+  --ring: #007AFF;
   
-  --color-glass: rgba(255, 255, 255, 0.95);
-  --color-glass-light: rgba(255, 255, 255, 0.8);
-  --color-glass-border: #EAEAEA;
-  --color-glass-hover: #F9F9F8;
+  --chart-1: #007AFF;
+  --chart-2: #34C759;
+  --chart-3: #FF3B30;
+  --chart-4: #5856D6;
+  --chart-5: #FF9500;
+  --radius: 0.75rem;
+
+  /* legacy custom vars mapping to shadcn for backwards compat */
+  --color-bg: var(--background);
+  --color-surface: var(--card);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-secondary: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-success: #34C759;
+  --color-danger: #FF3B30;
+  --color-warning: #FF9500;
+  --color-text: var(--foreground);
+  --color-muted: var(--muted-foreground);
+  
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-glass-light: rgba(255, 255, 255, 0.5);
+  --color-glass-border: rgba(0, 0, 0, 0.05);
+  --color-glass-hover: rgba(255, 255, 255, 0.9);
 
   --sidebar-width: 260px;
   --sidebar-collapsed: 72px;
@@ -86,50 +87,51 @@
 }
 
 .dark {
-  /* shadcn base variables */
-  --background: #111111;
-  --foreground: #F7F6F3;
-  --card: #1A1A1A;
-  --card-foreground: #F7F6F3;
-  --popover: #1A1A1A;
-  --popover-foreground: #F7F6F3;
-  --primary: #F7F6F3;
-  --primary-foreground: #111111;
-  --secondary: #2C2C2C;
-  --secondary-foreground: #F7F6F3;
-  --muted: #222222;
-  --muted-foreground: #A1A1AA;
-  --accent: #2C2C2C;
-  --accent-foreground: #F7F6F3;
-  --destructive: #EF4444;
-  --destructive-foreground: #F7F6F3;
-  --border: #2C2C2C;
-  --input: #2C2C2C;
-  --ring: #F7F6F3;
-  --chart-1: #EAB308;
-  --chart-2: #10B981;
-  --chart-3: #EF4444;
-  --chart-4: #3B82F6;
-  --chart-5: #A855F7;
+  /* Apple-inspired premium dark mode */
+  --background: #000000;
+  --foreground: #F5F5F7;
+  --card: #1C1C1E;
+  --card-foreground: #F5F5F7;
+  --popover: #1C1C1E;
+  --popover-foreground: #F5F5F7;
+  --primary: #FFFFFF;
+  --primary-foreground: #000000;
+  --secondary: #2C2C2E;
+  --secondary-foreground: #F5F5F7;
+  --muted: #2C2C2E;
+  --muted-foreground: #98989D;
+  --accent: #3A3A3C;
+  --accent-foreground: #F5F5F7;
+  --destructive: #FF453A;
+  --destructive-foreground: #FFFFFF;
+  --border: #38383A;
+  --input: #38383A;
+  --ring: #0A84FF;
   
-  /* legacy custom vars */
-  --color-bg: #111111;
-  --color-surface: #1A1A1A;
-  --color-card: #1A1A1A;
-  --color-border: #2C2C2C;
-  --color-primary: #F7F6F3;
-  --color-secondary: #A1A1AA;
-  --color-accent: #F7F6F3;
-  --color-success: #10B981;
-  --color-danger: #EF4444;
-  --color-warning: #EAB308;
-  --color-text: #F7F6F3;
-  --color-muted: #A1A1AA;
+  --chart-1: #0A84FF;
+  --chart-2: #30D158;
+  --chart-3: #FF453A;
+  --chart-4: #5E5CE6;
+  --chart-5: #FF9F0A;
+
+  /* legacy custom vars mapping to shadcn for backwards compat */
+  --color-bg: var(--background);
+  --color-surface: var(--card);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-secondary: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-success: #30D158;
+  --color-danger: #FF453A;
+  --color-warning: #FF9F0A;
+  --color-text: var(--foreground);
+  --color-muted: var(--muted-foreground);
   
-  --color-glass: rgba(26, 26, 26, 0.95);
-  --color-glass-light: rgba(26, 26, 26, 0.8);
-  --color-glass-border: #2C2C2C;
-  --color-glass-hover: #222222;
+  --color-glass: rgba(28, 28, 30, 0.7);
+  --color-glass-light: rgba(28, 28, 30, 0.5);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-glass-hover: rgba(44, 44, 46, 0.9);
 }
 
 /* ── Base Reset ───────────────────────────────────────────────── */
@@ -165,13 +167,15 @@ body {
 /* ── Glass Cards (Flattened per Minimalist UI) ──────────────────────────────────────────────── */
 .glass {
   background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--color-glass-border);
   border-radius: var(--radius-lg);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: none;
+  box-shadow: 0 4px 24px -1px rgba(0,0,0,0.05);
 }
 .glass:hover {
-  border-color: rgba(17, 17, 17, 0.15);
+  border-color: var(--border);
 }
 
 .glass-light {

@@ -24,7 +24,7 @@ import { motion } from 'framer-motion'
 import {
   LayoutDashboard, TrendingUp, Brain, Zap, Shield, FlaskConical,
   BarChart3, Lightbulb, Bell, LogOut, Activity,
-  Users
+  Users, Bot, Radar, Layers
 } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuth } from '@/contexts/AuthContext'
@@ -32,6 +32,9 @@ import { Logo } from './Logo'
 
 const NAV_ITEMS = [
   { to: '/dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
+  { to: '/copilot',        label: 'AI Copilot',       icon: Bot },
+  { to: '/scanner',        label: 'Market Scanner',   icon: Radar },
+  { to: '/derivatives',    label: 'Options Chain',    icon: Layers },
   { to: '/market',         label: 'Market Data',       icon: TrendingUp },
   { to: '/ai-prediction',  label: 'AI Prediction',     icon: Brain },
   { to: '/trading',        label: 'Trading Simulator', icon: Activity },
@@ -55,85 +58,81 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className={`sidebar ${!sidebarOpen ? 'collapsed' : 'open'}`}>
+    <aside className={`sidebar transition-all duration-300 ease-in-out border-r border-border bg-background flex flex-col h-full ${!sidebarOpen ? 'w-[72px]' : 'w-[260px]'}`}>
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ padding: '24px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: sidebarOpen ? 'flex-start' : 'center' }}
+        className={`p-6 border-b border-border flex ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
       >
         <Logo size={32} showText={sidebarOpen} className="sidebar-logo-container" />
       </motion.div>
 
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: '16px 0', overflowY: 'auto' }}>
-        {NAV_ITEMS.map(({ to, label, icon: Icon }, i) => (
-          <motion.div
-            key={to}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.04 }}
-          >
-            <NextLink
-              href={to}
-              className={`sidebar-link ${pathname === to ? 'active' : ''}`}
-              style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', padding: sidebarOpen ? '10px 16px' : '10px' }}
-              title={!sidebarOpen ? label : undefined}
+      <nav className="flex-1 py-4 overflow-y-auto px-3 space-y-1">
+        {NAV_ITEMS.map(({ to, label, icon: Icon }, i) => {
+          const isActive = pathname === to;
+          return (
+            <motion.div
+              key={to}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.04 }}
             >
-              <Icon size={18} />
-              {sidebarOpen && <span>{label}</span>}
-              {to === '/notifications' && unreadCount > 0 && sidebarOpen && (
-                <span style={{
-                  marginLeft: 'auto',
-                  background: 'var(--color-danger)',
-                  color: '#fff',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  padding: '2px 7px',
-                  borderRadius: 10,
-                  minWidth: 18,
-                  textAlign: 'center',
-                }}>{unreadCount}</span>
-              )}
-            </NextLink>
-          </motion.div>
-        ))}
+              <NextLink
+                href={to}
+                className={`flex items-center rounded-lg transition-colors duration-200 ${isActive ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:bg-muted hover:text-foreground'} ${sidebarOpen ? 'px-3 py-2.5 justify-start' : 'p-2.5 justify-center'}`}
+                title={!sidebarOpen ? label : undefined}
+              >
+                <Icon size={18} className={isActive ? 'text-primary' : 'text-muted-foreground'} />
+                {sidebarOpen && <span className="ml-3 text-sm">{label}</span>}
+                {to === '/notifications' && unreadCount > 0 && sidebarOpen && (
+                  <span className="ml-auto bg-destructive text-destructive-foreground text-[0.65rem] font-bold px-[7px] py-[2px] rounded-full min-w-[18px] text-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </NextLink>
+            </motion.div>
+          );
+        })}
 
         {/* Admin only */}
         {(user as any)?.role === 'admin' && (
-          <NextLink href="/admin" className={`sidebar-link ${pathname === '/admin' ? 'active' : ''}`} style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', padding: sidebarOpen ? '10px 16px' : '10px' }} title={!sidebarOpen ? 'Admin Panel' : undefined}>
-            <Users size={18} />
-            {sidebarOpen && <span>Admin Panel</span>}
+          <NextLink 
+            href="/admin" 
+            className={`flex items-center rounded-lg transition-colors duration-200 ${pathname === '/admin' ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:bg-muted hover:text-foreground'} ${sidebarOpen ? 'px-3 py-2.5 justify-start' : 'p-2.5 justify-center'}`}
+            title={!sidebarOpen ? 'Admin Panel' : undefined}
+          >
+            <Users size={18} className={pathname === '/admin' ? 'text-primary' : 'text-muted-foreground'} />
+            {sidebarOpen && <span className="ml-3 text-sm">Admin Panel</span>}
           </NextLink>
         )}
       </nav>
 
       {/* User section */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'center' }}>
+      <div className="p-4 border-t border-border flex justify-center">
         {sidebarOpen ? (
-          <div className="glass-light" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, borderRadius: 8, width: '100%' }}>
+          <div className="flex items-center gap-3 bg-muted/50 p-2.5 rounded-xl w-full border border-border/50 shadow-sm transition-all hover:bg-muted/80">
             {user?.photoURL ? (
-              <img src={user.photoURL} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-border" />
             ) : (
-              <div style={{
-                width: 32, height: 32,
-                background: 'var(--color-border)',
-                borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 600, fontSize: '0.8rem', color: 'var(--color-text)', flexShrink: 0,
-              }}>
+              <div className="w-8 h-8 bg-background border border-border rounded-full flex items-center justify-center font-medium text-xs text-foreground shrink-0 shadow-sm">
                 {(user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase()}
               </div>
             )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm truncate text-foreground">
+                {user?.displayName || user?.email?.split('@')[0] || 'User'}
+              </div>
+              <div className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </div>
             </div>
-            <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 4, display: 'flex' }}>
+            <button onClick={handleLogout} title="Logout" className="text-muted-foreground hover:text-destructive p-1.5 rounded-md hover:bg-destructive/10 transition-colors">
               <LogOut size={16} />
             </button>
           </div>
         ) : (
-          <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', padding: 10, display: 'flex', borderRadius: 8 }} className="sidebar-link">
+          <button onClick={handleLogout} title="Logout" className="text-muted-foreground hover:text-destructive p-2.5 rounded-xl hover:bg-destructive/10 transition-colors">
             <LogOut size={18} />
           </button>
         )}

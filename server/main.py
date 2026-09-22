@@ -22,7 +22,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
 from api.admin import router as admin_router
 from api.dashboard import router as dashboard_router
 from api.market_data import router as market_router
@@ -30,6 +29,8 @@ from api.news import router as news_router
 from api.portfolio import router as portfolio_router
 from api.threat_intel import router as threat_intel_router
 from attacks.router import router as attacks_router
+from api.copilot import router as copilot_router
+from api.compliance import router as compliance_router
 
 # Routers
 from auth.router import router as auth_router
@@ -93,6 +94,8 @@ app.include_router(defenses_router, prefix="/api/defenses",  tags=["Defense Mech
 app.include_router(admin_router,    prefix="/api/admin",     tags=["Admin Panel"])
 app.include_router(news_router,     prefix="/api/news",      tags=["News & Sentiment"])
 app.include_router(threat_intel_router, prefix="/api/threat-intel", tags=["Threat Intelligence"])
+app.include_router(copilot_router,  prefix="/api/copilot",   tags=["AI Copilot"])
+app.include_router(compliance_router, prefix="/api/compliance", tags=["Compliance Firewall"])
 
 
 from fastapi import Response

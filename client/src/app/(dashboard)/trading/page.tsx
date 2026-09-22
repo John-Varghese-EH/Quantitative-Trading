@@ -22,7 +22,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { LightweightChart } from '@/components/LightweightChart'
 import { XaiWaterfallOverlay } from '@/components/XaiWaterfallOverlay'
 import { AutonomousBotManagerModal } from '@/components/AutonomousBotManagerModal'
-import { OptionsDerivativesChain } from '@/components/OptionsDerivativesChain'
+
 import api from '@/services/api'
 import toast from 'react-hot-toast'
 import { useAppStore } from '@/store/useAppStore'
@@ -261,7 +261,7 @@ export default function TradingPage() {
   return (
     <div className="space-y-6">
       {/* ─── Top Header with Mode Selector & Kill Switch ──────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-white/5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-border">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -275,7 +275,7 @@ export default function TradingPage() {
               {tradingMode === 'novice' ? '🌱 Novice Mode' : '⚡ Quant Pro Mode'}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             {tradingMode === 'novice'
               ? 'Autonomous AI assistance, 1-click bot deployment, and plain-English strategies.'
               : 'Institutional execution terminal, pre-trade compliance firewall, and deep quant analytics.'}
@@ -285,11 +285,11 @@ export default function TradingPage() {
         {/* Action Controls */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Mode Switcher Toggle */}
-          <div className="glass p-1 flex items-center rounded-xl border border-white/10">
+          <div className="glass p-1 flex items-center rounded-xl border border-border">
             <button
               onClick={() => setTradingMode('novice')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                tradingMode === 'novice' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                tradingMode === 'novice' ? 'bg-blue-600 text-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Compass size={14} /> Novice View
@@ -297,7 +297,7 @@ export default function TradingPage() {
             <button
               onClick={() => setTradingMode('pro')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                tradingMode === 'pro' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                tradingMode === 'pro' ? 'bg-purple-600 text-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Sliders size={14} /> Quant Pro
@@ -306,10 +306,10 @@ export default function TradingPage() {
 
           {/* Paper Portfolio Quick Glance */}
           {paperSummary && (
-            <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-xl glass border border-white/10 text-xs">
+            <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-xl glass border border-border text-xs">
               <div>
-                <span className="text-slate-500 text-[10px] block uppercase">Paper Equity</span>
-                <span className="font-bold text-white">{formatCurrency(paperSummary.portfolio_value, currency)}</span>
+                <span className="text-muted-foreground text-[10px] block uppercase">Paper Equity</span>
+                <span className="font-bold text-foreground">{formatCurrency(paperSummary.portfolio_value, currency)}</span>
               </div>
               <div className={`font-semibold ${paperSummary.total_pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {paperSummary.total_pnl >= 0 ? '+' : ''}{paperSummary.total_pnl_pct}%
@@ -325,7 +325,7 @@ export default function TradingPage() {
               }
             }}
             disabled={panicMutation.isPending}
-            className="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            className="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-foreground border border-rose-500/30 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
           >
             <ShieldAlert size={14} />
             {panicMutation.isPending ? 'Halting…' : 'Panic Stop'}
@@ -343,24 +343,24 @@ export default function TradingPage() {
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div>
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Bot size={18} className="text-blue-400" /> 1-Click Automated Bots
                 </h2>
-                <p className="text-xs text-slate-400">Pre-configured, battle-tested algorithmic bots ready for instant paper deployment.</p>
+                <p className="text-xs text-muted-foreground">Pre-configured, battle-tested algorithmic bots ready for instant paper deployment.</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsBotModalOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-foreground border border-blue-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
                 >
                   <Bot size={14} /> Bot Fleet Command Center
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsOptionsModalOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-foreground border border-purple-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
                 >
                   <Layers size={14} /> Options & Sentiment
                 </button>
@@ -372,22 +372,22 @@ export default function TradingPage() {
                 <div key={bot.id} className="glass p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition-all group">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/5 text-slate-300">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
                         {bot.tag}
                       </span>
                       <span className="text-xs font-extrabold text-blue-400">{bot.symbol}</span>
                     </div>
-                    <h3 className="font-bold text-sm text-white group-hover:text-blue-400 transition-colors">{bot.name}</h3>
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{bot.desc}</p>
+                    <h3 className="font-bold text-sm text-foreground group-hover:text-blue-400 transition-colors">{bot.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bot.desc}</p>
 
-                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/5 text-[11px]">
+                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border text-[11px]">
                       <div>
-                        <span className="text-slate-500 block">Win Rate</span>
+                        <span className="text-muted-foreground block">Win Rate</span>
                         <span className="font-bold text-emerald-400">{bot.winRate}</span>
                       </div>
                       <div>
-                        <span className="text-slate-500 block">Risk Level</span>
-                        <span className="font-medium text-slate-300">{bot.risk}</span>
+                        <span className="text-muted-foreground block">Risk Level</span>
+                        <span className="font-medium text-muted-foreground">{bot.risk}</span>
                       </div>
                     </div>
                   </div>
@@ -401,7 +401,7 @@ export default function TradingPage() {
                       })
                       setIsBotModalOpen(true)
                     }}
-                    className="mt-4 w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                    className="mt-4 w-full py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-foreground border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
                   >
                     <Play size={13} /> Deploy Autonomous Bot
                   </button>
@@ -411,17 +411,17 @@ export default function TradingPage() {
           </div>
 
           {/* 1b. Live Market Opportunity Radar (Real-Time Scanner) */}
-          <div className="glass p-5 rounded-2xl border border-white/10 space-y-4">
+          <div className="glass p-5 rounded-2xl border border-border space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <Radar size={18} className="text-amber-400 animate-pulse" />
-                  <h2 className="text-base font-bold text-white">Live Market Opportunity Radar</h2>
+                  <h2 className="text-base font-bold text-foreground">Live Market Opportunity Radar</h2>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     Real-Time Scanner
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Algorithmic scanner screening US Equities, Indian Equities (NSE), and Crypto for institutional volume & breakout triggers.
                 </p>
               </div>
@@ -430,7 +430,7 @@ export default function TradingPage() {
                 <button
                   onClick={() => refetchScan()}
                   disabled={isScanning}
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs flex items-center gap-1.5 transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground text-xs flex items-center gap-1.5 transition-colors"
                 >
                   <RefreshCw size={13} className={isScanning ? 'animate-spin' : ''} />
                   {isScanning ? 'Scanning…' : 'Scan Now'}
@@ -439,10 +439,10 @@ export default function TradingPage() {
             </div>
 
             {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border text-xs">
               {/* Market Universe Tabs */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-500 mr-1">Market:</span>
+                <span className="text-[11px] text-muted-foreground mr-1">Market:</span>
                 {[
                   { id: 'ALL', label: 'All Markets' },
                   { id: 'US', label: '🇺🇸 US Equities' },
@@ -454,8 +454,8 @@ export default function TradingPage() {
                     onClick={() => setScannerMarket(m.id as any)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                       scannerMarket === m.id 
-                        ? 'bg-blue-600 text-white shadow-sm' 
-                        : 'bg-white/5 text-slate-400 hover:text-white'
+                        ? 'bg-blue-600 text-foreground shadow-sm' 
+                        : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {m.label}
@@ -465,7 +465,7 @@ export default function TradingPage() {
 
               {/* Signal Filter */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] text-slate-500 mr-1">Signal:</span>
+                <span className="text-[11px] text-muted-foreground mr-1">Signal:</span>
                 {[
                   { id: 'ALL', label: 'All' },
                   { id: 'BREAKOUT', label: 'Breakouts' },
@@ -477,8 +477,8 @@ export default function TradingPage() {
                     onClick={() => setScannerSignal(s.id as any)}
                     className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all ${
                       scannerSignal === s.id 
-                        ? 'bg-white/20 text-white font-bold' 
-                        : 'bg-white/5 text-slate-400 hover:text-slate-300'
+                        ? 'bg-white/20 text-foreground font-bold' 
+                        : 'bg-muted/50 text-muted-foreground hover:text-muted-foreground'
                     }`}
                   >
                     {s.label}
@@ -491,17 +491,17 @@ export default function TradingPage() {
             {scanData?.candidates && scanData.candidates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
                 {scanData.candidates.slice(0, 6).map((c: any) => (
-                  <div key={c.symbol} className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all flex flex-col justify-between">
+                  <div key={c.symbol} className="p-3.5 rounded-xl bg-muted/50 border border-border hover:border-blue-500/30 transition-all flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-sm text-white">{c.symbol}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-400 uppercase">
+                          <span className="font-extrabold text-sm text-foreground">{c.symbol}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase">
                             {c.market}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="font-bold text-xs text-white">${c.price.toFixed(2)}</span>
+                          <span className="font-bold text-xs text-foreground">${c.price.toFixed(2)}</span>
                           <span className={`text-[11px] font-semibold ml-1.5 ${
                             c.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'
                           }`}>
@@ -519,27 +519,27 @@ export default function TradingPage() {
                         }`}>
                           {c.tag}
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
                           {c.volume_surge_ratio}x Vol
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
                           RSI {c.rsi}
                         </span>
                       </div>
 
-                      <p className="text-[11px] text-slate-400 line-clamp-2 mb-3">
+                      <p className="text-[11px] text-muted-foreground line-clamp-2 mb-3">
                         {c.notes}
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
                       <button
                         onClick={() => {
                           setCouncilSymbol(c.symbol)
                           councilMutation.mutate(c.symbol)
                           toast.success(`AI Council deliberating on ${c.symbol}…`)
                         }}
-                        className="py-1.5 px-2 rounded-lg bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
+                        className="py-1.5 px-2 rounded-lg bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-foreground text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
                       >
                         <Cpu size={12} /> Council
                       </button>
@@ -551,7 +551,7 @@ export default function TradingPage() {
                           order_type: 'MARKET',
                           strategy_id: `Scanner ${c.tag}`,
                         })}
-                        className="py-1.5 px-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
+                        className="py-1.5 px-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-foreground text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
                       >
                         <Play size={12} /> Paper Buy
                       </button>
@@ -560,7 +560,7 @@ export default function TradingPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-slate-500 text-xs">
+              <div className="text-center py-6 text-muted-foreground text-xs">
                 {isScanning ? 'Scanning markets for anomalies…' : 'No prominent breakout triggers in current filter. Try selecting "All Markets".'}
               </div>
             )}
@@ -574,15 +574,15 @@ export default function TradingPage() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Sparkles size={18} className="text-amber-400" />
-                  <h2 className="text-base font-bold text-white">Prompt-to-Strategy AI Copilot</h2>
+                  <h2 className="text-base font-bold text-foreground">Prompt-to-Strategy AI Copilot</h2>
                 </div>
-                <p className="text-xs text-slate-400 mb-4">
+                <p className="text-xs text-muted-foreground mb-4">
                   Describe your trading idea in plain English. The AI synthesizes the logic into a compliant algorithmic strategy.
                 </p>
 
                 <div className="space-y-3">
                   <textarea
-                    className="w-full h-24 p-3 rounded-xl bg-black/30 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 resize-none"
+                    className="w-full h-24 p-3 rounded-xl bg-black/30 border border-border text-xs sm:text-sm text-foreground placeholder-slate-500 focus:outline-none focus:border-blue-500/50 resize-none"
                     placeholder="e.g., Buy Apple whenever RSI is below 30 and the 50-day moving average is pointing upwards, with a 2% stop loss..."
                     value={userPrompt}
                     onChange={(e) => setUserPrompt(e.target.value)}
@@ -590,18 +590,18 @@ export default function TradingPage() {
 
                   {/* Suggestions pills */}
                   <div className="flex items-center gap-2 flex-wrap text-[11px]">
-                    <span className="text-slate-500">Try:</span>
+                    <span className="text-muted-foreground">Try:</span>
                     <button
                       type="button"
                       onClick={() => setUserPrompt("Buy tech stocks when RSI < 32 and volume increases by 1.5x, risk 1.5% max")}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                      className="px-2 py-1 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors"
                     >
                       RSI Dip + Volume Surge
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserPrompt("Momentum breakout strategy above 20-day high with trailing 2% stop loss")}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                      className="px-2 py-1 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors"
                     >
                       Breakout Channel
                     </button>
@@ -609,25 +609,25 @@ export default function TradingPage() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-white/5">
+              <div className="mt-4 pt-3 border-t border-border">
                 <button
                   onClick={() => promptMutation.mutate(userPrompt || "Buy tech breakouts with 2% stop loss")}
                   disabled={promptMutation.isPending}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-foreground font-semibold text-xs flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
                 >
                   <Sparkles size={15} />
                   {promptMutation.isPending ? 'Synthesizing Strategy…' : 'Compile Strategy with AI'}
                 </button>
 
                 {compiledStrategy && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 p-3 rounded-xl bg-white/5 text-xs space-y-2 border border-white/10">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 p-3 rounded-xl bg-muted/50 text-xs space-y-2 border border-border">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{compiledStrategy.strategy_name}</span>
+                      <span className="font-bold text-foreground">{compiledStrategy.strategy_name}</span>
                       <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300">
                         {compiledStrategy.estimated_complexity}
                       </span>
                     </div>
-                    <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <ul className="text-muted-foreground space-y-1 list-disc list-inside">
                       {compiledStrategy.compiled_rules?.map((r: string, idx: number) => (
                         <li key={idx}>{r}</li>
                       ))}
@@ -643,13 +643,13 @@ export default function TradingPage() {
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <Cpu size={18} className="text-purple-400" />
-                    <h2 className="text-base font-bold text-white">5-Agent AI Council</h2>
+                    <h2 className="text-base font-bold text-foreground">5-Agent AI Council</h2>
                   </div>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
                     Red-Team Protected
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   Technical, Fundamental, Sentiment, Adversarial Red-Team, and Chief Risk Officer agents deliberate on any ticker.
                 </p>
 
@@ -657,7 +657,7 @@ export default function TradingPage() {
                 <div className="flex items-center gap-2 mb-3">
                   <input
                     type="text"
-                    className="flex-1 p-2.5 rounded-xl bg-black/30 border border-white/10 text-xs sm:text-sm text-white font-semibold uppercase tracking-wider focus:outline-none focus:border-purple-500/50"
+                    className="flex-1 p-2.5 rounded-xl bg-black/30 border border-border text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider focus:outline-none focus:border-purple-500/50"
                     placeholder="Ticker (e.g. AAPL, NVDA, RELIANCE.NS)"
                     value={councilSymbol}
                     onChange={(e) => setCouncilSymbol(e.target.value)}
@@ -665,7 +665,7 @@ export default function TradingPage() {
                   <button
                     onClick={() => councilMutation.mutate(councilSymbol)}
                     disabled={councilMutation.isPending}
-                    className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                    className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-foreground font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
                   >
                     <Activity size={14} />
                     {councilMutation.isPending ? 'Deliberating…' : 'Consult Council'}
@@ -681,7 +681,7 @@ export default function TradingPage() {
                         setCouncilSymbol(sym)
                         councilMutation.mutate(sym)
                       }}
-                      className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[11px] text-slate-300 transition-colors"
+                      className="px-2 py-0.5 rounded bg-muted/50 hover:bg-muted text-[11px] text-muted-foreground transition-colors"
                     >
                       {sym}
                     </button>
@@ -707,16 +707,16 @@ export default function TradingPage() {
           <div className="glass p-5 rounded-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   <DollarSign size={18} className="text-emerald-400" /> Active Paper Trading Portfolio
                 </h2>
-                <p className="text-xs text-slate-400">Risk-free execution sandbox with realistic fee & slippage modeling.</p>
+                <p className="text-xs text-muted-foreground">Risk-free execution sandbox with realistic fee & slippage modeling.</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => refetchPaper()}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs transition-colors"
+                  className="p-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-xs transition-colors"
                   title="Refresh Portfolio"
                 >
                   <RefreshCw size={14} />
@@ -725,7 +725,7 @@ export default function TradingPage() {
                   onClick={() => {
                     if (confirm('Reset paper balance back to $100,000?')) resetPaperMutation.mutate()
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground text-xs font-semibold transition-colors"
                 >
                   Reset Balance
                 </button>
@@ -734,28 +734,28 @@ export default function TradingPage() {
 
             {/* Quick Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="text-[10px] text-slate-500 block uppercase">Total Portfolio Value</span>
-                <span className="text-base sm:text-lg font-bold text-white">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <span className="text-[10px] text-muted-foreground block uppercase">Total Portfolio Value</span>
+                <span className="text-base sm:text-lg font-bold text-foreground">
                   {formatCurrency(paperSummary?.portfolio_value || 100000, currency)}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="text-[10px] text-slate-500 block uppercase">Available Cash</span>
-                <span className="text-base sm:text-lg font-bold text-white">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <span className="text-[10px] text-muted-foreground block uppercase">Available Cash</span>
+                <span className="text-base sm:text-lg font-bold text-foreground">
                   {formatCurrency(paperSummary?.cash || 100000, currency)}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="text-[10px] text-slate-500 block uppercase">Realized P&L</span>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <span className="text-[10px] text-muted-foreground block uppercase">Realized P&L</span>
                 <span className={`text-base sm:text-lg font-bold ${
                   (paperSummary?.realized_pnl || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                   {formatCurrency(paperSummary?.realized_pnl || 0, currency)}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="text-[10px] text-slate-500 block uppercase">Open Positions</span>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <span className="text-[10px] text-muted-foreground block uppercase">Open Positions</span>
                 <span className="text-base sm:text-lg font-bold text-blue-400">
                   {paperSummary?.open_positions_count || 0} active
                 </span>
@@ -766,7 +766,7 @@ export default function TradingPage() {
             {paperSummary?.open_positions?.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="text-[11px] text-slate-500 uppercase border-b border-white/5">
+                  <thead className="text-[11px] text-muted-foreground uppercase border-b border-border">
                     <tr>
                       <th className="pb-2">Symbol</th>
                       <th className="pb-2">Qty</th>
@@ -778,11 +778,11 @@ export default function TradingPage() {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {paperSummary.open_positions.map((pos: any) => (
-                      <tr key={pos.symbol} className="hover:bg-white/5">
-                        <td className="py-2.5 font-bold text-white">{pos.symbol}</td>
-                        <td className="py-2.5 text-slate-300">{pos.quantity}</td>
-                        <td className="py-2.5 text-slate-300">{formatCurrency(pos.entry_price, currency)}</td>
-                        <td className="py-2.5 text-slate-300">{formatCurrency(pos.current_price, currency)}</td>
+                      <tr key={pos.symbol} className="hover:bg-muted/50">
+                        <td className="py-2.5 font-bold text-foreground">{pos.symbol}</td>
+                        <td className="py-2.5 text-muted-foreground">{pos.quantity}</td>
+                        <td className="py-2.5 text-muted-foreground">{formatCurrency(pos.entry_price, currency)}</td>
+                        <td className="py-2.5 text-muted-foreground">{formatCurrency(pos.current_price, currency)}</td>
                         <td className={`py-2.5 font-semibold ${pos.unrealized_pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                           {pos.unrealized_pnl >= 0 ? '+' : ''}{formatCurrency(pos.unrealized_pnl, currency)} ({pos.unrealized_pnl_pct}%)
                         </td>
@@ -795,7 +795,7 @@ export default function TradingPage() {
                               order_type: 'MARKET',
                               strategy_id: 'Manual Close',
                             })}
-                            className="px-2.5 py-1 rounded bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-[11px] font-semibold transition-colors"
+                            className="px-2.5 py-1 rounded bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-foreground text-[11px] font-semibold transition-colors"
                           >
                             Close
                           </button>
@@ -806,7 +806,7 @@ export default function TradingPage() {
                 </table>
               </div>
             ) : (
-              <div className="text-center py-6 text-slate-500 text-xs">
+              <div className="text-center py-6 text-muted-foreground text-xs">
                 No active open positions in paper account. Deploy a bot or consult the AI Council above to open one!
               </div>
             )}
@@ -822,12 +822,12 @@ export default function TradingPage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
 
           {/* Pre-Trade Compliance & Legal Firewall Status Bar */}
-          <div className="glass p-4 rounded-xl border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="glass p-4 rounded-xl border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-3">
               <Shield size={20} className="text-purple-400 shrink-0" />
               <div>
-                <span className="font-bold text-white block">Pre-Trade Legal Compliance Firewall Active</span>
-                <span className="text-slate-400 text-[11px]">
+                <span className="font-bold text-foreground block">Pre-Trade Legal Compliance Firewall Active</span>
+                <span className="text-muted-foreground text-[11px]">
                   SEC Rule 15c3-5 Fat-Finger Guards · SEBI IST Circuit Collars · MiFID II Rate Throttling
                 </span>
               </div>
@@ -841,7 +841,7 @@ export default function TradingPage() {
               }`}>
                 {complianceStatus?.kill_switch_active ? 'KILL-SWITCH ENGAGED' : 'FIREWALL: PASSING'}
               </span>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-muted-foreground">
                 Max Daily Loss Cap: {complianceStatus?.max_daily_loss_limit || '5%'}
               </span>
             </div>
@@ -853,8 +853,8 @@ export default function TradingPage() {
             <div className="space-y-5">
 
               {/* Order Execution Terminal */}
-              <div className="glass p-5 rounded-2xl border border-white/10">
-                <h3 className="font-bold text-sm text-white mb-3 flex items-center gap-2">
+              <div className="glass p-5 rounded-2xl border border-border">
+                <h3 className="font-bold text-sm text-foreground mb-3 flex items-center gap-2">
                   <ArrowUpRight size={16} className="text-blue-400" /> Pro Execution Terminal
                 </h3>
 
@@ -864,7 +864,7 @@ export default function TradingPage() {
                       type="button"
                       onClick={() => setOrderSide('BUY')}
                       className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                        orderSide === 'BUY' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white/5 text-slate-400'
+                        orderSide === 'BUY' ? 'bg-emerald-600 text-foreground shadow-md' : 'bg-muted/50 text-muted-foreground'
                       }`}
                     >
                       BUY / LONG
@@ -873,7 +873,7 @@ export default function TradingPage() {
                       type="button"
                       onClick={() => setOrderSide('SELL')}
                       className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                        orderSide === 'SELL' ? 'bg-rose-600 text-white shadow-md' : 'bg-white/5 text-slate-400'
+                        orderSide === 'SELL' ? 'bg-rose-600 text-foreground shadow-md' : 'bg-muted/50 text-muted-foreground'
                       }`}
                     >
                       SELL / SHORT
@@ -881,10 +881,10 @@ export default function TradingPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Symbol</label>
+                    <label className="text-[11px] text-muted-foreground block mb-1">Symbol</label>
                     <input
                       type="text"
-                      className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-xs text-white font-bold uppercase focus:outline-none focus:border-blue-500/50"
+                      className="w-full p-2.5 rounded-lg bg-black/30 border border-border text-xs text-foreground font-bold uppercase focus:outline-none focus:border-blue-500/50"
                       value={symbol}
                       onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                     />
@@ -892,19 +892,19 @@ export default function TradingPage() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] text-slate-400 block mb-1">Quantity</label>
+                      <label className="text-[11px] text-muted-foreground block mb-1">Quantity</label>
                       <input
                         type="number"
-                        className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-xs text-white focus:outline-none focus:border-blue-500/50"
+                        className="w-full p-2.5 rounded-lg bg-black/30 border border-border text-xs text-foreground focus:outline-none focus:border-blue-500/50"
                         value={orderQty}
                         onChange={(e) => setOrderQty(Number(e.target.value))}
                         min={1}
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] text-slate-400 block mb-1">Type</label>
+                      <label className="text-[11px] text-muted-foreground block mb-1">Type</label>
                       <select
-                        className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-xs text-white focus:outline-none focus:border-blue-500/50"
+                        className="w-full p-2.5 rounded-lg bg-black/30 border border-border text-xs text-foreground focus:outline-none focus:border-blue-500/50"
                         value={orderType}
                         onChange={(e) => setOrderType(e.target.value)}
                       >
@@ -916,9 +916,9 @@ export default function TradingPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Compliance Jurisdiction</label>
+                    <label className="text-[11px] text-muted-foreground block mb-1">Compliance Jurisdiction</label>
                     <select
-                      className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-xs text-white focus:outline-none focus:border-blue-500/50"
+                      className="w-full p-2.5 rounded-lg bg-black/30 border border-border text-xs text-foreground focus:outline-none focus:border-blue-500/50"
                       value={orderJurisdiction}
                       onChange={(e) => setOrderJurisdiction(e.target.value)}
                     >
@@ -939,7 +939,7 @@ export default function TradingPage() {
                       strategy_id: 'Pro Manual Terminal',
                     })}
                     disabled={executeOrderMutation.isPending}
-                    className={`w-full py-2.5 rounded-xl text-white font-bold text-xs transition-all shadow-md mt-2 ${
+                    className={`w-full py-2.5 rounded-xl text-foreground font-bold text-xs transition-all shadow-md mt-2 ${
                       orderSide === 'BUY' ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-rose-600 hover:bg-rose-500'
                     }`}
                   >
@@ -949,8 +949,8 @@ export default function TradingPage() {
               </div>
 
               {/* Strategy Backtest Controls */}
-              <div className="glass p-5 rounded-2xl border border-white/10">
-                <h3 className="font-bold text-sm text-white mb-3">Backtest Strategy Parameters</h3>
+              <div className="glass p-5 rounded-2xl border border-border">
+                <h3 className="font-bold text-sm text-foreground mb-3">Backtest Strategy Parameters</h3>
 
                 <div className="space-y-3">
                   <div className="space-y-1.5">
@@ -961,30 +961,30 @@ export default function TradingPage() {
                         className={`w-full p-2.5 rounded-xl border text-left text-xs transition-all ${
                           strategy === s.id 
                             ? 'border-blue-500/50 bg-blue-500/10' 
-                            : 'border-white/5 hover:border-white/10'
+                            : 'border-border hover:border-border'
                         }`}
                       >
-                        <div className="font-bold text-white">{s.name}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{s.desc}</div>
+                        <div className="font-bold text-foreground">{s.name}</div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">{s.desc}</div>
                       </button>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-2">
                     <div>
-                      <label className="text-[11px] text-slate-400 block mb-1">Start Date</label>
+                      <label className="text-[11px] text-muted-foreground block mb-1">Start Date</label>
                       <input
                         type="date"
-                        className="w-full p-2 rounded-lg bg-black/30 border border-white/10 text-xs text-white"
+                        className="w-full p-2 rounded-lg bg-black/30 border border-border text-xs text-foreground"
                         value={startDate}
                         onChange={e => setStartDate(e.target.value)}
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] text-slate-400 block mb-1">End Date</label>
+                      <label className="text-[11px] text-muted-foreground block mb-1">End Date</label>
                       <input
                         type="date"
-                        className="w-full p-2 rounded-lg bg-black/30 border border-white/10 text-xs text-white"
+                        className="w-full p-2 rounded-lg bg-black/30 border border-border text-xs text-foreground"
                         value={endDate}
                         onChange={e => setEndDate(e.target.value)}
                       />
@@ -992,10 +992,10 @@ export default function TradingPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Capital ({currency})</label>
+                    <label className="text-[11px] text-muted-foreground block mb-1">Capital ({currency})</label>
                     <input
                       type="number"
-                      className="w-full p-2 rounded-lg bg-black/30 border border-white/10 text-xs text-white"
+                      className="w-full p-2 rounded-lg bg-black/30 border border-border text-xs text-foreground"
                       value={capital}
                       onChange={e => setCapital(Number(e.target.value))}
                       min={100}
@@ -1005,7 +1005,7 @@ export default function TradingPage() {
                   <button
                     onClick={handleRunBacktest}
                     disabled={backtestMutation.isPending}
-                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md disabled:opacity-50"
+                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-foreground font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md disabled:opacity-50"
                   >
                     <Play size={14} />
                     {backtestMutation.isPending ? 'Backtesting…' : 'Execute Historical Backtest'}
@@ -1014,17 +1014,17 @@ export default function TradingPage() {
               </div>
 
               {/* Recent Backtests History */}
-              <div className="glass p-5 rounded-2xl border border-white/10">
-                <h4 className="font-bold text-xs text-white uppercase tracking-wider mb-3">Recent Backtests</h4>
+              <div className="glass p-5 rounded-2xl border border-border">
+                <h4 className="font-bold text-xs text-foreground uppercase tracking-wider mb-3">Recent Backtests</h4>
                 {(!history || history.length === 0) ? (
-                  <p className="text-slate-500 text-xs text-center py-2">No previous backtests</p>
+                  <p className="text-muted-foreground text-xs text-center py-2">No previous backtests</p>
                 ) : (
                   <div className="space-y-2">
                     {history.slice(0, 4).map((h: any) => (
-                      <div key={h.id} className="p-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs">
+                      <div key={h.id} className="p-2.5 rounded-xl bg-muted/50 border border-border flex items-center justify-between text-xs">
                         <div>
-                          <div className="font-bold text-white">{h.symbol} · {h.strategy}</div>
-                          <div className="text-[10px] text-slate-400">Win: {h.win_rate}% · {h.total_trades} trades</div>
+                          <div className="font-bold text-foreground">{h.symbol} · {h.strategy}</div>
+                          <div className="text-[10px] text-muted-foreground">Win: {h.win_rate}% · {h.total_trades} trades</div>
                         </div>
                         <div className={`font-bold ${h.total_return >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                           {h.total_return >= 0 ? '+' : ''}{h.total_return?.toFixed(1)}%
@@ -1046,8 +1046,8 @@ export default function TradingPage() {
                   onClick={() => setProChartTab('chart')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     proChartTab === 'chart'
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white/5 text-slate-400 hover:text-white'
+                      ? 'bg-blue-600 text-foreground shadow-md'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <BarChart2 size={14} /> Candlestick Chart ({symbol})
@@ -1057,8 +1057,8 @@ export default function TradingPage() {
                   onClick={() => setProChartTab('backtest')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     proChartTab === 'backtest'
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white/5 text-slate-400 hover:text-white'
+                      ? 'bg-blue-600 text-foreground shadow-md'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Activity size={14} /> Backtest Equity Curve {result ? `(${result.symbol})` : ''}
@@ -1073,8 +1073,8 @@ export default function TradingPage() {
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     proChartTab === 'council_xai'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'bg-white/5 text-slate-400 hover:text-white'
+                      ? 'bg-purple-600 text-foreground shadow-md'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Cpu size={14} /> AI Council & SHAP XAI ({symbol})
@@ -1084,8 +1084,8 @@ export default function TradingPage() {
                   onClick={() => setProChartTab('options')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     proChartTab === 'options'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'bg-white/5 text-slate-400 hover:text-white'
+                      ? 'bg-purple-600 text-foreground shadow-md'
+                      : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Layers size={14} /> Options Chain & Greeks ({symbol})
@@ -1094,19 +1094,19 @@ export default function TradingPage() {
 
               {/* Tab 1: Live Candlestick Chart */}
               {proChartTab === 'chart' && (
-                <div className="glass p-5 rounded-2xl border border-white/10 space-y-3">
+                <div className="glass p-5 rounded-2xl border border-border space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                      <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
                         {symbol} · Institutional Candlestick Feed
                       </h3>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-muted-foreground">
                         High-precision candles with EMA 20 (blue), EMA 50 (amber), and Volume Histogram.
                       </p>
                     </div>
                     <div className="flex items-center gap-1 text-[11px]">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-1" />
-                      <span className="text-slate-300 font-semibold">Active Feed</span>
+                      <span className="text-muted-foreground font-semibold">Active Feed</span>
                     </div>
                   </div>
 
@@ -1121,7 +1121,7 @@ export default function TradingPage() {
                       />
                     </div>
                   ) : (
-                    <div className="h-64 flex items-center justify-center text-xs text-slate-500">
+                    <div className="h-64 flex items-center justify-center text-xs text-muted-foreground">
                       {isOhlcvLoading ? 'Loading live market candle data…' : 'No candlestick data available for this symbol.'}
                     </div>
                   )}
@@ -1130,9 +1130,9 @@ export default function TradingPage() {
 
               {/* Tab 2: Backtest Equity Curve */}
               {proChartTab === 'backtest' && !result && !backtestMutation.isPending && (
-                <div className="glass p-12 text-center rounded-2xl border border-white/10 flex flex-col items-center justify-center min-h-[400px]">
+                <div className="glass p-12 text-center rounded-2xl border border-border flex flex-col items-center justify-center min-h-[400px]">
                   <Activity size={56} className="text-slate-600 mb-3" />
-                  <h3 className="text-slate-400 font-medium text-sm">Select strategy parameters and execute a backtest</h3>
+                  <h3 className="text-muted-foreground font-medium text-sm">Select strategy parameters and execute a backtest</h3>
                   <p className="text-xs text-slate-600 max-w-sm mt-1">
                     Simulates realistic execution across tick-level historical data with commissions and slippage.
                   </p>
@@ -1140,9 +1140,9 @@ export default function TradingPage() {
               )}
 
               {proChartTab === 'backtest' && backtestMutation.isPending && (
-                <div className="glass p-12 text-center rounded-2xl border border-white/10 flex flex-col items-center justify-center min-h-[400px]">
+                <div className="glass p-12 text-center rounded-2xl border border-border flex flex-col items-center justify-center min-h-[400px]">
                   <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3" />
-                  <span className="text-xs text-slate-400">Crunching quantitative strategy metrics…</span>
+                  <span className="text-xs text-muted-foreground">Crunching quantitative strategy metrics…</span>
                 </div>
               )}
 
@@ -1152,24 +1152,24 @@ export default function TradingPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { l: 'Total Return', v: `${result.total_return >= 0 ? '+' : ''}${result.total_return?.toFixed(2)}%`, color: result.total_return >= 0 ? 'text-emerald-400' : 'text-rose-400' },
-                      { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'text-white' },
+                      { l: 'Sharpe Ratio', v: result.sharpe_ratio?.toFixed(2), color: 'text-foreground' },
                       { l: 'Max Drawdown', v: `${result.max_drawdown?.toFixed(2)}%`, color: 'text-rose-400' },
                       { l: 'Win Rate', v: `${result.win_rate?.toFixed(1)}%`, color: 'text-emerald-400' },
-                      { l: 'Final Value', v: formatCurrency(result.final_value, currency), color: 'text-white' },
-                      { l: 'Total Trades', v: result.total_trades, color: 'text-white' },
+                      { l: 'Final Value', v: formatCurrency(result.final_value, currency), color: 'text-foreground' },
+                      { l: 'Total Trades', v: result.total_trades, color: 'text-foreground' },
                       { l: 'CAGR', v: `${result.cagr?.toFixed(2)}%`, color: 'text-amber-400' },
-                      { l: 'Initial Capital', v: formatCurrency(result.initial_capital, currency), color: 'text-slate-400' },
+                      { l: 'Initial Capital', v: formatCurrency(result.initial_capital, currency), color: 'text-muted-foreground' },
                     ].map(stat => (
-                      <div key={stat.l} className="glass p-3 rounded-xl border border-white/5">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wide block">{stat.l}</span>
+                      <div key={stat.l} className="glass p-3 rounded-xl border border-border">
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide block">{stat.l}</span>
                         <span className={`text-base font-extrabold ${stat.color}`}>{stat.v}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Equity Curve Chart */}
-                  <div className="glass p-5 rounded-2xl border border-white/10">
-                    <h3 className="font-bold text-sm text-white mb-3">
+                  <div className="glass p-5 rounded-2xl border border-border">
+                    <h3 className="font-bold text-sm text-foreground mb-3">
                       Equity Curve · {activeStrategyObj?.name} on {result.symbol}
                     </h3>
                     <ResponsiveContainer width="100%" height={260}>
@@ -1194,11 +1194,11 @@ export default function TradingPage() {
 
                   {/* Trade Log */}
                   {result.trade_log?.length > 0 && (
-                    <div className="glass p-5 rounded-2xl border border-white/10">
-                      <h4 className="font-bold text-sm text-white mb-3">Trade Execution Audit</h4>
+                    <div className="glass p-5 rounded-2xl border border-border">
+                      <h4 className="font-bold text-sm text-foreground mb-3">Trade Execution Audit</h4>
                       <div className="overflow-x-auto max-h-60">
                         <table className="w-full text-left text-xs">
-                          <thead className="text-[11px] text-slate-500 uppercase border-b border-white/5">
+                          <thead className="text-[11px] text-muted-foreground uppercase border-b border-border">
                             <tr>
                               <th className="pb-2">Date</th>
                               <th className="pb-2">Type</th>
@@ -1210,8 +1210,8 @@ export default function TradingPage() {
                           </thead>
                           <tbody className="divide-y divide-white/5">
                             {result.trade_log.slice(-15).reverse().map((t: any, i: number) => (
-                              <tr key={i} className="hover:bg-white/5">
-                                <td className="py-2 text-slate-400 text-[11px]">{t.date}</td>
+                              <tr key={i} className="hover:bg-muted/50">
+                                <td className="py-2 text-muted-foreground text-[11px]">{t.date}</td>
                                 <td className="py-2">
                                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                     t.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
@@ -1219,8 +1219,8 @@ export default function TradingPage() {
                                     {t.type}
                                   </span>
                                 </td>
-                                <td className="py-2 text-white">{formatCurrency(t.price, currency)}</td>
-                                <td className="py-2 text-slate-300">{t.shares}</td>
+                                <td className="py-2 text-foreground">{formatCurrency(t.price, currency)}</td>
+                                <td className="py-2 text-muted-foreground">{t.shares}</td>
                                 <td className={`py-2 font-semibold ${t.pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                   {t.pnl !== undefined ? `${t.pnl >= 0 ? '+' : ''}${formatCurrency(Math.abs(t.pnl), currency)}` : '-'}
                                 </td>
@@ -1239,13 +1239,13 @@ export default function TradingPage() {
 
               {/* Tab 3: AI Council & SHAP Attribution */}
               {proChartTab === 'council_xai' && (
-                <div className="glass p-5 rounded-2xl border border-white/10 space-y-4">
+                <div className="glass p-5 rounded-2xl border border-border space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                      <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
                         <Cpu size={16} className="text-purple-400" /> Explainable AI & SHAP Attribution · {symbol}
                       </h3>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-muted-foreground">
                         Multi-agent quantitative consensus with feature attribution, counterfactual stress-testing, and dynamic risk limits.
                       </p>
                     </div>
@@ -1254,7 +1254,7 @@ export default function TradingPage() {
                       type="button"
                       onClick={() => councilMutation.mutate(symbol)}
                       disabled={councilMutation.isPending}
-                      className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                      className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-foreground font-semibold text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
                     >
                       <RefreshCw size={13} className={councilMutation.isPending ? 'animate-spin' : ''} />
                       {councilMutation.isPending ? 'Deliberating…' : 'Re-Deliberate'}
@@ -1262,7 +1262,7 @@ export default function TradingPage() {
                   </div>
 
                   {councilMutation.isPending ? (
-                    <div className="h-64 flex flex-col items-center justify-center text-xs text-slate-400 gap-2">
+                    <div className="h-64 flex flex-col items-center justify-center text-xs text-muted-foreground gap-2">
                       <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
                       <span>5-Agent Council deliberating on {symbol}…</span>
                     </div>
@@ -1274,28 +1274,17 @@ export default function TradingPage() {
                       embedded={false}
                     />
                   ) : (
-                    <div className="h-64 flex flex-col items-center justify-center text-center text-xs text-slate-500">
+                    <div className="h-64 flex flex-col items-center justify-center text-center text-xs text-muted-foreground">
                       <Cpu size={40} className="text-slate-600 mb-2" />
                       <p>No deliberation loaded yet for {symbol}.</p>
                       <button
                         onClick={() => councilMutation.mutate(symbol)}
-                        className="mt-3 px-3 py-1.5 rounded-lg bg-purple-600 text-white font-semibold text-xs"
+                        className="mt-3 px-3 py-1.5 rounded-lg bg-purple-600 text-foreground font-semibold text-xs"
                       >
                         Consult Council on {symbol}
                       </button>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Tab 4: Options Chain & Greeks Matrix */}
-              {proChartTab === 'options' && (
-                <div className="glass p-5 rounded-2xl border border-white/10 space-y-4">
-                  <OptionsDerivativesChain
-                    initialSymbol={symbol}
-                    onExecuteStrategy={(p) => executeOrderMutation.mutate(p)}
-                    isExecuting={executeOrderMutation.isPending}
-                  />
                 </div>
               )}
             </div>
@@ -1315,30 +1304,7 @@ export default function TradingPage() {
         initialDeployPreset={deployPreset}
       />
 
-      {/* Options & Greeks Modal for Novice Mode */}
-      {isOptionsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto glass p-6 rounded-2xl border border-white/20 shadow-2xl relative space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Layers size={18} className="text-purple-400" /> Options & Derivatives Market Barometer
-              </h2>
-              <button
-                type="button"
-                onClick={() => setIsOptionsModalOpen(false)}
-                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <OptionsDerivativesChain
-              initialSymbol={symbol}
-              onExecuteStrategy={(p) => executeOrderMutation.mutate(p)}
-              isExecuting={executeOrderMutation.isPending}
-            />
-          </div>
-        </div>
-      )}
+
 
     </div>
   )
