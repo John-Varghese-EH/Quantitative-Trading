@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, ChevronRight, CheckCircle, ArrowLeft, Terminal, Activity,
-  BrainCircuit, Check, Menu, X, Play, TrendingUp, ShieldAlert, BarChart2,
+  BrainCircuit, Check, Menu, Play, TrendingUp, ShieldAlert, BarChart2,
   FileText, Download, ExternalLink, Video, ChevronDown, Shield, Zap,
   AlertTriangle, Eye, Lock, Cpu, Database, Globe, BookMarked, GraduationCap,
   Layers, Target, Bug, Library, Rocket, HelpCircle, Presentation,
   Workflow, FlaskConical, Boxes
 } from "lucide-react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, AreaChart, Area, ReferenceLine
 } from "recharts";
 

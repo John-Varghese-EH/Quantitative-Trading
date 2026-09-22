@@ -27,7 +27,7 @@ export interface BotData {
   name: string
   bot_type: string
   symbol: string
-  allocated_capital: float
+  allocated_capital: number
   status: 'RUNNING' | 'PAUSED' | 'STOPPED'
   mode: string
   broker_id: string

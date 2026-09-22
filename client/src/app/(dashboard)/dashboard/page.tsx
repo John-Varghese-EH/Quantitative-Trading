@@ -3,11 +3,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, Variants } from 'framer-motion';
-import {
-  DollarSign, TrendingUp, TrendingDown, Brain, Activity,
-  Zap, BarChart2, Target, AlertTriangle, Briefcase, Newspaper,
-  ChevronRight, ArrowUpRight, ArrowDownRight, Server, Shield,
-  CreditCard, Users
+import { 
+  DollarSign, TrendingUp, TrendingDown, Brain, Activity, 
+  Zap, Briefcase, Newspaper, 
+  ChevronRight, Server, Shield, 
+  CreditCard
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '@/services/api';
@@ -103,10 +103,8 @@ export default function DashboardPage() {
           <Button variant="outline" size="sm" className="hidden md:flex bg-muted/30">
             <Newspaper className="mr-2 h-4 w-4" /> Market Report
           </Button>
-          <Button size="sm" asChild className="bg-foreground text-background hover:bg-foreground/90 font-bold">
-            <Link href="/trading">
-              <Zap className="mr-2 h-4 w-4" /> Trade Terminal
-            </Link>
+          <Button size="sm" render={<Link href="/trading" />} className="bg-foreground text-background hover:bg-foreground/90 font-bold">
+            <Zap className="mr-2 h-4 w-4" /> Trade Terminal
           </Button>
         </div>
       </motion.div>
@@ -225,8 +223,8 @@ export default function DashboardPage() {
                     <CardTitle className="text-lg font-bold">Active Positions</CardTitle>
                     <CardDescription>Current algorithmic holdings</CardDescription>
                   </div>
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href="/trading"><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+                  <Button variant="ghost" size="icon" render={<Link href="/trading" />}>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </div>
               </CardHeader>
