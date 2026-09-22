@@ -1,133 +1,56 @@
 "use client";
-/**
- * QuantAdv - Quantitative Trading Platform
- * Copyright (C) 2026 John Varghese (J0X)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
 
-import { useQuery } from '@tanstack/react-query'
-import { motion, Variants } from 'framer-motion'
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { motion, Variants } from 'framer-motion';
 import {
   DollarSign, TrendingUp, TrendingDown, Brain, Activity,
   Zap, BarChart2, Target, AlertTriangle, Briefcase, Newspaper,
-  ChevronRight, ArrowUpRight, ArrowDownRight, Server, Shield
-} from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import api from '@/services/api'
-import { useAppStore } from '@/store/useAppStore'
-import { formatCurrency, formatCurrencyCompact } from '@/utils/currency'
-import Link from 'next/link'
+  ChevronRight, ArrowUpRight, ArrowDownRight, Server, Shield,
+  CreditCard, Users
+} from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import api from '@/services/api';
+import { useAppStore } from '@/store/useAppStore';
+import { formatCurrency, formatCurrencyCompact } from '@/utils/currency';
+import Link from 'next/link';
 
-const CARD_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 20 },
+// UI components
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+const ANIM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({ 
     opacity: 1, y: 0, 
-    transition: { delay: i * 0.05, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } 
+    transition: { delay: i * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
   }),
-}
+};
 
-interface StatCard {
-  label: string
-  value: string | number
-  change?: string
-  positive?: boolean
-  icon: React.ReactNode
-  color: string
-}
-
-function StatCardComponent({ card, index }: { card: StatCard; index: number }) {
+// Double Bezel Wrapper for Premium Look
+function DoubleBezel({ children, className = "" }: { children: React.ReactNode, className?: string }) {
   return (
-    <motion.div
-      className="glass"
-      custom={index}
-      initial="hidden"
-      animate="visible"
-      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(0,0,0,0.08)' }}
-      variants={CARD_VARIANTS}
-      style={{
-        padding: '24px',
-        position: 'relative',
-        overflow: 'hidden',
-        borderTop: `3px solid ${card.color}`,
-        borderRadius: 'var(--radius-lg)'
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-        <div>
-          <p style={{ margin: '0 0 10px', color: 'var(--color-muted)', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{card.label}</p>
-          <h3 style={{ margin: '0 0 10px', fontSize: '1.85rem', fontWeight: 800, color: 'var(--color-text)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-            {card.value}
-          </h3>
-          {card.change && (
-            <span style={{ 
-              fontSize: '0.75rem', 
-              color: card.positive ? 'var(--color-success)' : 'var(--color-danger)', 
-              fontWeight: 700,
-              background: `color-mix(in srgb, ${card.color} 15%, transparent)`,
-              padding: '4px 10px',
-              borderRadius: '20px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4
-            }}>
-              {card.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {card.change}
-            </span>
-          )}
-        </div>
-        <div style={{
-          width: 52, height: 52, borderRadius: 16,
-          background: `color-mix(in srgb, ${card.color} 12%, transparent)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: card.color,
-        }}>
-          {card.icon}
-        </div>
-      </div>
-      
-      {/* Decorative ambient background */}
-      <div style={{
-        position: 'absolute', right: -20, bottom: -20, width: 120, height: 120,
-        background: `radial-gradient(circle, color-mix(in srgb, ${card.color} 15%, transparent) 0%, transparent 70%)`,
-        zIndex: 0, borderRadius: '50%', pointerEvents: 'none'
-      }} />
-    </motion.div>
-  )
+    <div className={`p-1.5 rounded-2xl bg-muted/40 ring-1 ring-border/60 ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 export default function DashboardPage() {
-  const { currency } = useAppStore()
+  const { currency } = useAppStore();
+  
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.get('/dashboard/stats').then(r => r.data),
     refetchInterval: 60_000,
-  })
+  });
 
   const { data: portfolio } = useQuery({
     queryKey: ['portfolio-history'],
     queryFn: () => api.get('/dashboard/portfolio-history?days=30').then(r => r.data),
-  })
-
-  const { data: heatmap } = useQuery({
-    queryKey: ['market-heatmap'],
-    queryFn: () => api.get('/dashboard/market-heatmap').then(r => r.data.sectors),
-  })
-
-  const { data: news } = useQuery({
-    queryKey: ['news-feed'],
-    queryFn: () => api.get('/news/feed').then(r => r.data.articles),
-  })
+  });
 
   const { data: holdings } = useQuery({
     queryKey: ['portfolio-holdings'],
@@ -136,261 +59,281 @@ export default function DashboardPage() {
       shares: p.quantity,
       avg_price: p.entry_price,
       current_price: p.current_price,
-      pnl: p.unrealized_pnl
+      pnl: p.unrealized_pnl,
+      pnl_pct: p.unrealized_pnl_pct
     }))).catch(() => []),
-  })
+  });
 
-  const CARDS: StatCard[] = stats ? [
-    {
-      label: 'Portfolio Value', value: formatCurrency(stats.portfolio_value, currency),
-      change: `${Math.abs(stats.daily_pnl_pct)}%`, positive: stats.daily_pnl_pct >= 0,
-      icon: <DollarSign size={24} />, color: 'var(--color-accent)'
-    },
-    {
-      label: 'Daily P&L', value: `${stats.daily_pnl >= 0 ? '+' : ''}${formatCurrency(Math.abs(stats.daily_pnl), currency)}`,
-      positive: stats.daily_pnl >= 0,
-      icon: stats.daily_pnl >= 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />,
-      color: stats.daily_pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)'
-    },
-    {
-      label: 'AI Confidence', value: `${stats.ai_confidence ?? 0}%`,
-      icon: <Brain size={24} />, color: '#8B5CF6'
-    },
-    {
-      label: 'Model Accuracy', value: `${stats.model_accuracy ?? 0}%`,
-      icon: <Target size={24} />, color: 'var(--color-warning)'
-    },
-    {
-      label: 'Risk Score', value: `${stats.risk_score ?? 0}`,
-      icon: <AlertTriangle size={24} />, color: 'var(--color-danger)'
-    },
-    {
-      label: 'Open Positions', value: stats.open_positions ?? 0,
-      icon: <Activity size={24} />, color: '#10B981'
-    },
-    {
-      label: 'Total Trades', value: stats.total_trades ?? 0,
-      icon: <BarChart2 size={24} />, color: '#F43F5E'
-    },
-    {
-      label: 'Attacks Simulated', value: stats.total_attacks ?? 0,
-      icon: <Zap size={24} />, color: '#F59E0B'
-    },
-  ] : []
+  const { data: news } = useQuery({
+    queryKey: ['news-feed'],
+    queryFn: () => api.get('/news/feed').then(r => r.data.articles),
+  });
 
-  const greeting = (() => {
-    const h = new Date().getHours()
-    if (h < 12) return 'Good Morning'
-    if (h < 17) return 'Good Afternoon'
-    return 'Good Evening'
-  })()
+  if (isLoading) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-foreground" />
+      </div>
+    );
+  }
+
+  const portfolioValue = stats?.portfolio_value || 0;
+  const dailyPnl = stats?.daily_pnl || 0;
+  const dailyPnlPct = stats?.daily_pnl_pct || 0;
+  const isPositive = dailyPnl >= 0;
 
   return (
-    <div style={{ paddingBottom: 40 }}>
-      {/* Header Section */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
+    <div className="flex flex-col gap-6 md:gap-8 pb-10">
+      
+      {/* Top Header / Actions */}
+      <motion.div 
+        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}
+      >
         <div>
-          <h1 style={{ margin: '0 0 8px', fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--color-text)' }}>
-            {greeting}
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+            Overview
           </h1>
-          <p style={{ color: 'var(--color-muted)', margin: 0, fontSize: '0.95rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }} />
-            Algorithmic Sandbox <span style={{ opacity: 0.5 }}>•</span> Paper Trading Mode
+          <p className="text-sm font-medium text-muted-foreground mt-1 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-chart-2" />
+            Algorithmic Sandbox Active
           </p>
         </div>
-        <div className="flex flex-wrap md:flex-nowrap gap-3 mt-4 md:mt-0 overflow-x-auto hide-scrollbar pb-2 md:pb-0 w-full md:w-auto">
-          {[
-            { label: 'Train Model', href: '/ai-prediction', color: 'var(--color-accent)', icon: <Brain size={16} /> },
-            { label: 'Run Backtest', href: '/trading', color: 'var(--color-success)', icon: <Activity size={16} /> },
-            { label: 'Launch Attack', href: '/adversarial', color: 'var(--color-danger)', icon: <Shield size={16} /> },
-          ].map(action => (
-            <Link key={action.label} href={action.href} style={{
-              padding: '10px 18px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700,
-              background: `color-mix(in srgb, ${action.color} 10%, transparent)`, 
-              border: `1px solid color-mix(in srgb, ${action.color} 30%, transparent)`,
-              color: action.color, textDecoration: 'none', transition: 'all 0.2s',
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              boxShadow: `0 4px 12px color-mix(in srgb, ${action.color} 10%, transparent)`,
-              whiteSpace: 'nowrap'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = action.color;
-              e.currentTarget.style.color = '#fff';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = `color-mix(in srgb, ${action.color} 10%, transparent)`;
-              e.currentTarget.style.color = action.color;
-            }}>
-              {action.icon}
-              {action.label}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="hidden md:flex bg-muted/30">
+            <Newspaper className="mr-2 h-4 w-4" /> Market Report
+          </Button>
+          <Button size="sm" asChild className="bg-foreground text-background hover:bg-foreground/90 font-bold">
+            <Link href="/trading">
+              <Zap className="mr-2 h-4 w-4" /> Trade Terminal
             </Link>
-          ))}
+          </Button>
         </div>
       </motion.div>
 
-      {/* Stat Cards Grid */}
-      {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}><div className="spinner" /></div>
-      ) : (
-        <div className="dashboard-grid mb-8">
-          {CARDS.map((c, i) => <StatCardComponent key={c.label} card={c} index={i} />)}
-        </div>
-      )}
+      {/* 4-Card Metrics Row */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[
+          { 
+            title: "Total Portfolio Value", 
+            value: formatCurrency(portfolioValue, currency), 
+            change: `${isPositive ? '+' : ''}${dailyPnlPct}% from yesterday`,
+            icon: <DollarSign className="h-4 w-4 text-muted-foreground" />
+          },
+          { 
+            title: "Daily Profit/Loss", 
+            value: `${isPositive ? '+' : ''}${formatCurrency(Math.abs(dailyPnl), currency)}`, 
+            change: isPositive ? "Bullish trend active" : "Bearish pressure",
+            icon: isPositive ? <TrendingUp className="h-4 w-4 text-chart-2" /> : <TrendingDown className="h-4 w-4 text-chart-3" />
+          },
+          { 
+            title: "Model Confidence", 
+            value: `${stats?.ai_confidence ?? 0}%`, 
+            change: "Across 14 active predictions",
+            icon: <Brain className="h-4 w-4 text-chart-4" />
+          },
+          { 
+            title: "Active Positions", 
+            value: stats?.open_positions ?? 0, 
+            change: `${stats?.total_trades ?? 0} total trades executed`,
+            icon: <Briefcase className="h-4 w-4 text-muted-foreground" />
+          }
+        ].map((metric, i) => (
+          <motion.div key={metric.title} custom={i} variants={ANIM_VARIANTS} initial="hidden" animate="visible">
+            <DoubleBezel>
+              <Card className="border-0 shadow-none bg-card rounded-xl">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {metric.title}
+                  </CardTitle>
+                  {metric.icon}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold font-mono tracking-tight">{metric.value}</div>
+                  <p className="text-xs text-muted-foreground mt-1 font-medium">
+                    {metric.change}
+                  </p>
+                </CardContent>
+              </Card>
+            </DoubleBezel>
+          </motion.div>
+        ))}
+      </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+      {/* Main Charts & Data Row */}
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-7">
         
-        {/* Portfolio Growth Chart */}
-        <motion.div className="glass p-4 sm:p-6 xl:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem' }}>Portfolio Growth (30 Days)</h3>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-muted)', background: 'var(--color-border)', padding: '4px 12px', borderRadius: 20 }}>
-              Live Data
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={portfolio?.history || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="portfolioGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.5} />
-                  <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="4 4" stroke="var(--color-border)" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-muted)', fontWeight: 600 }} tickLine={false} axisLine={false} tickFormatter={(v) => v.slice(5)} dy={10} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted)', fontWeight: 600 }} tickLine={false} axisLine={false} tickFormatter={(v) => formatCurrencyCompact(v, currency)} />
-              <Tooltip 
-                contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, color: 'var(--color-text)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', fontWeight: 600 }}
-                itemStyle={{ color: 'var(--color-accent)', fontWeight: 800 }}
-                formatter={(v: any) => [formatCurrency(v, currency), 'Value']} 
-              />
-              <Area type="monotone" dataKey="value" stroke="var(--color-accent)" strokeWidth={3} fill="url(#portfolioGrad)" activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--color-accent)' }} />
-            </AreaChart>
-          </ResponsiveContainer>
+        {/* Main Chart (Col Span 4) */}
+        <motion.div custom={4} variants={ANIM_VARIANTS} initial="hidden" animate="visible" className="lg:col-span-4">
+          <DoubleBezel className="h-full">
+            <Card className="border-0 shadow-none bg-card rounded-xl h-full flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">Portfolio Growth</CardTitle>
+                <CardDescription>30-day historical performance</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 min-h-[300px] pl-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={portfolio?.history || []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--foreground)" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="var(--foreground)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: 'var(--muted-foreground)', fontSize: 12, fontWeight: 500 }}
+                      tickFormatter={(v) => v.slice(5)} 
+                      dy={10} 
+                    />
+                    <YAxis 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: 'var(--muted-foreground)', fontSize: 12, fontWeight: 500 }}
+                      tickFormatter={(v) => formatCurrencyCompact(v, currency)} 
+                    />
+                    <Tooltip 
+                      contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
+                      itemStyle={{ color: 'var(--foreground)', fontWeight: 700 }}
+                      formatter={(v: any) => [formatCurrency(v, currency), 'Value']} 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="var(--foreground)" 
+                      strokeWidth={2} 
+                      fill="url(#chartGrad)" 
+                      activeDot={{ r: 5, fill: 'var(--foreground)', strokeWidth: 0 }} 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </DoubleBezel>
         </motion.div>
 
-        {/* Market Heatmap */}
-        <motion.div className="glass p-4 sm:p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem' }}>Sector Heatmap</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {(heatmap || []).map((s: any) => {
-              const isPositive = s.change >= 0;
-              const colorBase = isPositive ? 'var(--color-success)' : 'var(--color-danger)';
-              return (
-                <motion.div key={s.sector} whileHover={{ scale: 1.02 }} transition={{ duration: 0.15 }} style={{
-                  padding: '16px', borderRadius: 12, textAlign: 'center',
-                  background: `color-mix(in srgb, ${colorBase} 10%, transparent)`,
-                  border: `1px solid color-mix(in srgb, ${colorBase} 25%, transparent)`,
-                  cursor: 'default',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'center'
-                }}>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--color-text)', marginBottom: 4, fontWeight: 700 }}>{s.sector}</div>
-                  <div style={{ fontWeight: 800, color: colorBase, fontSize: '1.1rem', fontVariantNumeric: 'tabular-nums' }}>
-                    {isPositive ? '+' : ''}{s.change}%
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-        {/* Portfolio Holdings */}
-        <motion.div className="glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Briefcase size={20} style={{ color: 'var(--color-accent)' }} /> Active Holdings
-            </h3>
-            <Link href="/trading" style={{ fontSize: '0.85rem', color: 'var(--color-accent)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-              View All <ChevronRight size={14} />
-            </Link>
-          </div>
-          {(!holdings || holdings.length === 0) ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-muted)', background: 'var(--color-glass-light)', borderRadius: 12, fontWeight: 600 }}>No active positions in sandbox</div>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
-                    <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asset</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shares</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Price</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--color-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {holdings.map((h: any, i: number) => (
-                    <motion.tr key={h.symbol} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                      <td style={{ padding: '16px 8px', fontWeight: 800 }}>{h.symbol}</td>
-                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>{h.shares}</td>
-                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--color-muted)', fontWeight: 600 }}>{formatCurrency(h.avg_price, currency)}</td>
-                      <td style={{ padding: '16px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 800, color: h.pnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                        {formatCurrency(h.shares * h.current_price, currency)}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </motion.div>
-
-        {/* News Feed */}
-        <motion.div className="glass p-4 sm:p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <h3 style={{ margin: '0 0 20px', fontWeight: 800, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Newspaper size={20} style={{ color: 'var(--color-accent)' }} /> Market Signals
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {(news || []).slice(0, 4).map((article: any, i: number) => {
-              const isBullish = article.impact === 'bullish';
-              return (
-                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  style={{ 
-                    padding: '16px', borderRadius: 12, cursor: 'pointer',
-                    background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', gap: 16, alignItems: 'flex-start'
-                  }}>
-                  <div style={{ 
-                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                    background: `color-mix(in srgb, ${isBullish ? 'var(--color-success)' : 'var(--color-danger)'} 15%, transparent)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: isBullish ? 'var(--color-success)' : 'var(--color-danger)'
-                  }}>
-                    {isBullish ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                  </div>
+        {/* Recent Positions (Col Span 3) */}
+        <motion.div custom={5} variants={ANIM_VARIANTS} initial="hidden" animate="visible" className="lg:col-span-3">
+          <DoubleBezel className="h-full">
+            <Card className="border-0 shadow-none bg-card rounded-xl h-full flex flex-col">
+              <CardHeader>
+                <div className="flex items-center justify-between">
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{article.source}</span>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.5, fontWeight: 600, color: 'var(--color-text)' }}>{article.title}</p>
+                    <CardTitle className="text-lg font-bold">Active Positions</CardTitle>
+                    <CardDescription>Current algorithmic holdings</CardDescription>
                   </div>
-                </motion.div>
-              )
-            })}
-          </div>
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href="/trading"><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1">
+                {(!holdings || holdings.length === 0) ? (
+                  <div className="flex h-[200px] items-center justify-center text-sm font-medium text-muted-foreground bg-muted/20 rounded-lg border border-dashed border-border">
+                    No active positions.
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {holdings.slice(0, 5).map((h: any) => (
+                      <div key={h.symbol} className="flex items-center">
+                        <Avatar className="h-9 w-9 rounded-md border border-border">
+                          <AvatarFallback className="bg-muted font-mono text-xs font-bold rounded-md text-foreground">
+                            {h.symbol.slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="ml-4 space-y-1">
+                          <p className="text-sm font-bold leading-none">{h.symbol}</p>
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {h.shares} shares @ {formatCurrency(h.avg_price, currency)}
+                          </p>
+                        </div>
+                        <div className="ml-auto text-right space-y-1">
+                          <p className="text-sm font-bold font-mono text-foreground">
+                            {formatCurrency(h.shares * h.current_price, currency)}
+                          </p>
+                          <p className={`text-xs font-bold ${h.pnl >= 0 ? 'text-chart-2' : 'text-chart-3'}`}>
+                            {h.pnl >= 0 ? '+' : ''}{(h.pnl_pct || 0).toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </DoubleBezel>
         </motion.div>
       </div>
 
-      {/* System Status Footer */}
-      <motion.div className="glass p-4 sm:p-6 rounded-md flex flex-col md:flex-row items-center justify-between gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
-          {[
-            { label: 'API Connection', ok: true },
-            { label: 'ML Engine', ok: true },
-            { label: 'Market Feed', ok: true },
-            { label: 'Security Module', ok: true },
-          ].map(s => (
-            <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', fontWeight: 600 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.ok ? 'var(--color-success)' : 'var(--color-danger)', boxShadow: s.ok ? '0 0 10px var(--color-success)' : '0 0 10px var(--color-danger)' }} />
-              <span style={{ color: 'var(--color-text)' }}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Server size={14} /> Systems Operational
-        </div>
-      </motion.div>
+      {/* Bottom Grid for News & System Status */}
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+        <motion.div custom={6} variants={ANIM_VARIANTS} initial="hidden" animate="visible">
+          <DoubleBezel>
+            <Card className="border-0 shadow-none bg-card rounded-xl">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">Market Intelligence</CardTitle>
+                <CardDescription>Latest signals and news analysis</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {(news || []).slice(0, 3).map((article: any, i: number) => {
+                    const isBullish = article.impact === 'bullish';
+                    return (
+                      <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/40 transition-colors border border-transparent hover:border-border">
+                        <div className={`mt-0.5 w-8 h-8 rounded-md flex items-center justify-center shrink-0 border ${isBullish ? 'bg-chart-2/10 border-chart-2/20 text-chart-2' : 'bg-chart-3/10 border-chart-3/20 text-chart-3'}`}>
+                          {isBullish ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-[0.65rem] px-1.5 py-0 rounded-sm font-bold border-border text-muted-foreground">
+                              {article.source}
+                            </Badge>
+                          </div>
+                          <p className="text-sm font-medium leading-snug text-foreground">{article.title}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </DoubleBezel>
+        </motion.div>
+
+        <motion.div custom={7} variants={ANIM_VARIANTS} initial="hidden" animate="visible">
+          <DoubleBezel className="h-full">
+            <Card className="border-0 shadow-none bg-card rounded-xl h-full flex flex-col justify-between">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">System Status</CardTitle>
+                <CardDescription>Infrastructure and API health</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: 'Trading Engine', status: 'Online', icon: <Server size={14} /> },
+                    { label: 'Market Data Feed', status: 'Online', icon: <Activity size={14} /> },
+                    { label: 'Risk Management', status: 'Active', icon: <Shield size={14} /> },
+                    { label: 'Execution Gateway', status: 'Online', icon: <CreditCard size={14} /> },
+                  ].map((sys) => (
+                    <div key={sys.label} className="p-3 border border-border rounded-lg bg-background flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-muted-foreground font-medium text-xs">
+                        {sys.icon} {sys.label}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                        <span className="w-2 h-2 rounded-full bg-chart-2" />
+                        {sys.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </DoubleBezel>
+        </motion.div>
+      </div>
     </div>
-  )
+  );
 }
